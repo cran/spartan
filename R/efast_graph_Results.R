@@ -37,6 +37,7 @@ function(RESULTS_FILE_PATH,PARAMETERS,Si,STi,errorsSi,errorsSTi,MEASURES,TIMEPOI
 
 		dev.off()
 	}
+	print(paste("Graphs Output to ",RESULTS_FILE_PATH,sep=""))
 
 
 }

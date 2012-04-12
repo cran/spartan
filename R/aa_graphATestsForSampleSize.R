@@ -6,8 +6,8 @@ function(FILEPATH,SAMPLESIZE,MEASURES,NUMSUBSETSPERSAMPLESIZE,LARGEDIFFINDICATOR
 
 	# Where the resulting graph should go
 	GRAPHFILE = paste(FILEPATH,"/",SAMPLESIZE,"/",GRAPHOUTPUTNAME,sep="")
-	pdf(GRAPHFILE,width=10,height=7)
-	par(xpd=NA,oma=c(0,0,0,9))
+	pdf(GRAPHFILE,width=12,height=7)
+	par(xpd=NA,oma=c(0,0,0,14))
 
 	# WILL PLOT EACH MEASURE IN TURN.  BUT PLOT THE INITIAL MEASURE FIRST
 	MEASURELABEL<-paste("ATest",MEASURES[1],sep="")

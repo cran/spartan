@@ -1,7 +1,7 @@
 Package: spartan
 Type: Package
 Title: Spartan (Simulation Parameter Analysis R Toolkit ApplicatioN)
-Version: 1.0
+Version: 1.1
 Date: 2012-04-12
 Author: Kieran Alden, Mark Read, Paul Andrews, Jon Timmis, Henrique
         Veiga-Fernandes, Mark Coles
@@ -28,6 +28,6 @@ Description: Computer simulations are becoming a popular technique to
         have a significant effect on simulation behaviour.
 Suggests: lhs, gplots
 License: GPL-2
-Packaged: 2012-05-17 14:47:02 UTC; kieran
+Packaged: 2012-06-14 21:24:06 UTC; kieran
 Repository: CRAN
-Date/Publication: 2012-05-17 15:52:39
+Date/Publication: 2012-06-15 03:48:40

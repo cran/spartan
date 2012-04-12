@@ -1,5 +1,5 @@
 pcor.mat <-
-function(x,y,z,method="p",na.rm=TRUE){
+function(x,y,z,corMethod="p",na.rm=TRUE){
 
 	x <- c(x)
 	y <- c(y)
@@ -16,15 +16,15 @@ function(x,y,z,method="p",na.rm=TRUE){
 	}
 
 	xdata <- na.omit(data.frame(data[,c(1,2)]))
-	Sxx <- cov(xdata,xdata,method)
+	Sxx <- cov(xdata,xdata,method=corMethod)
 
 	xzdata <- na.omit(data)
 	xdata <- data.frame(xzdata[,c(1,2)])
 	zdata <- data.frame(xzdata[,-c(1,2)])
-	Sxz <- cov(xdata,zdata,method)
+	Sxz <- cov(xdata,zdata,method=corMethod)
 
 	zdata <- na.omit(data.frame(data[,-c(1,2)]))
-	Szz <- cov(zdata,zdata,method)
+	Szz <- cov(zdata,zdata,method=corMethod)
 
 	# is Szz positive definite?
 	zz.ev <- eigen(Szz)$values

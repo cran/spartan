@@ -1,31 +1,38 @@
 oat_parameter_sampling <-
 function(FILEPATH,PARAMETERS,BASELINE,PMIN,PMAX,PINC)
 {
-	# CONSIDER EACH PARAMETER IN TURN
-	for(PARAMOFINT in 1:length(PARAMETERS))
+	if(file.exists(FILEPATH))
 	{
-		PARAMETERTABLE<-NULL
-
-		for(PARAM in 1:length(PARAMETERS))
+		# CONSIDER EACH PARAMETER IN TURN
+		for(PARAMOFINT in 1:length(PARAMETERS))
 		{
-			if(PARAMOFINT==PARAM)
+			PARAMETERTABLE<-NULL
+
+			for(PARAM in 1:length(PARAMETERS))
 			{
-				PARAMETERTABLE<-cbind(PARAMETERTABLE,seq(PMIN[PARAMOFINT],PMAX[PARAMOFINT],PINC[PARAMOFINT]))
+				if(PARAMOFINT==PARAM)
+				{
+					PARAMETERTABLE<-cbind(PARAMETERTABLE,seq(PMIN[PARAMOFINT],PMAX[PARAMOFINT],PINC[PARAMOFINT]))
+				}
+				else
+				{
+					PARAMETERTABLE<-cbind(PARAMETERTABLE,array(BASELINE[PARAM],dim=c(length(seq(PMIN[PARAMOFINT],PMAX[PARAMOFINT],PINC[PARAMOFINT])))))				
+				}
 			}
-			else
-			{
-				PARAMETERTABLE<-cbind(PARAMETERTABLE,array(BASELINE[PARAM],dim=c(length(seq(PMIN[PARAMOFINT],PMAX[PARAMOFINT],PINC[PARAMOFINT])))))				
-			}
-		}
 	
-
-		# FORMAT THEN OUTPUT THE PARAMETER TABLE FOR THIS PARAMETER OF INTEREST
-		colnames(PARAMETERTABLE)<-PARAMETERS
-
-		# WRITE THE A-TEST RESULTS TO FILE
-		resultsFile = paste(FILEPATH,"/",PARAMETERS[PARAMOFINT],"_OAT_Values.csv",sep="")
-
-		write.csv(PARAMETERTABLE,resultsFile,quote = FALSE,row.names=FALSE)
+	
+			# FORMAT THEN OUTPUT THE PARAMETER TABLE FOR THIS PARAMETER OF INTEREST
+			colnames(PARAMETERTABLE)<-PARAMETERS
+	
+			# WRITE THE A-TEST RESULTS TO FILE
+			resultsFile = paste(FILEPATH,"/",PARAMETERS[PARAMOFINT],"_OAT_Values.csv",sep="")
+	
+			write.csv(PARAMETERTABLE,resultsFile,quote = FALSE,row.names=FALSE)
+		}
+	}
+	else
+	{
+		print("The directory specified in FILEPATH does not exist. No parameter samples generated")
 	}
 
 }

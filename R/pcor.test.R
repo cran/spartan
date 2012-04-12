@@ -1,5 +1,5 @@
 pcor.test <-
-function(x,y,z,use="mat",method="p",na.rm=TRUE){
+function(x,y,z,use="mat",calcMethod="p",na.rm=TRUE){
 	# The partial correlation coefficient between x and y given z
 	#
 	# pcor.test is free and comes with ABSOLUTELY NO WARRANTY.
@@ -29,20 +29,20 @@ function(x,y,z,use="mat",method="p",na.rm=TRUE){
 
 	if(use == "mat"){
 		p.use <- "Var-Cov matrix"
-		pcor = pcor.mat(x,y,z,method=method,na.rm=na.rm)
+		pcor = pcor.mat(x,y,z,corMethod=calcMethod,na.rm=na.rm)
 	}else if(use == "rec"){
 		p.use <- "Recursive formula"
-		pcor = pcor.rec(x,y,z,method=method,na.rm=na.rm)
+		pcor = pcor.rec(x,y,z,corMethod=calcMethod,na.rm=na.rm)
 	}else{
 		stop("\'use\' should be either \"rec\" or \"mat\"!\n")
 	}
 
 	# print the method
-	if(gregexpr("p",method)[[1]][1] == 1){
+	if(gregexpr("p",calcMethod)[[1]][1] == 1){
 		p.method <- "Pearson"
-	}else if(gregexpr("s",method)[[1]][1] == 1){
+	}else if(gregexpr("s",calcMethod)[[1]][1] == 1){
 		p.method <- "Spearman"
-	}else if(gregexpr("k",method)[[1]][1] == 1){
+	}else if(gregexpr("k",calcMethod)[[1]][1] == 1){
 		p.method <- "Kendall"
 	}else{
 		stop("\'method\' should be \"pearson\" or \"spearman\" or \"kendall\"!\n")

@@ -19,7 +19,6 @@ function(RESULTSARRAY,OMi,MI,OUTMEASURES,NUMPARAMS,NUMCURVES)
 	{
 		for(PARAMNUM in 1:NUMPARAMS) #loop through parameters
 		{
-			print(paste("MEASURE: ",MEASURE," PARAMNUM: ",PARAMNUM,sep=""))	
             		# Initialize AV,AVi,AVci to zero.
 			# THOUGH THESE SEEM TO BE HIGHLIGHTED OUT OF THE ORIGINAL
             		AV<-0;

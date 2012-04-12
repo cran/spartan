@@ -1,5 +1,5 @@
 oat_analyseAllParams <-
-function(FILEPATH,PARAMETERS,BASELINE,PMIN,PMAX,PINC,MEASURES,MEDIANSFILENAME,ATESTRESULTSFILENAME)
+function(FILEPATH,PARAMETERS,BASELINE,PMIN,PMAX,PINC,MEASURES,MEDIANSFILEFORMAT,MEDIANSFILENAME,ATESTRESULTSFILENAME)
 {
 	if(file.exists(FILEPATH))
 	{
@@ -10,11 +10,23 @@ function(FILEPATH,PARAMETERS,BASELINE,PMIN,PMAX,PINC,MEASURES,MEDIANSFILENAME,AT
 		{
 			print(paste("Comparing results to baseline behaviour for parameter: ",PARAMETERS[PARAM],sep=""))
 
-			if(file.exists(paste(FILEPATH,"/",PARAMETERS[PARAM],"/",toString(BASELINE[PARAM]),"/",MEDIANSFILENAME,sep="")))
+			PATHTOSAMPLEMEDIANS<-paste(FILEPATH,"/",PARAMETERS[PARAM],"/",toString(BASELINE[PARAM]),"/",MEDIANSFILENAME,sep="")
+				
+			if(file.exists(paste(PATHTOSAMPLEMEDIANS,".csv",sep="")) | file.exists(paste(PATHTOSAMPLEMEDIANS,".xml",sep="")))
 			{
 				# READ IN THE BASELINE VALUES ON WHICH THE ALTERATIONS WILL BE COMPARED
-				BASELINEFILE = paste(FILEPATH,"/",PARAMETERS[PARAM],"/",toString(BASELINE[PARAM]),"/",MEDIANSFILENAME,sep="")
-				BASELINERESULT <- read.csv(BASELINEFILE,header=TRUE,sep=",")
+				
+				if(MEDIANSFILEFORMAT=="csv")
+				{
+					BASELINEFILE = paste(FILEPATH,"/",PARAMETERS[PARAM],"/",toString(BASELINE[PARAM]),"/",MEDIANSFILENAME,".csv",sep="")
+					BASELINERESULT <- read.csv(BASELINEFILE,header=TRUE,sep=",")
+				}
+				else if(MEDIANSFILEFORMAT=="xml")
+				{
+					# XML Median Set
+					BASELINEFILE = paste(FILEPATH,"/",PARAMETERS[PARAM],"/",toString(BASELINE[PARAM]),"/",MEDIANSFILENAME,".xml",sep="")
+					BASELINERESULT<-xmlToDataFrame(BASELINEFILE)
+				}
 			
 				# NOW COMPARE THE RESULTS FROM THE REST OF THE VALUES SET FOR THIS PARAMETER WITH THE BASELINE USING
 				# THE A-TEST
@@ -23,49 +35,50 @@ function(FILEPATH,PARAMETERS,BASELINE,PMIN,PMAX,PINC,MEASURES,MEDIANSFILENAME,AT
 			
 				while(PARAMVAL<=PMAX[PARAM])
 				{
-					if(file.exists(paste(FILEPATH,"/",PARAMETERS[PARAM],"/",toString(PARAMVAL),
-						"/",MEDIANSFILENAME,sep="")))
-					{
-						# Read in the set to be compared to the BASELINE
-						COMPAREDISTFILE<-paste(FILEPATH,"/",PARAMETERS[PARAM],"/",toString(PARAMVAL),
-							"/",MEDIANSFILENAME,sep="")	
-				
-						# NOW LOOK AT EACH MEASURE IN TURN
-						ATESTALLMEASURES<-NULL
-						ATESTALLMEASURES<-c(PARAMVAL)
-				
-						for(l in 1:length(MEASURES))
-						{
-							if(file.exists(COMPAREDISTFILE))
-							{
-								COMPAREDIST<-read.csv(COMPAREDISTFILE,header=TRUE,sep=",")
-			
-								ATESTVAL<- atest(BASELINERESULT[,MEASURES[l]],COMPAREDIST[,MEASURES[l]])
-								ATESTNORM<-normaliseATest(ATESTVAL)
+					PATHTOCOMPAREDMEDIANS<-paste(FILEPATH,"/",PARAMETERS[PARAM],"/",toString(PARAMVAL),"/",MEDIANSFILENAME,sep="")
 					
-								# ADD RESULTS FOR THIS SAMPLE TO RESULT VECTOR
-								ATESTALLMEASURES<-cbind(ATESTALLMEASURES,ATESTVAL,ATESTNORM)
+					# NOW LOOK AT EACH MEASURE IN TURN
+					ATESTALLMEASURES<-NULL
+					ATESTALLMEASURES<-c(PARAMVAL)
+				
+					for(l in 1:length(MEASURES))
+					{
+						if(file.exists(paste(PATHTOCOMPAREDMEDIANS,".csv",sep="")) | file.exists(paste(PATHTOCOMPAREDMEDIANS,".xml",sep="")))
+						{
+							if(MEDIANSFILEFORMAT=="csv")
+							{			
+								COMPAREDIST<-read.csv(paste(PATHTOCOMPAREDMEDIANS,".csv",sep=""),header=TRUE,sep=",")
 							}
-							else
+							else if(MEDIANSFILEFORMAT=="xml")
 							{
-								ATESTALLMEASURES<-cbind(ATESTALLMEASURES,1,1)
-							}			
+								COMPAREDIST<-xmlToDataFrame(paste(PATHTOCOMPAREDMEDIANS,".xml",sep=""))
+							}
+			
+							ATESTMEASURERESULT<-atest(as.numeric(as.matrix(BASELINERESULT[MEASURES[l]])),
+									as.numeric(as.matrix(COMPAREDIST[MEASURES[l]][,1])))
+							
+							#ATESTVAL<- atest(BASELINERESULT[,MEASURES[l]],COMPAREDIST[,MEASURES[l]])
+							ATESTNORM<-normaliseATest(ATESTMEASURERESULT)
+				
+							# ADD RESULTS FOR THIS SAMPLE TO RESULT VECTOR
+							ATESTALLMEASURES<-cbind(ATESTALLMEASURES,ATESTMEASURERESULT,ATESTNORM)
+						}
+						else
+						{
+							ATESTALLMEASURES<-cbind(ATESTALLMEASURES,1,1)
+						}			
 	
 					
-						}
+					}
 				
-						RESULTS<-rbind(RESULTS,ATESTALLMEASURES)
-						PARAMVAL<-PARAMVAL+PINC[PARAM]
-					}
-					else
-					{
-						print(paste("No results found for parameter: ",PARAMETERS[PARAM], ", value: ",PARAMVAL,sep=""))
-					}
+					RESULTS<-rbind(RESULTS,ATESTALLMEASURES)
+					PARAMVAL<-PARAMVAL+PINC[PARAM]
+					
 				}
 
 
 				# WRITE THE A-TEST RESULTS TO FILE (ATests.csv for 1 timepoint)
-				RESULTSFILE = paste(FILEPATH,"/",PARAMETERS[PARAM],"/",ATESTRESULTSFILENAME,sep="")
+				RESULTSFILE = paste(FILEPATH,"/",PARAMETERS[PARAM],"/",ATESTRESULTSFILENAME,".csv",sep="")
 			
 				# GENERATE COLUMN HEADERS FOR EASE OF REFERENCE LATER
 				COLHEADERS<-c("ParameterVal")

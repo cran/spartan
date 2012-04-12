@@ -1,7 +1,7 @@
 Package: spartan
 Type: Package
 Title: Spartan (Simulation Parameter Analysis R Toolkit ApplicatioN)
-Version: 1.1
+Version: 1.2
 Date: 2012-04-12
 Author: Kieran Alden, Mark Read, Paul Andrews, Jon Timmis, Henrique
         Veiga-Fernandes, Mark Coles
@@ -15,7 +15,7 @@ Description: Computer simulations are becoming a popular technique to
         uncertainty in the system caused through inherent
         stochasticity, and determines the number of replicate runs
         necessary to generate a representative result. The second
-        examines how robust asimulation is to parameter perturbation,
+        examines how robust a simulation is to parameter perturbation,
         through the use of a one-at-a-time parameter analysis
         technique. Thirdly, a latin hypercube based sensitivity
         analysis technique is included which can elucidate non-linear
@@ -26,8 +26,8 @@ Description: Computer simulations are becoming a popular technique to
         included to partition the variance in simulation results
         between input parameters, to determine the parameters which
         have a significant effect on simulation behaviour.
-Suggests: lhs, gplots
+Suggests: lhs, gplots, XML
 License: GPL-2
-Packaged: 2012-06-14 21:24:06 UTC; kieran
+Packaged: 2012-11-06 21:21:31 UTC; kieran
 Repository: CRAN
-Date/Publication: 2012-06-15 03:48:40
+Date/Publication: 2012-11-07 05:55:56

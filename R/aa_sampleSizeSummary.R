@@ -10,15 +10,15 @@ function(FILEPATH,SAMPLESIZES,MEASURES,ATESTRESULTSFILENAME,SUMMARYFILENAME)
 		SAMPLEPROCESSING = SAMPLESIZES[k]
 		print(paste("Processing Sample Size: ",SAMPLEPROCESSING,sep=""))
 
-		if(file.exists(paste(FILEPATH,"/",SAMPLEPROCESSING,"/",sep="")))
+		if(file.exists(paste(FILEPATH,"/",SAMPLEPROCESSING,sep="")))
 		{
 			SAMPLEAS<-c(toString(SAMPLEPROCESSING))
 
-			if(file.exists(paste(FILEPATH,"/",SAMPLEPROCESSING,"/",ATESTRESULTSFILENAME,sep="")))
+			if(file.exists(paste(FILEPATH,"/",SAMPLEPROCESSING,"/",ATESTRESULTSFILENAME,".csv",sep="")))
 			{
 
 				# get the max and median results for this sample for graphing later		
-				ATESTS <- read.csv(paste(FILEPATH,SAMPLEPROCESSING,"/",ATESTRESULTSFILENAME,sep=""),header=TRUE)
+				ATESTS <- read.csv(paste(FILEPATH,"/",SAMPLEPROCESSING,"/",ATESTRESULTSFILENAME,".csv",sep=""),header=TRUE)
 	
 				# WORK THESE OUT FOR EACH MEASURE
 				for(l in 1:length(MEASURES))
@@ -54,10 +54,10 @@ function(FILEPATH,SAMPLESIZES,MEASURES,ATESTRESULTSFILENAME,SUMMARYFILENAME)
 
 	# NOW OUTPUT THESE FOR GRAPHING LATER
 	# SUMMARY FILENAME SOMETHING LIKE ATESTMAXANDMEDIANS.CSV FOR ONE TIMEPOINT
-	RESULTFILE = paste(FILEPATH,"/",SUMMARYFILENAME,sep="")
+	RESULTFILE = paste(FILEPATH,"/",SUMMARYFILENAME,".csv",sep="")
 	# WRITE OUT SO HAVE THE TABLE IF NECESSARY LATER
 	write.csv(ATESTMAXES,RESULTFILE,quote = FALSE,row.names=FALSE)
 
-	print(paste("Summary file of all A-Test results output to ",FILEPATH,"/",SUMMARYFILENAME,sep=""))
+	print(paste("Summary file of all A-Test results output to ",FILEPATH,"/",SUMMARYFILENAME,".csv",sep=""))
 }
 

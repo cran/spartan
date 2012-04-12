@@ -4,12 +4,12 @@ function(FILEPATH,MEASURES,MAXSAMPLESIZE,SMALL,MEDIUM,LARGE,SUMMARYFILENAME,GRAP
 	# NOW DRAW THE GRAPH
 	print("Creating Summary Graph")
 	
-	if(file.exists(paste(FILEPATH,"/",SUMMARYFILENAME,sep="")))
+	if(file.exists(paste(FILEPATH,"/",SUMMARYFILENAME,".csv",sep="")))
 	{
-		aTestResults <- read.csv(paste(FILEPATH,"/",SUMMARYFILENAME,sep=""),header=TRUE)
+		aTestResults <- read.csv(paste(FILEPATH,"/",SUMMARYFILENAME,".csv",sep=""),header=TRUE)
 
 		# Where the resulting graph should go (ATESTMAXES.PDF USED IF ONE TIMEPOINT)
-		graphFile = paste(FILEPATH,"/",GRAPHOUTPUTFILE,sep="")
+		graphFile = paste(FILEPATH,"/",GRAPHOUTPUTFILE,".pdf",sep="")
 		pdf(graphFile,width=12,height=7)
 		par(xpd=NA,oma=c(0,0,0,14))
 
@@ -49,7 +49,7 @@ function(FILEPATH,MEASURES,MAXSAMPLESIZE,SMALL,MEDIUM,LARGE,SUMMARYFILENAME,GRAP
 		text(MAXSAMPLESIZE/2,MEDIUM+0.02, "MEDIUM effect", col = "blue") 
 		dev.off()
 
-		print(paste("Summary Graph output to ",FILEPATH,"/",GRAPHOUTPUTFILE,sep=""))
+		print(paste("Summary Graph output to ",FILEPATH,"/",GRAPHOUTPUTFILE,".pdf",sep=""))
 	}
 	else
 	{

@@ -9,10 +9,10 @@ function(FILEPATH,PARAMETERS,PMIN,PMAX,PINC,MEASURES,ATESTSIGLEVEL,ATESTRESULTSF
 		{
 			print(paste("Creating graph for Parameter ",PARAMETERS[PARAM],sep=""))
 
-			if(file.exists(paste(FILEPATH,"/",PARAMETERS[PARAM],"/",ATESTRESULTSFILENAME,sep="")))
+			if(file.exists(paste(FILEPATH,"/",PARAMETERS[PARAM],"/",ATESTRESULTSFILENAME,".csv",sep="")))
 			{
 				# Where the A-Test Results are (ATests.csv for 1 timepoint)
-				ATESTS <- read.csv(paste(FILEPATH,"/",PARAMETERS[PARAM],"/",ATESTRESULTSFILENAME,sep=""),header=TRUE)
+				ATESTS <- read.csv(paste(FILEPATH,"/",PARAMETERS[PARAM],"/",ATESTRESULTSFILENAME,".csv",sep=""),header=TRUE)
 	
 				# Where the resulting graph should go 
 				if(is.null(TIMEPOINT))

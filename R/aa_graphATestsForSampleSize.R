@@ -1,8 +1,8 @@
 aa_graphATestsForSampleSize <-
 function(FILEPATH,SAMPLESIZE,MEASURES,NUMSUBSETSPERSAMPLESIZE,LARGEDIFFINDICATOR,ATESTRESULTSFILENAME,GRAPHOUTPUTNAME,TIMEPOINT,TIMEPOINTSCALE)
 {
-	# Where the A-Test Results are
-	ATESTS <- read.csv(paste(FILEPATH,SAMPLESIZE,"/",ATESTRESULTSFILENAME,sep=""),header=TRUE)
+	# Where the A-Test Results are - at present spartan only outputs test results as CSV
+	ATESTS <- read.csv(paste(FILEPATH,"/",SAMPLESIZE,"/",ATESTRESULTSFILENAME,".csv",sep=""),header=TRUE)
 
 	# Where the resulting graph should go
 	GRAPHFILE = paste(FILEPATH,"/",SAMPLESIZE,"/",GRAPHOUTPUTNAME,sep="")

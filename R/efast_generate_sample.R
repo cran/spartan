@@ -114,13 +114,13 @@ function(FILEPATH,NUMCURVES,NUMSAMPLES,PARAMETERS,PMIN,PMAX)
 		{
 			for(PARAMNUM in 1:NUMPARAMS)
 			{
-				parameterFile = paste(FILEPATH,"Curve",CURVENUM,"_",PARAMETERS[PARAMNUM],".csv",sep="")
+				parameterFile = paste(FILEPATH,"/Curve",CURVENUM,"_",PARAMETERS[PARAMNUM],".csv",sep="")
 				outputParams <- PARAMETERVALS[,,PARAMNUM,CURVENUM]
 				colnames(outputParams)<-c(PARAMETERS)
 				
 				write.csv(outputParams,parameterFile,quote = FALSE,row.names=FALSE)
 
-				print(paste("Parameter Set for ",CURVENUM," Generated and Output to ",FILEPATH,CURVENUM,"_",PARAMETERS[PARAMNUM],".csv",sep=""))
+				print(paste("Parameter Set for ",CURVENUM," Generated and Output to ",FILEPATH,"/Curve",CURVENUM,"_",PARAMETERS[PARAMNUM],".csv",sep=""))
 			}
 		}
 		

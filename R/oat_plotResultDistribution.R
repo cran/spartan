@@ -1,5 +1,5 @@
 oat_plotResultDistribution <-
-function(FILEPATH,PARAMETERS,PMIN,PMAX,PINC,MEASURES,MEASURE_SCALE,MEDIANSFILENAME,TIMEPOINT,TIMEPOINTSCALE)
+function(FILEPATH,PARAMETERS,PMIN,PMAX,PINC,MEASURES,MEASURE_SCALE,MEDIANSFILEFORMAT,MEDIANSFILENAME,TIMEPOINT,TIMEPOINTSCALE)
 {
 	if(file.exists(FILEPATH))
 	{
@@ -18,22 +18,31 @@ function(FILEPATH,PARAMETERS,PMIN,PMAX,PINC,MEASURES,MEASURE_SCALE,MEDIANSFILENA
 	
 				while(PARAMVAL<=PMAX[PARAM])	
 				{
-					VALUERESULTS<-paste(FILEPATH,"/",PARAMETERS[PARAM],"/",toString(PARAMVAL),
+					# Open the medians file - this may be XML or CSV
+					# Set the path to the file (without extension)
+					VALUERESULTSPATH<-paste(FILEPATH,"/",PARAMETERS[PARAM],"/",toString(PARAMVAL),
 						"/",MEDIANSFILENAME,sep="")
 
-					if(file.exists(VALUERESULTS))
+					if(file.exists(paste(VALUERESULTSPATH,".csv",sep="")) | file.exists(paste(VALUERESULTSPATH,".xml",sep="")))
 					{
-						RESULTS<-read.csv(VALUERESULTS,header=TRUE)
+						if(MEDIANSFILEFORMAT=="csv")
+						{
+							RESULTS<-read.csv(paste(VALUERESULTSPATH,".csv",sep=""),header=TRUE)
+						}
+						else if(MEDIANSFILEFORMAT=="xml")
+						{
+							RESULTS<-xmlToDataFrame(paste(VALUERESULTSPATH,".xml",sep=""))
+						}
 					
 						LABEL<-NULL
 						RUNRESULTS<-NULL
 		
-						for(k in 1:length(RESULTS[,MEASURES[l]]))
+						for(k in 1:length(as.numeric(as.matrix(RESULTS[,MEASURES[l]]))))
 						{
 							LABEL<-rbind(LABEL,PARAMVAL[1])
 						}
 	
-						RUNRESULTS<-cbind(RESULTS[,MEASURES[l]],LABEL)
+						RUNRESULTS<-cbind(as.numeric(as.matrix(RESULTS[,MEASURES[l]])),LABEL)
 		
 						COMBINEDRESULTS<-rbind(COMBINEDRESULTS,RUNRESULTS)
 					}

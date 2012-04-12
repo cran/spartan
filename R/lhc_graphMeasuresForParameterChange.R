@@ -5,13 +5,13 @@ function(FILEPATH,PARAMETERS,MEASURES,MEASURE_SCALE,CORCOEFFSOUTPUTFILE,LHCSUMMA
 	{
 		# LHCSUMMARYFILENAME IS LHCSummary.csv FOR 1 TIMEPOINT
 		# CORCOEFFSOUTPUTFILE IS corCoefs.csv FOR 1 TIMEPOINT
-		if(file.exists(paste(FILEPATH,"/",CORCOEFFSOUTPUTFILE,sep="")))
+		if(file.exists(paste(FILEPATH,"/",CORCOEFFSOUTPUTFILE,".csv",sep="")))
 		{
-			CORCOEFFS<-read.csv(paste(FILEPATH,"/",CORCOEFFSOUTPUTFILE,sep=""),header=TRUE)
+			CORCOEFFS<-read.csv(paste(FILEPATH,"/",CORCOEFFSOUTPUTFILE,".csv",sep=""),header=TRUE)
 
-			if(file.exists(paste(FILEPATH,"/",LHCSUMMARYFILENAME,sep="")))
+			if(file.exists(paste(FILEPATH,"/",LHCSUMMARYFILENAME,".csv",sep="")))
 			{
-				LHCRESULTFILE<-read.csv(paste(FILEPATH,"/",LHCSUMMARYFILENAME,sep=""))
+				LHCRESULTFILE<-read.csv(paste(FILEPATH,"/",LHCSUMMARYFILENAME,".csv",sep=""))
 
 				print("Generating output graphs for LHC Parameter Analysis (lhc_graphMeasuresForParameterChange)")
 	

@@ -1,5 +1,6 @@
 efast_run_Analysis <-
-function(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,NUMSAMPLES,OUTPUTMEASURES_TO_TTEST,TTEST_CONF_INT,GRAPH_FLAG,CURVERESULTSFILENAME,EFASTRESULTFILENAME,TIMEPOINT,TIMEPOINTSCALE)
+function(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,NUMSAMPLES,OUTPUTMEASURES_TO_TTEST,TTEST_CONF_INT,GRAPH_FLAG,
+		CURVERESULTSFILENAME,EFASTRESULTFILENAME,TIMEPOINT,TIMEPOINTSCALE)
 {
 	if(file.exists(FILEPATH))
 	{
@@ -24,18 +25,18 @@ function(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,NUMSAMPLES,OUTPUTMEASURES_TO_TTE
 		print("Producing eFAST Analysis (efast_run_analysis)")
 
 		# READ IN THE FIRST CURVE
-		if(file.exists(paste(FILEPATH,"/",1,"/",CURVERESULTSFILENAME,sep="")))
+		if(file.exists(paste(FILEPATH,"/",1,"/",CURVERESULTSFILENAME,".csv",sep="")))
 		{
-			RESULTS<-read.csv(paste(FILEPATH,"/",1,"/",CURVERESULTSFILENAME,sep=""),sep=",")
+			RESULTS<-read.csv(paste(FILEPATH,"/",1,"/",CURVERESULTSFILENAME,".csv",sep=""),sep=",")
 
 			# NOW READ IN ANY FURTHER CURVES
 			if(NUMCURVES>1)
 			{
 				for(CURVE in 2:NUMCURVES)
 				{
-					if(file.exists(paste(FILEPATH,"/",CURVE,"/",CURVERESULTSFILENAME,sep="")))
+					if(file.exists(paste(FILEPATH,"/",CURVE,"/",CURVERESULTSFILENAME,".csv",sep="")))
 					{
-						CURVERESULTS<-read.csv(paste(FILEPATH,"/",CURVE,"/",CURVERESULTSFILENAME,sep=""),sep=",")
+						CURVERESULTS<-read.csv(paste(FILEPATH,"/",CURVE,"/",CURVERESULTSFILENAME,".csv",sep=""),sep=",")
 						# NOTE THIS ASSUMES THAT THE RESULTS HAVE BEEN GENERATED WITH THE FIRST COLUMN CONTAINING NO SAMPLE COUNT
 						# ADD TO THE PREVIOUS CURVES
 						RESULTS<-cbind(RESULTS,CURVERESULTS[1:length(CURVERESULTS)])
@@ -96,7 +97,7 @@ function(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,NUMSAMPLES,OUTPUTMEASURES_TO_TTE
 		
 				measureResults<-cbind(resultList$Si[,,MEASURE],t_tests$p_Si[,,MEASURE],resultList$STi[,,MEASURE],t_tests$p_STi[,,MEASURE],(1-resultList$STi[,,MEASURE]),cvSi_coeffResults[,MEASURE],cvSTi_coeffResults[,MEASURE],errorsSi[,MEASURE],errorsSTi[,MEASURE])
 
-		colnames(measureResults)<-c(paste(MEASURES[MEASURE],"_Si",sep=""),paste(MEASURES[MEASURE],"_Si_PVal",sep=""),paste(MEASURES[MEASURE],"_STi",sep=""),paste(MEASURES[MEASURE],"_STi_PVal",sep=""),paste(MEASURES[MEASURE],"_SCi",sep=""),paste(MEASURES[MEASURE],"_Si_CoEff_of_Var",sep=""),paste(MEASURES[MEASURE],"_STi_CoEff_of_Var",sep=""),paste(MEASURES[MEASURE],"_Si_ErrorBar",sep=""),paste(MEASURES[MEASURE],"_STi_ErrorBar",sep=""))
+				colnames(measureResults)<-c(paste(MEASURES[MEASURE],"_Si",sep=""),paste(MEASURES[MEASURE],"_Si_PVal",sep=""),paste(MEASURES[MEASURE],"_STi",sep=""),paste(MEASURES[MEASURE],"_STi_PVal",sep=""),paste(MEASURES[MEASURE],"_SCi",sep=""),paste(MEASURES[MEASURE],"_Si_CoEff_of_Var",sep=""),paste(MEASURES[MEASURE],"_STi_CoEff_of_Var",sep=""),paste(MEASURES[MEASURE],"_Si_ErrorBar",sep=""),paste(MEASURES[MEASURE],"_STi_ErrorBar",sep=""))
 
 				formattedResults<-cbind(formattedResults,measureResults)
 			}
@@ -105,10 +106,10 @@ function(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,NUMSAMPLES,OUTPUTMEASURES_TO_TTE
 
 			# OUTPUT THE SUMMARY RESULTS FILES
 			# A - THE FILE WITH THE AMOUNT OF VARIANCE ACCOUNTED FOR BY EACH PARAMETER
-			resultsFile = paste(FILEPATH,"/",EFASTRESULTFILENAME,sep="")
-			write.csv(formattedResults,resultsFile,quote = FALSE)
+			RESULTSFILE = paste(FILEPATH,"/",EFASTRESULTFILENAME,".csv",sep="")
+			write.csv(formattedResults,RESULTSFILE,quote = FALSE)
 
-			print(paste("eFAST Results file generated. Output to ",resultsFile,sep=""))
+			print(paste("eFAST Results file generated. Output to ",RESULTSFILE,sep=""))
 		
 			# GRAPH THE RESULTS IF REQUIRED
 			if(GRAPH_FLAG)

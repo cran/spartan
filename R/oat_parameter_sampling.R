@@ -28,6 +28,8 @@ function(FILEPATH,PARAMETERS,BASELINE,PMIN,PMAX,PINC)
 			resultsFile = paste(FILEPATH,"/",PARAMETERS[PARAMOFINT],"_OAT_Values.csv",sep="")
 	
 			write.csv(PARAMETERTABLE,resultsFile,quote = FALSE,row.names=FALSE)
+
+			print(paste("Sample File Generated for parameter ",PARAMETERS[PARAMOFINT]," and output to ",resultsFile,sep=""))
 		}
 	}
 	else

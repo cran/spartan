@@ -1,22 +1,39 @@
 aa_getATestResults <-
-function(FILEPATH,SAMPLEPROCESSING,NUMSUBSETSPERSAMPLESIZE,MEASURES,MEDIANSFILENAME,ATESTRESULTSFILENAME)
+function(FILEPATH,SAMPLEPROCESSING,NUMSUBSETSPERSAMPLESIZE,MEASURES,MEDIANSFILEFORMAT,MEDIANSFILENAME,ATESTRESULTSFILENAME)
 {
 	# import the first distribution - this will be used as the comparison set
+	# However need to check whether this is a CSV or XML file
+	FILEADDRESS = paste(FILEPATH,"/",SAMPLEPROCESSING,"/",toString(1),"/",MEDIANSFILENAME,sep="")
 	
-	FILEADDRESS = paste(FILEPATH,SAMPLEPROCESSING,"/",toString(1),"/",MEDIANSFILENAME,sep="")
-	COMPARISONSET <- read.csv(FILEADDRESS,header=TRUE,sep=",")
-
+	if(MEDIANSFILEFORMAT=="csv")
+	{
+		COMPARISONSET <- read.csv(paste(FILEADDRESS,".csv",sep=""),header=TRUE,sep=",")	
+	}
+	else if(MEDIANSFILEFORMAT=="xml")
+	{
+		COMPARISONSET<-xmlToDataFrame(paste(FILEADDRESS,".xml",sep=""))
+	}
+	
 	RESULTS<-NULL
 
 	for(m in 2:NUMSUBSETSPERSAMPLESIZE)
 	{
 		# Get the set that will be compared with set one
-		FILEADDRESS = paste(FILEPATH,SAMPLEPROCESSING,"/",toString(m),"/",MEDIANSFILENAME,sep="")
+		FILEADDRESS = paste(FILEPATH,"/",SAMPLEPROCESSING,"/",toString(m),"/",MEDIANSFILENAME,sep="")
 
-		if(file.exists(FILEADDRESS))
+
+		if(file.exists(paste(FILEADDRESS,".csv",sep="")) | file.exists(paste(FILEADDRESS,".xml",sep="")))
 		{
-			SAMPLEMEDIANS <- read.csv(FILEADDRESS,header=TRUE,sep=",")
-
+			if(MEDIANSFILEFORMAT=="csv")
+			{
+				SAMPLEMEDIANS <- read.csv(paste(FILEADDRESS,".csv",sep=""),header=TRUE,sep=",")
+			}
+			else if(MEDIANSFILEFORMAT=="xml")
+			{
+				# XML Median Set
+				SAMPLEMEDIANS<-xmlToDataFrame(paste(FILEADDRESS,".xml",sep=""))
+			}
+				
 			# start the output, label the first column with the sample set number
 			ALLATESTRESULTS<-c(toString(m))
 	
@@ -25,7 +42,8 @@ function(FILEPATH,SAMPLEPROCESSING,NUMSUBSETSPERSAMPLESIZE,MEASURES,MEDIANSFILEN
 			for(l in 1:length(MEASURES))
 			{
 				# ATEST IS IN ATESTR.R, AS IS NORMALISEATEST
-				ATESTMEASURERESULT<-atest(COMPARISONSET[MEASURES[l]][,1],SAMPLEMEDIANS[MEASURES[l]][,1])
+				ATESTMEASURERESULT<-atest(as.numeric(as.matrix(COMPARISONSET[MEASURES[l]][,1])),
+						as.numeric(as.matrix(SAMPLEMEDIANS[MEASURES[l]][,1])))
 				# the [,1] is added so the data is extracted	
 				ATESTMEASURENORM <- normaliseATest(ATESTMEASURERESULT)				
 				ALLATESTRESULTS<-cbind(ALLATESTRESULTS,ATESTMEASURERESULT,ATESTMEASURENORM)
@@ -37,7 +55,7 @@ function(FILEPATH,SAMPLEPROCESSING,NUMSUBSETSPERSAMPLESIZE,MEASURES,MEDIANSFILEN
 	}
 
 	# OUTPUT THE RESULTS FOR EACH SUBSET TO THE FILE
-	RESULTSFILE = paste(FILEPATH,"/",SAMPLEPROCESSING,"/",ATESTRESULTSFILENAME,sep="")
+	RESULTSFILE = paste(FILEPATH,"/",SAMPLEPROCESSING,"/",ATESTRESULTSFILENAME,".csv",sep="")
 
 	# GENERATE COLUMN HEADINGS
 	ATESTRESULTSHEADER<-c("Sample")

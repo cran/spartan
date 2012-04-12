@@ -15,16 +15,22 @@ There are three methods to this process:\cr
 \bold{efast_run_Analysis:} Produces a file summarising the analysis; partitioning the variance between parameters and providing relevant statistics. These include, for each parameter of interest, first-order sensitivity index (Si), total-order sensitivity index (STi), complementary parameters sensitivity index (SCi), and relevant p-values and error bar data calculated using a two-sample t-test and standard error respectively. For a more detailed examination of this analysis, see the Marino paper or Saltelli book references, or the tutorial on the package website. An example of the output file generated can be seen in the data folder of this package (EgSet_eFAST_Analysis.csv) For ease of representation, the method also produces a graph showing this data for each simulation output measure. Two examples can be seen in the extdata folder of this package (eFAST_Displacement.pdf and eFAST_Velocity.pdf).
 }
 \usage{
-efast_generate_medians_for_all_parameter_subsets(FILEPATH,NUMCURVES,
-	PARAMETERS,NUMSAMPLES,NUMRUNSPERSAMPLE,MEASURES,
-	OUTPUTCOLSTART,OUTPUTCOLEND,RESULTFILENAME,
-	ALTERNATIVEFILENAME,MEDIANSFILENAME)
-efast_get_overall_medians(FILEPATH,NUMCURVES,PARAMETERS,NUMSAMPLES,
-	MEASURES,MEDIANSFILENAME,CURVERESULTSFILENAME)
-efast_run_Analysis(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,NUMSAMPLES,
-	OUTPUTMEASURES_TO_TTEST,TTEST_CONF_INT,GRAPH_FLAG,
-	CURVERESULTSFILENAME,EFASTRESULTFILENAME,TIMEPOINT,
-	TIMEPOINTSCALE)
+efast_generate_medians_for_all_parameter_subsets(FILEPATH,
+	NUMCURVES,PARAMETERS,NUMSAMPLES,NUMRUNSPERSAMPLE,
+	MEASURES,RESULTFILEFORMAT,RESULTFILENAME,
+	ALTERNATIVEFILENAME,OUTPUTCOLSTART,OUTPUTCOLEND,
+	MEDIANSFILEFORMAT,MEDIANSFILENAME)
+
+efast_get_overall_medians(FILEPATH,NUMCURVES,PARAMETERS,
+	NUMSAMPLES,MEASURES,MEDIANSFILEFORMAT,MEDIANSFILENAME,
+	CURVERESULTSFILENAME)
+
+efast_run_Analysis(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,
+	NUMSAMPLES,OUTPUTMEASURES_TO_TTEST,TTEST_CONF_INT,
+	GRAPH_FLAG,CURVERESULTSFILENAME,EFASTRESULTFILENAME,
+	TIMEPOINT,TIMEPOINTSCALE)
+
+
 }
 \arguments{
   \item{FILEPATH}{Directory where the simulation runs can be found}
@@ -35,12 +41,14 @@ efast_run_Analysis(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,NUMSAMPLES,
   \item{MEASURES}{Array containing the names of the output measures which are used to analyse the simulation}
   \item{OUTPUTCOLSTART}{Column number in the results file where output begins - saves (a) reading in unnecessary data, and (b) errors where the first column is a label, and therefore could contain duplicates}
   \item{OUTPUTCOLEND}{Column number in the results file where the last output measure is}
-  \item{RESULTFILENAME}{Name of the simulation results file (e.g. "trackedCells_Close.csv")}
+  \item{RESULTFILEFORMAT}{The file format output by the simulation. Spartan can process XML or CSV output formats}
+  \item{RESULTFILENAME}{Name of the simulation results file (e.g. "trackedCells_Close")}
   \item{ALTERNATIVEFILENAME}{In some cases, it may be relevant to read from a further results file if the initial file contains no results. This filename is set here}
-   \item{MEDIANSFILENAME}{If oat_processParamSubsets is used, this analyses the results of replicate simulation runs and creates a file containing the median value of each measure for every run. This specifies what that file should be called (e.g. Medians.csv)}
-   \item{CURVERESULTSFILENAME}{Whereas efast_generate_medians_for_all_parameter_subsets processes each replicate set of runs to produce a median set to be analysed, get_overall_medians processes each sample point for each parameter, for each curve in turn, producing a summary file for each curve. This specifies the output file name for this result file. Example: AllResults.csv could be set here, then each curve will contain a results file bearing this name}
+  \item{MEDIANSFILEFORMAT}{File format for the median distribution files produced from simulation results. Can be either XML or CSV}
+  \item{MEDIANSFILENAME}{If oat_processParamSubsets is used, this analyses the results of replicate simulation runs and creates a file containing the median value of each measure for every run. This specifies what that file should be called (e.g. Medians)}
+  \item{CURVERESULTSFILENAME}{Whereas efast_generate_medians_for_all_parameter_subsets processes each replicate set of runs to produce a median set to be analysed, get_overall_medians processes each sample point for each parameter, for each curve in turn, producing a summary file for each curve. This specifies the output file name for this result file. Example: AllResults could be set here, then each curve will contain a results file bearing this name}
   \item{OUTPUTMEASURES_TO_TTEST}{Which measures in the range should be tested to see if the result is statistically significant.  To do all, and if there were 3 measures, this would be set to 1:3}
-  \item{EFASTRESULTFILENAME}{File name under which the full eFAST analysis should be stored. This will contain the partitioning of variance for each parameter. Example: eFAST_Analysis.csv}
+  \item{EFASTRESULTFILENAME}{File name under which the full eFAST analysis should be stored. This will contain the partitioning of variance for each parameter. Example: eFAST_Analysis}
   \item{TTEST_CONF_INT}{The level of significance to use for the T-Test}
   \item{GRAPH_FLAG}{Whether graphs should be produced summarising the output - should be TRUE or FALSE}
   \item{TIMEPOINT}{Used so this method can be used when analysing multiple simulation timepoints.  NULL in this case.  See Technique 4: eFAST Analysis Over Time}
@@ -72,33 +80,37 @@ NUMSAMPLES<-65
 NUMRUNSPERSAMPLE<-300
 # F: THE OUTPUT MEASURES (ARRAY)
 MEASURES<-c("Velocity","Displacement")
-# G: WHERE THE OUTPUT MEASURES START IN THE RESULTS FILE FROM
+# G: FORMAT OF THE SIMULATOR RESULT FILES
+RESULTFILEFORMAT<-"csv"
+# H: WHAT THE SIMULATION RESULT FILE IS CALLED - NO EXTENSION
+RESULTFILENAME<-"trackedCells_Close_Endpoint"
+# I: NAME OF AN ALTERNATIVE RESULTS FILE IF NECESSARY
+ALTERNATIVEFILENAME<-NULL
+# J: WHERE THE OUTPUT MEASURES START IN THE RESULTS FILE FROM
 # THE SIMULATION. SAVES READING THE WHOLE FILE & AVOIDS POTENTIAL
 # PROBLEMS WHERE THE FIRST COLUMN IS DUPLICATED (eg A CELL LABEL)
 OUTPUTCOLSTART<-10
-# H: WHERE THE OUTPUT MEASURES END
+# K: WHERE THE OUTPUT MEASURES END
 OUTPUTCOLEND<-11
-# I: WHAT THE SIMULATION RESULT FILE IS CALLED
-RESULTFILENAME<-"trackedCells_Close_Endpoint.csv"
-# J: NAME OF AN ALTERNATIVE RESULTS FILE IF NECESSARY
-ALTERNATIVEFILENAME<-NULL
-# K: NAME OF THE FILE TO CONTAIN THE MEDIANS FOR ALL RUNS UNDER A SET
+# L: FILE FORMAT FOR THE MEDIAN OUTPUT FILE - XML OR CSV
+MEDIANSFILEFORMAT<-"csv"
+# M: NAME OF THE FILE TO CONTAIN THE MEDIANS FOR ALL RUNS UNDER A SET
 # OF CONDITIONS
-MEDIANSFILENAME<-"EgSet_Medians.csv"
-# L: NAME OF THE SUMMARY FILE FOR EACH CURVE, SHOWING PARAMETER VALUES
+MEDIANSFILENAME<-"EgSet_Medians"
+# N: NAME OF THE SUMMARY FILE FOR EACH CURVE, SHOWING PARAMETER VALUES
 # AND MEDIAN RESULTS FOR THAT CONDITION
-CURVERESULTSFILENAME<-"EgSet_AllResults.csv"
-# M: NAME OF FILE WHICH IS GENERATED WHICH HAS OVERALL RESULTS IN
+CURVERESULTSFILENAME<-"EgSet_AllResults"
+# O: NAME OF FILE WHICH IS GENERATED WHICH HAS OVERALL RESULTS IN
 # (PARTITIONING OF VARIANCE)
-EFASTRESULTFILENAME<-"EgSet_eFAST_Analysis.csv"
-# N: WHICH OUTPUT MEASURES IN THE ARRAY TO T-TEST FOR SIGNIFICANCE
+EFASTRESULTFILENAME<-"EgSet_eFAST_Analysis"
+# P: WHICH OUTPUT MEASURES IN THE ARRAY TO T-TEST FOR SIGNIFICANCE
 # (SHOULD BE ALL BUT IN SOME CASES MAY NOT BE)
 OUTPUTMEASURES_TO_TTEST<-1:2
-# O: T-TEST CONFIDENCE LEVEL
+# Q: T-TEST CONFIDENCE LEVEL
 TTEST_CONF_INT<-0.95
-# P: WHETHER USER WANTS RESULTS GRAPHED
+# R: WHETHER USER WANTS RESULTS GRAPHED
 GRAPH_FLAG<-TRUE
-# Q TIMEPOINT AND TIMEPOINT SCALE NOT USED HERE AS NOT DOING 
+# S: TIMEPOINT AND TIMEPOINT SCALE NOT USED HERE AS NOT DOING 
 # MULTIPLE TIMEPOINTS
 TIMEPOINT<-NULL
 TIMEPOINTSCALE<-NULL
@@ -113,17 +125,18 @@ library(gplots)
 ##--- NOW RUN THE FOUR METHODS IN THIS ORDER ----
 # FIRSTLY, AS FOR EACH PARAMETER SET MULTIPLE RUNS ARE PERFORMED,
 # MEDIAN DISTRIBUTIONS NEED TO BE GAINED FOR EVERY RUN
-#efast_generate_medians_for_all_parameter_subsets(FILEPATH,NUMCURVES,
-#	PARAMETERS,NUMSAMPLES,NUMRUNSPERSAMPLE,MEASURES,
-#	OUTPUTCOLSTART,OUTPUTCOLEND,RESULTFILENAME,
-#	ALTERNATIVEFILENAME,MEDIANSFILENAME)
+efast_generate_medians_for_all_parameter_subsets(FILEPATH,NUMCURVES,
+	PARAMETERS,NUMSAMPLES,NUMRUNSPERSAMPLE,MEASURES,RESULTFILEFORMAT,
+	RESULTFILENAME,ALTERNATIVEFILENAME,OUTPUTCOLSTART,OUTPUTCOLEND,
+	MEDIANSFILEFORMAT,MEDIANSFILENAME)
 
 # NOW NEED TO CREATE THE OUTPUT FILE THAT THE EFAST ANALYSIS SCRIPTS
 # USE - A FILE SHOWING THE OVERALL MEDIAN RESULTS FOR EACH THE RUNS
 # PERFORMED FOR EVERY PARAMETER OF INTEREST, FOR THAT CURVE.
 # ONE FILE IS CREATED PER CURVE
 efast_get_overall_medians(FILEPATH,NUMCURVES,PARAMETERS,NUMSAMPLES,
-	MEASURES,MEDIANSFILENAME,CURVERESULTSFILENAME)
+	MEASURES,MEDIANSFILEFORMAT,MEDIANSFILENAME,
+	CURVERESULTSFILENAME)
 
 # NOW THESE ALLCURVE.CSV FILES HAVE BEEN GENERATED, FULL ANALYSIS
 # CAN BEGIN
@@ -131,10 +144,12 @@ efast_run_Analysis(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,NUMSAMPLES,
 	OUTPUTMEASURES_TO_TTEST,TTEST_CONF_INT,GRAPH_FLAG,
 	CURVERESULTSFILENAME,EFASTRESULTFILENAME,TIMEPOINT,
 	TIMEPOINTSCALE)
+
+
 }
 }
 \keyword{eFAST}
-\keyword{fourier}
+\keyword{Fourier}
 \keyword{amplitude}
 \keyword{sampling}
 \keyword{parameter}

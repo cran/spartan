@@ -4,36 +4,43 @@
 \alias{lhc_generatePRCoEffs_overTime}
 \alias{lhc_graphMeasuresForParameterChange_overTime}
 \title{LHC: Perform Analysis of Results at Multiple Timepoints}
-\description{This uses the same technique above, and all of the described methods, but analyses simulation results at multiple timepoints in the simulation run.  This may give a better indication of when any non-linear effect become apparent throughout a time period. This analysis over time method assumes that the result file for each timepoint has the same name (e.g. finalPatchStats), which has the timepoint at which it was captured appended to it (e.g. finalPatchStats_12.csv).  It is assumed that the same folder structure is in place as detailed in Technique 3 above, and shown in figure LHC_Folder_Struc in the extdata folder of this package. The package then examines each timepoint in turn, performing the same analyses documented in Technique 3 above, producing the same output files and same graphs, but this time for multiple timepoints.\cr
+\description{This uses the same technique above, and all of the described methods, but analyses simulation results at multiple timepoints in the simulation run.  This may give a better indication of when any non-linear effect become apparent throughout a time period. This analysis over time method assumes that the result file for each timepoint has the same name (e.g. finalPatchStats), which has the timepoint at which it was captured appended to it (e.g. finalPatchStats_12).  It is assumed that the same folder structure is in place as detailed in Technique 3 above, and shown in figure LHC_Folder_Struc in the extdata folder of this package. The package then examines each timepoint in turn, performing the same analyses documented in Technique 3 above, producing the same output files and same graphs, but this time for multiple timepoints.\cr
 \cr
 Again there are four methods available. These act as a wrapper for the previous methods. For example, lets say we are analysing the results at 6,12,18,and 24 hours. Thus TIMEPOINTS will be declared as TIMEPOINTS<-c(6,12,18,24). In this case, it is important that we declare the filenames for both input and output files but leave off the file extension (unlike that used above). All methods below consider each timepoint in turn, and prepare the input and output file names to suit the methods detailed above. So if our result file name was finalPatchStats, the method appends the timepoint being analysed to this and the names of any output files that are generated (producing finalPatchStats_12.csv). Once this is done, the original method described in the technique above is called.
 }
 \usage{
 lhc_process_sample_run_subsets_overTime(FILEPATH,NUMSAMPLES,
-	NUMRUNSPERSAMPLE,OUTPUTCOLSTART,OUTPUTCOLEND,MEASURES,
-	RESULTFILENAME,ALTERNATIVEFILENAME,MEDIANSFILENAME,
+	NUMRUNSPERSAMPLE,MEASURES,RESULTFILEFORMAT,
+	RESULTFILENAME,ALTERNATIVEFILENAME,OUTPUTCOLSTART,
+	OUTPUTCOLEND,MEDIANSFILEFORMAT,MEDIANSFILENAME,
 	TIMEPOINTS)
-lhc_generateLHCSummary_overTime(FILEPATH,LHC_PARAM_CSV_LOCATION,
-	PARAMETERS,NUMSAMPLES,MEASURES,MEDIANSFILENAME,
-	LHCSUMMARYFILENAME,TIMEPOINTS)
+
+lhc_generateLHCSummary_overTime(FILEPATH,
+	LHC_PARAM_CSV_LOCATION,PARAMETERS,NUMSAMPLES,MEASURES,
+	MEDIANSFILEFORMAT,MEDIANSFILENAME,LHCSUMMARYFILENAME,
+	TIMEPOINTS)
+
 lhc_generatePRCoEffs_overTime(FILEPATH,PARAMETERS,MEASURES,
 	LHCSUMMARYFILENAME,CORCOEFFSOUTPUTFILE,TIMEPOINTS)
-lhc_graphMeasuresForParameterChange_overTime(FILEPATH,PARAMETERS,
-	MEASURES,MEASURE_SCALE,LHCSUMMARYFILENAME,
+
+lhc_graphMeasuresForParameterChange_overTime(FILEPATH,
+	PARAMETERS,MEASURES,MEASURE_SCALE,LHCSUMMARYFILENAME,
 	CORCOEFFSOUTPUTFILE,TIMEPOINTS,TIMEPOINTSCALE)
 }
 \arguments{
   \item{FILEPATH}{Directory where the simulation runs can be found}
   \item{NUMSAMPLES}{The number of parameter subsets that were generated in the LHC design}
   \item{NUMRUNSPERSAMPLE}{The number of runs performed for each parameter subset. This figure is generated through Aleatory Analysis}
+  \item{MEASURES}{Array containing the names of the output measures which are used to analyse the simulation}
+  \item{RESULTFILEFORMAT}{The file format output by the simulation. Spartan can process XML or CSV output formats}
+  \item{RESULTFILENAME}{Name of the simulation results file (e.g. "trackedCells_Close")}
+  \item{ALTERNATIVEFILENAME}{In some cases, it may be relevant to read from a further results file if the initial file contains no results. This filename is set here}
   \item{OUTPUTCOLSTART}{Column number in the results file where output begins - saves (a) reading in unnecessary data, and (b) errors where the first column is a label, and therefore could contain duplicates}
   \item{OUTPUTCOLEND}{Column number in the results file where the last output measure is}
-  \item{MEASURES}{Array containing the names of the output measures which are used to analyse the simulation}
+  \item{MEDIANSFILEFORMAT}{File format for the median distribution files produced from simulation results. Can be either XML or CSV}
+  \item{MEDIANSFILENAME}{Analyses the results of replicate simulation runs and creates a file containing the median value of each measure for every run. This specifies what that file should be called.}
   \item{LHC_PARAM_CSV_LOCATION}{Location of the file output by the latin-hypercube sampling method}
   \item{PARAMETERS}{Array containing the names of the parameters of which parameter samples will be generated}
-  \item{RESULTFILENAME}{Name of the simulation results file (e.g. "trackedCells_Close.csv")}
-  \item{ALTERNATIVEFILENAME}{In some cases, it may be relevant to read from a further results file if the initial file contains no results. This filename is set here}
-  \item{MEDIANSFILENAME}{Analyses the results of replicate simulation runs and creates a file containing the median value of each measure for every run. This specifies what that file should be called.}
   \item{LHCSUMMARYFILENAME}{Name of the LHC Summary file to be generated by lhc_generateLHCSummary. Contains each parameter set alongside the result gained when the simulation was run under that criteria.}
   \item{CORCOEFFSOUTPUTFILE}{Name of the file to be generated by lhc_generatePRCoEffs.  Contains the Partial Rank Correlation Coefficients for each parameter.}
   \item{TIMEPOINTS}{A list of the simulation timepoints which are to be analysed}
@@ -99,26 +106,28 @@ TIMEPOINTSCALE<-"Hours"
 ##--- NOW RUN THE FOUR METHODS IN THIS ORDER ----
 # A - GENERATE THE MEDIANS FOR EACH SET OF PARAMETER VALUES
 # GENERATED BY THE HYPERCUBE - FOR ALL TIMEPOINTS
-#lhc_process_sample_run_subsets_overTime(FILEPATH,NUMSAMPLES,
-#	NUMRUNSPERSAMPLE,OUTPUTCOLSTART,OUTPUTCOLEND,MEASURES,
-#	RESULTFILENAME,ALTERNATIVEFILENAME,MEDIANSFILENAME,
-#	TIMEPOINTS)
+lhc_process_sample_run_subsets_overTime(FILEPATH,NUMSAMPLES,
+	NUMRUNSPERSAMPLE,MEASURES,RESULTFILEFORMAT,
+	RESULTFILENAME,ALTERNATIVEFILENAME,OUTPUTCOLSTART,
+	OUTPUTCOLEND,MEDIANSFILEFORMAT,MEDIANSFILENAME,
+	TIMEPOINTS)
 
 # B - GENERATE THE SUMMARY FILE SHOWING THE PARAMETERS USED AND
 # MEDIAN RESULTS FOR THE MEASURES OVER THE n RUNS
 # THIS PRODUCES LHCSUMMARY.CSV - THEREFORE IF JUST REANALYSING
 # TURN THIS OFF
-lhc_generateLHCSummary_overTime(FILEPATH,LHC_PARAM_CSV_LOCATION,
-	PARAMETERS,NUMSAMPLES,MEASURES,MEDIANSFILENAME,
-	LHCSUMMARYFILENAME,TIMEPOINTS)
+lhc_generateLHCSummary_overTime(FILEPATH,
+	LHC_PARAM_CSV_LOCATION,PARAMETERS,NUMSAMPLES,MEASURES,
+	MEDIANSFILEFORMAT,MEDIANSFILENAME,LHCSUMMARYFILENAME,
+	TIMEPOINTS)
 
 # C- CALCULATE THE PARTIAL RANK CORRELATION COEFFICIENTS
 lhc_generatePRCoEffs_overTime(FILEPATH,PARAMETERS,MEASURES,
 	LHCSUMMARYFILENAME,CORCOEFFSOUTPUTFILE,TIMEPOINTS)
 
 # D - GRAPH THE RESULTS
-lhc_graphMeasuresForParameterChange_overTime(FILEPATH,PARAMETERS,
-	MEASURES,MEASURE_SCALE,LHCSUMMARYFILENAME,
+lhc_graphMeasuresForParameterChange_overTime(FILEPATH,
+	PARAMETERS,MEASURES,MEASURE_SCALE,LHCSUMMARYFILENAME,
 	CORCOEFFSOUTPUTFILE,TIMEPOINTS,TIMEPOINTSCALE)
 }
 }

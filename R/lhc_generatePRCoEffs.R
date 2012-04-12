@@ -3,11 +3,12 @@ function(FILEPATH,PARAMETERS,MEASURES,LHCSUMMARYFILENAME,CORCOEFFSOUTPUTFILE)
 {
 	if(file.exists(FILEPATH))
 	{
+		print(paste(FILEPATH,"/",LHCSUMMARYFILENAME,".csv",sep=""))
 		# LHCSUMMARYFILENAME IS LHCSummary.csv FOR 1 TIMEPOINT
 		# CORCOEFFSOUTPUTFILE IS corCoefs.csv FOR 1 TIMEPOINT
-		if(file.exists(paste(FILEPATH,"/",LHCSUMMARYFILENAME,sep="")))
+		if(file.exists(paste(FILEPATH,"/",LHCSUMMARYFILENAME,".csv",sep="")))
 		{
-			LHCRESULTFILE<-read.csv(paste(FILEPATH,"/",LHCSUMMARYFILENAME,sep=""),header=TRUE)
+			LHCRESULTFILE<-read.csv(paste(FILEPATH,"/",LHCSUMMARYFILENAME,".csv",sep=""),header=TRUE)
 			PARAMCOEFFSTRUCT<-NULL
 			COEFFRESULTS<-NULL
 			print("Generating Partial Rank Correlation Coefficients (lhc_generatePRCoEffs)")
@@ -27,7 +28,6 @@ function(FILEPATH,PARAMETERS,MEASURES,LHCSUMMARYFILENAME,CORCOEFFSOUTPUTFILE)
 				for(l in 1:length(MEASURES))
 				{
 					COEFFMEASURERESULT<-LHCRESULTFILE[,MEASURES[l]]
-					#PARAMCOEFF<-pcor.test(COEFFPARAMCOL,COEFFMEASURERESULT,COEFFDATA,method=c("s"))
 					PARAMCOEFF<-pcor.test(COEFFPARAMCOL,COEFFMEASURERESULT,COEFFDATA,calcMethod=c("s"))
 					PARAMRESULTS<-cbind(PARAMRESULTS,PARAMCOEFF$estimate,PARAMCOEFF$p.value)
 				}
@@ -48,10 +48,10 @@ function(FILEPATH,PARAMETERS,MEASURES,LHCSUMMARYFILENAME,CORCOEFFSOUTPUTFILE)
 			colnames(COEFFRESULTS)<-c(COEFFRESULTSHEAD)
 			rownames(COEFFRESULTS)<-PARAMETERS
 		
-			coEffsResultsFile<-paste(FILEPATH,"/",CORCOEFFSOUTPUTFILE,sep="")
-			write.csv(COEFFRESULTS,coEffsResultsFile,quote = FALSE)
+			COEFFSRESULTSFILE<-paste(FILEPATH,"/",CORCOEFFSOUTPUTFILE,".csv",sep="")
+			write.csv(COEFFRESULTS,COEFFSRESULTSFILE,quote = FALSE)
 		
-			print(paste("File of Partial Rank Correlation Coefficients Generated. Output to ",coEffsResultsFile,sep=""))
+			print(paste("File of Partial Rank Correlation Coefficients Generated. Output to ",COEFFSRESULTSFILE,sep=""))
 		}
 		else
 		{

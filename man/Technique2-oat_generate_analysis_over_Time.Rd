@@ -10,33 +10,38 @@ Again there are four methods available. These act as a wrapper for the previous 
 } 
 \usage{
 oat_processParamSubsets_overTime(FILEPATH,PARAMETERS,PMIN,PMAX,
-	PINC,NUMRUNSPERSAMPLE,MEASURES,OUTPUTCOLSTART,OUTPUTCOLEND,
-	RESULTSFILENAME,ALTERNATIVEFILENAME,MEDIANSFILENAME,
-	TIMEPOINTS)
+	PINC,NUMRUNSPERSAMPLE,MEASURES,RESULTFILEFORMAT,
+	RESULTFILENAME,ALTERNATIVEFILENAME,OUTPUTCOLSTART,
+	OUTPUTCOLEND,MEDIANSFILEFORMAT,MEDIANSFILENAME,TIMEPOINTS)
+
 oat_analyseAllParams_overTime(FILEPATH,PARAMETERS,BASELINE,PMIN,
-	PMAX,PINC,MEASURES,MEDIANSFILENAME,ATESTRESULTSFILENAME,
-	TIMEPOINTS)
+	PMAX,PINC,MEASURES,MEDIANSFILEFORMAT,MEDIANSFILENAME,
+	ATESTRESULTSFILENAME,TIMEPOINTS)
+
 oat_graphATestsForSampleSize_overTime(FILEPATH,PARAMETERS,PMIN,
 	PMAX,PINC,ATESTRESULTSFILENAME,MEASURES,ATESTSIGLEVEL,
 	TIMEPOINTS,TIMEPOINTSCALE)
+
 oat_plotResultDistribution_overTime(FILEPATH,PARAMETERS,PMIN,
-	PMAX,PINC,MEDIANSFILENAME,MEASURES,MEASURE_SCALE,
-	TIMEPOINTS,TIMEPOINTSCALE)
+	PMAX,PINC,MEDIANSFILEFORMAT,MEDIANSFILENAME,MEASURES,
+	MEASURE_SCALE,TIMEPOINTS,TIMEPOINTSCALE)
 }
 \arguments{
   \item{FILEPATH}{Directory where the simulation runs can be found}
   \item{PARAMETERS}{Array containing the names of the parameters of which parameter samples will be generated}
   \item{NUMRUNSPERSAMPLE}{The number of runs performed for each parameter subset. This figure is generated through Aleatory Analysis}
+  \item{MEASURES}{Array containing the names of the output measures which are used to analyse the simulation}
+  \item{RESULTFILEFORMAT}{The file format output by the simulation. Spartan can process XML or CSV output formats}
+  \item{RESULTFILENAME}{Name of the simulation results file (e.g. "trackedCells_Close")}
+  \item{ALTERNATIVEFILENAME}{In some cases, it may be relevant to read from a further results file if the initial file contains no results. This filename is set here}
   \item{OUTPUTCOLSTART}{Column number in the results file where output begins - saves (a) reading in unnecessary data, and (b) errors where the first column is a label, and therefore could contain duplicates}
   \item{OUTPUTCOLEND}{Column number in the results file where the last output measure is}
-  \item{RESULTSFILENAME}{Name of the simulation results file (e.g. "trackedCells_Close.csv")}
-  \item{ALTERNATIVEFILENAME}{In some cases, it may be relevant to read from a further results file if the initial file contains no results. This filename is set here}
+  \item{MEDIANSFILEFORMAT}{File format for the median distribution files produced from simulation results. Can be either XML or CSV}
+  \item{MEDIANSFILENAME}{If oat_processParamSubsets is used, this analyses the results of replicate simulation runs and creates a file containing the median value of each measure for every run, for each timepoint. This specifies what that file should be called.  \bold{Note, the algorithm takes this file name and appends the timepoint to it, so don't specify an extension}. For example, this could be set to "Medians". The algorithm, for timepoint 6, would then make this "Medians_6.csv"}
   \item{BASELINE}{Array containing the values assigned to each of these parameters in the calibrated baseline}
   \item{PMIN}{Array containing the minimum value that should be used for each parameter.  Sets a lower bound on sampling space}
   \item{PMAX}{Array containing the maximum value that should be used for each parameter.  Sets an upper bound on sampling space}
   \item{PINC}{Array containing the increment value that should be applied for each parameter. For example, a parameter could have a minimum value of 10, and maximum value of 100, and be incremented by 10}
-  \item{MEASURES}{Array containing the names of the output measures which are used to analyse the simulation}
-  \item{MEDIANSFILENAME}{If oat_processParamSubsets is used, this analyses the results of replicate simulation runs and creates a file containing the median value of each measure for every run, for each timepoint. This specifies what that file should be called.  \bold{Note, the algorithm takes this file name and appends the timepoint to it, so don't specify .csv}. For example, this could be set to "Medians". The algorithm, for timepoint 6, would then make this "Medians_6.csv"}
   \item{ATESTRESULTSFILENAME}{File name of the ATests result summary file created by oat_analyseAllParams.  Again, as multiple timepoints are being considered, don't specify the extension.  If this was set to "ATests", the algorithm would create "ATests_6.csv" for a timepoint of 6}
   \item{TIMEPOINTS}{A list of the simulation timepoints which are to be analysed}
   \item{TIMEPOINTSCALE}{A string detailing how TIMEPOINTS should be interpreted (e.g. this could be "Seconds", "Minutes", "Hours", or simply "Simulation Steps"). Used in graphing}
@@ -69,30 +74,35 @@ PINC<-c(10,0.1,0.05,0.005,0.05,0.25,1)
 NUMRUNSPERSAMPLE<-300
 # G: THE OUTPUT MEASURES (ARRAY)
 MEASURES<-c("Velocity","Displacement")
-# H: WHERE THE OUTPUT MEASURES START IN THE RESULTS FILE FROM THE
-# SIMULATION. SAVES READING THE WHOLE FILE & AVOIDS POTENTIAL
+# H: FORMAT OF THE SIMULATOR RESULT FILES
+RESULTFILEFORMAT<-"csv"
+# I: WHAT THE SIMULATION RESULT FILE IS CALLED
+RESULTSFILENAME<-"trackedCells_Close"
+# J: NAME OF AN ALTERNATIVE RESULTS FILE IF NECESSARY
+ALTERNATIVEFILENAME<-NULL
+# K: WHERE THE OUTPUT MEASURES START IN THE RESULTS FILE FROM THE
+# SIMULATION, IF USING CSV FILE FORMAT.
+# SAVES READING THE WHOLE FILE & AVOIDS POTENTIAL
 # PROBLEMS WHERE THE FIRST COLUMN IS DUPLICATED (eg A CELL LABEL)
 OUTPUTCOLSTART<-10
-# I: WHERE THE OUTPUT MEASURES END
+# L: WHERE THE OUTPUT MEASURES END, IF USING CSV FILE FORMAT
 OUTPUTCOLEND<-11
-# J: WHAT THE SIMULATION RESULT FILE IS CALLED
-RESULTSFILENAME<-"trackedCells_Close"
-# K: NAME OF AN ALTERNATIVE RESULTS FILE IF NECESSARY
-ALTERNATIVEFILENAME<-NULL
-# L: NAME TO BE GIVEN TO EACH FILE OF GENERATED MEDIAN MEASURES FOR
+# M: FILE FORMAT FOR THE MEDIAN OUTPUT FILE - XML OR CSV
+MEDIANSFILEFORMAT<-"csv"
+# N: NAME TO BE GIVEN TO EACH FILE OF GENERATED MEDIAN MEASURES FOR
 # EACH PARAMETER
 MEDIANSFILENAME<-"EgSet_Medians_Over_Time"
-# M: NAME TO BE GIVEN TO THE FILES CONTAINING THE A-TEST RESULTS FOR
+# O: NAME TO BE GIVEN TO THE FILES CONTAINING THE A-TEST RESULTS FOR
 # EACH PARAMETER
 ATESTRESULTSFILENAME<-"EgSet_ATests_Over_Time"
-# N: BASELINE PARAMETER VALUES
+# P: BASELINE PARAMETER VALUES
 BASELINE<-c(50,0.3,0.2,0.04,0.60,1.0,12)
-# O: LEVEL AT WHICH A-TEST RESULTS ARE SIGNIFICANT
+# Q: LEVEL AT WHICH A-TEST RESULTS ARE SIGNIFICANT
 ATESTSIGLEVEL<-0.21
-# P: MEASUREMENTS FOR GRAPHING
+# R: MEASUREMENTS FOR GRAPHING
 MEASURE_SCALE<-c(NULL,NULL,"Simulation Steps","Simulation Steps",
 	"Simulation Steps","Square Pixels")
-# Q: TIMEPOINTS - USED WHEN ANALYSING OVER TIME
+# S: TIMEPOINTS - USED WHEN ANALYSING OVER TIME
 TIMEPOINTS<-c(12,36,48,60)
 TIMEPOINTSCALE<-"Hours"
 
@@ -104,26 +114,25 @@ TIMEPOINTSCALE<-"Hours"
 
 # A - GENERATE THE MEDIAN SETS FOR EACH SET OF RUNS FOR THE
 # PARAMETER VALUE
-oat_processParamSubsets_overTime(FILEPATH,PARAMETERS,PMIN,PMAX,
-	PINC,NUMRUNSPERSAMPLE,MEASURES,OUTPUTCOLSTART,OUTPUTCOLEND,
-	RESULTSFILENAME,ALTERNATIVEFILENAME,MEDIANSFILENAME,
-	TIMEPOINTS)
+oat_processParamSubsets_overTime(FILEPATH,PARAMETERS,PMIN,PMAX,PINC,
+	NUMRUNSPERSAMPLE,MEASURES,RESULTFILEFORMAT,RESULTFILENAME,
+	ALTERNATIVEFILENAME,OUTPUTCOLSTART,OUTPUTCOLEND,MEDIANSFILEFORMAT,
+	MEDIANSFILENAME,TIMEPOINTS)
 
 # B - RUN THE ATEST FOR EACH PARAMETER VALUE, AND EACH PARAMETER
-oat_analyseAllParams_overTime(FILEPATH,PARAMETERS,BASELINE,PMIN,
-	PMAX,PINC,MEASURES,MEDIANSFILENAME,ATESTRESULTSFILENAME,
+oat_analyseAllParams_overTime(FILEPATH,PARAMETERS,BASELINE,PMIN,PMAX,
+	PINC,MEASURES,MEDIANSFILEFORMAT,MEDIANSFILENAME,ATESTRESULTSFILENAME,
 	TIMEPOINTS)
 
-
 # C - GRAPH THE RESULTS FOR ALL MEASURES FOR EACH PARAMETER
-oat_graphATestsForSampleSize_overTime(FILEPATH,PARAMETERS,PMIN,
-	PMAX,PINC,ATESTRESULTSFILENAME,MEASURES,ATESTSIGLEVEL,
-	TIMEPOINTS,TIMEPOINTSCALE)
+oat_graphATestsForSampleSize_overTime(FILEPATH,PARAMETERS,PMIN,PMAX,
+	PINC,ATESTRESULTSFILENAME,MEASURES,ATESTSIGLEVEL,TIMEPOINTS,
+	TIMEPOINTSCALE)
 
 # D - GRAPH THE DISTRIBUTION OF THE RESULTS FOR THIS MEASURE, FOR
 # THIS PARAMETER
-oat_plotResultDistribution_overTime(FILEPATH,PARAMETERS,PMIN,
-	PMAX,PINC,MEDIANSFILENAME,MEASURES,MEASURE_SCALE,
+oat_plotResultDistribution_overTime(FILEPATH,PARAMETERS,PMIN,PMAX,
+	PINC,MEDIANSFILEFORMAT,MEDIANSFILENAME,MEASURES,MEASURE_SCALE,
 	TIMEPOINTS,TIMEPOINTSCALE)
 }
 }

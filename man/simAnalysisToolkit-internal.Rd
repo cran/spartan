@@ -14,7 +14,9 @@
 \alias{efast_sd}
 \alias{efast_setfreq}
 \alias{efast_ttest}
+\alias{table_header_check}
+\alias{num.decimals}
 \docType{package}
 \title{Internal Functions}
-\description{A number of internal functions (14) are used which are not directly called by the user employing this package.  These are: (a) aa_getATestResults (b) aa_graphATestsForSampleSize (c) atest (d) normaliseATest (e) pcor.mat (f) pcor.rec (g) pcor.test (h) lhc_constructCoEffDataSet (i) efast_cvmethod (j) efast_graph_Results (k) efast_parameterdist (l) efast_sd (m) efast_setfreq (n) efast_ttest
+\description{A number of internal functions (14) are used which are not directly called by the user employing this package.  These are: (a) aa_getATestResults (b) aa_graphATestsForSampleSize (c) atest (d) normaliseATest (e) pcor.mat (f) pcor.rec (g) pcor.test (h) lhc_constructCoEffDataSet (i) efast_cvmethod (j) efast_graph_Results (k) efast_parameterdist (l) efast_sd (m) efast_setfreq (n) efast_ttest (o) table_header_check (p) num_decimals
  }

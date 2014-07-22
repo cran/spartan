@@ -1,72 +1,121 @@
 aa_getATestResults <-
-function(FILEPATH,SAMPLEPROCESSING,NUMSUBSETSPERSAMPLESIZE,MEASURES,MEDIANSFILEFORMAT,MEDIANSFILENAME,ATESTRESULTSFILENAME)
+function(FILEPATH,SAMPLESIZES,NUMSUBSETSPERSAMPLESIZE,MEASURES,AA_SIM_RESULTS,ATESTRESULTSFILENAME,LARGEDIFFINDICATOR,TIMEPOINTS=NULL,TIMEPOINTSCALE=NULL,GRAPHNAME=NULL)
 {
-	# import the first distribution - this will be used as the comparison set
-	# However need to check whether this is a CSV or XML file
-	FILEADDRESS = paste(FILEPATH,"/",SAMPLEPROCESSING,"/",toString(1),"/",MEDIANSFILENAME,sep="")
-	
-	if(MEDIANSFILEFORMAT=="csv")
+	if(is.null(TIMEPOINTS))
 	{
-		COMPARISONSET <- read.csv(paste(FILEADDRESS,".csv",sep=""),header=TRUE,sep=",")	
-	}
-	else if(MEDIANSFILEFORMAT=="xml")
-	{
-		COMPARISONSET<-xmlToDataFrame(paste(FILEADDRESS,".xml",sep=""))
-	}
-	
-	RESULTS<-NULL
+		# ALL A-TEST SCORES, FOR ALL SAMPLE SIZES
+		RESULTS<-NULL
 
-	for(m in 2:NUMSUBSETSPERSAMPLESIZE)
-	{
-		# Get the set that will be compared with set one
-		FILEADDRESS = paste(FILEPATH,"/",SAMPLEPROCESSING,"/",toString(m),"/",MEDIANSFILENAME,sep="")
+		# ATEST SCORES FOR JUST A SAMPLE SIZE - COMPILED FOR GRAPHING
+		SIZE_RESULTS<-NULL
 
+		# READ IN THE SUMMARY FILE
+		RESULT<-read.csv(paste(FILEPATH,"/",AA_SIM_RESULTS,sep=""),sep=",",header=T)
+		print("Generating A-Test Scores for Consistency Analysis")
 
-		if(file.exists(paste(FILEADDRESS,".csv",sep="")) | file.exists(paste(FILEADDRESS,".xml",sep="")))
+		# GENERATE COLUMN HEADINGS - WE USE THIS TWICE LATER
+		ATESTRESULTSHEADER<-cbind("Sample Size","Sample")
+
+		for(l in 1:length(MEASURES))
 		{
-			if(MEDIANSFILEFORMAT=="csv")
-			{
-				SAMPLEMEDIANS <- read.csv(paste(FILEADDRESS,".csv",sep=""),header=TRUE,sep=",")
-			}
-			else if(MEDIANSFILEFORMAT=="xml")
-			{
-				# XML Median Set
-				SAMPLEMEDIANS<-xmlToDataFrame(paste(FILEADDRESS,".xml",sep=""))
-			}
-				
-			# start the output, label the first column with the sample set number
-			ALLATESTRESULTS<-c(toString(m))
-	
-			# Now perform the analysis for each measure
-			# THEN NORMALISE (PUT ABOVE 0.5) AS DIRECTION DOES NOT MATTER
-			for(l in 1:length(MEASURES))
-			{
-				# ATEST IS IN ATESTR.R, AS IS NORMALISEATEST
-				ATESTMEASURERESULT<-atest(as.numeric(as.matrix(COMPARISONSET[MEASURES[l]][,1])),
-						as.numeric(as.matrix(SAMPLEMEDIANS[MEASURES[l]][,1])))
-				# the [,1] is added so the data is extracted	
-				ATESTMEASURENORM <- normaliseATest(ATESTMEASURERESULT)				
-				ALLATESTRESULTS<-cbind(ALLATESTRESULTS,ATESTMEASURERESULT,ATESTMEASURENORM)
-			}
-
-			# ADD TO THE SET OF ALL RESULTS SO FAR FOR THIS SAMPLE SIZE
-			RESULTS<-rbind(RESULTS,ALLATESTRESULTS)
+			ATESTRESULTSHEADER<-cbind(ATESTRESULTSHEADER,paste("ATest",MEASURES[l],sep=""),paste("ATest",MEASURES[l],"Norm",sep=""))
 		}
+
+		for(s in 1:length(SAMPLESIZES))
+		{
+
+			print(paste("Processing Sample Size: ",SAMPLESIZES[s],sep=""))
+
+			## GET THE FIRST SET, SO THIS CAN BE COMPARED WITH ALL THE OTHERS	
+			## SO SUBSET THE RESULTS
+			SUBSET_CRITERIA<-c("SampleSize","Set")
+			SET1<-subset_results_by_param_value_set(SUBSET_CRITERIA,RESULT,c(SAMPLESIZES[s],1))
+
+			# REST THE SCORES FOR EACH SAMPLE SIZE
+			SIZE_RESULTS<-NULL
+
+			for(m in 2:NUMSUBSETSPERSAMPLESIZE)
+			{
+
+				ALLATESTRESULTS<-cbind(SAMPLESIZES[s],m)
+
+				COMPAREDSET<-subset_results_by_param_value_set(SUBSET_CRITERIA,RESULT,c(SAMPLESIZES[s],m))
+
+				if(nrow(COMPAREDSET)>0)
+				{
+					# Now perform the analysis for each measure
+					# THEN NORMALISE (PUT ABOVE 0.5) AS DIRECTION DOES NOT MATTER
+					for(l in 1:length(MEASURES))
+					{
+						ATESTMEASURERESULT<-atest(as.numeric(as.matrix(SET1[MEASURES[l]][,1])),
+								as.numeric(as.matrix(COMPAREDSET[MEASURES[l]][,1])))
+						# the [,1] is added so the data is extracted	
+						ATESTMEASURENORM <- normaliseATest(ATESTMEASURERESULT)				
+						ALLATESTRESULTS<-cbind(ALLATESTRESULTS,ATESTMEASURERESULT,ATESTMEASURENORM)
+
+					}
+				}
+				else
+				{
+					for(l in 1:length(MEASURES))
+					{
+						ALLATESTRESULTS<-cbind(ALLATESTRESULTS,1,1)
+					}
+				
+				}
+				# ADD THESE TESTS TO THE RESULTS
+				RESULTS<-rbind(RESULTS,ALLATESTRESULTS)
+
+				SIZE_RESULTS<-rbind(SIZE_RESULTS,ALLATESTRESULTS)
+
+			}
+
+			colnames(SIZE_RESULTS)<-ATESTRESULTSHEADER
+			
+			# NOW GRAPH THIS SAMPLE SIZE
+			if(is.null(GRAPHNAME))
+			{
+				GRAPHOUTPUTNAME<-paste(SAMPLESIZES[s],"Samples.pdf",sep="")
+			}
+			else
+			{
+				GRAPHOUTPUTNAME<-paste(SAMPLESIZES[s],"Samples_",GRAPHNAME,".pdf",sep="")
+			}
+			
+			aa_graphATestsForSampleSize(FILEPATH,SIZE_RESULTS,MEASURES,LARGEDIFFINDICATOR,GRAPHOUTPUTNAME,NULL,NULL)
+			print(paste("Summary Graph for Sample Size of ",SAMPLESIZES[s]," Saved to ",FILEPATH,"/",GRAPHOUTPUTNAME,sep=""))
+		}
+
+		
+
+		colnames(RESULTS)<-c(ATESTRESULTSHEADER)
+
+		# NOW WRITE THE FILE OUT
+		write.csv(RESULTS,paste(FILEPATH,"/",ATESTRESULTSFILENAME,sep=""),quote = FALSE,row.names=FALSE)		
 	}
-
-	# OUTPUT THE RESULTS FOR EACH SUBSET TO THE FILE
-	RESULTSFILE = paste(FILEPATH,"/",SAMPLEPROCESSING,"/",ATESTRESULTSFILENAME,".csv",sep="")
-
-	# GENERATE COLUMN HEADINGS
-	ATESTRESULTSHEADER<-c("Sample")
-
-	for(l in 1:length(MEASURES))
+	else
 	{
-		ATESTRESULTSHEADER<-cbind(ATESTRESULTSHEADER,paste("ATest",MEASURES[l],sep=""),paste("ATest",MEASURES[l],"Norm",sep=""))
+		# PROCESS EACH TIMEPOINT, BY AMENDING THE FILENAMES AND RECALLING THIS FUNCTION
+		for(n in 1:length(TIMEPOINTS))
+		{
+
+			TIMEPOINTPROCESSING<-TIMEPOINTS[n]
+			print(paste("PROCESSING TIMEPOINT: ",TIMEPOINTPROCESSING,sep=""))
+
+			AA_SIM_RESULTS_FORMAT<-substr(AA_SIM_RESULTS,(nchar(AA_SIM_RESULTS)+1)-3,nchar(AA_SIM_RESULTS))
+			AA_SIM_RESULTS_FULL<-paste(substr(AA_SIM_RESULTS,0,nchar(AA_SIM_RESULTS)-4),"_",TIMEPOINTPROCESSING,".",AA_SIM_RESULTS_FORMAT,sep="")
+
+			ATESTRESULTSFILENAME_FORMAT<-substr(ATESTRESULTSFILENAME,(nchar(ATESTRESULTSFILENAME)+1)-3,nchar(ATESTRESULTSFILENAME))
+			ATESTRESULTSFILENAME_FULL<-paste(substr(ATESTRESULTSFILENAME,0,nchar(ATESTRESULTSFILENAME)-4),"_",TIMEPOINTPROCESSING,".",ATESTRESULTSFILENAME_FORMAT,sep="")
+
+			GRAPHOUTPUTNAME<-TIMEPOINTPROCESSING
+
+			aa_getATestResults(FILEPATH,SAMPLESIZES,NUMSUBSETSPERSAMPLESIZE,MEASURES,AA_SIM_RESULTS_FULL,
+						ATESTRESULTSFILENAME_FULL,LARGEDIFFINDICATOR,TIMEPOINTS=NULL,TIMEPOINTSCALE=NULL,GRAPHOUTPUTNAME)
+
+
+		}
+
+
 	}
-
-	colnames(RESULTS)<-c(ATESTRESULTSHEADER)	
-
-	write.csv(RESULTS,RESULTSFILE,quote = FALSE,row.names=FALSE)		
 }
-

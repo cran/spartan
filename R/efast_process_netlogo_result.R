@@ -1,5 +1,5 @@
 efast_process_netlogo_result <-
-function(FILEPATH,EFASTSAMPLE_RESULTFILENAME,PARAMETERS,NUMCURVES,NUMSAMPLES,MEASURES,RESULTFILEFORMAT,RESULTFILENAME,TIMESTEP)
+function(FILEPATH,EFASTSAMPLE_RESULTFILENAME,PARAMETERS,NUMCURVES,NUMSAMPLES,MEASURES,RESULTFILENAME,TIMESTEP)
 {
 	# TO KEEP THIS IN LINE WITH TRADITIONAL SPARTAN, AND AS NETLOGO OFFERS THE CHANCE TO RUN REPEATED RUNS OF THE SAME EXPERIMENT
 	# WE ARE GOING TO CREATE A MEDIAN SET OF RESULTS FOR EACH LHC SAMPLE. THEN THE OLD SPARTAN CODE CAN BE USED FROM THAT POINT
@@ -14,6 +14,13 @@ function(FILEPATH,EFASTSAMPLE_RESULTFILENAME,PARAMETERS,NUMCURVES,NUMSAMPLES,MEA
 	{
 		for(PARAMNUM in 1:length(PARAMETERS))
 		{
+
+			print(paste("Processing Curve: ",CURVENUM," Parameter: ",PARAMETERS[PARAMNUM],sep="")) 
+			# Open the parameter file
+			params<-read.csv(paste(FILEPATH,"/Curve",CURVENUM,"_",PARAMETERS[PARAMNUM],".csv",sep=""))
+
+			CURVE_PARAM_RESULT<-NULL
+
 			for(SAMPLE in 1:NUMSAMPLES)
 			{
 				if(file.exists(paste(FILEPATH,"/",CURVENUM,"/",PARAMNUM,"/",SAMPLE,"/",EFASTSAMPLE_RESULTFILENAME,SAMPLE,".csv",sep="")))
@@ -35,44 +42,32 @@ function(FILEPATH,EFASTSAMPLE_RESULTFILENAME,PARAMETERS,NUMCURVES,NUMSAMPLES,MEA
 
 					# NOW TO CREATE THE RESULTS FOR THIS SAMPLE SET
 					# NETLOGO DOES GIVE THE OPTION OF RUNNING REPLICATES OF THE SAME EXPERIMENT
-					# SO THERE MAY BE A FEW ROWS HERE. IF SO, LETS TAKE THE MEDIAN OF THE MEASURES, AS WE WOULD WITH TRADITIONAL SPARTAN
-					MEDIANSFORALLMEASURES<-NULL
+					# SO THERE MAY BE A FEW ROWS HERE. THE SUMMARY METHOD WILL SUMMARISE THESE
+					
+					# FIRST LETS SET UP THE NUMBER OF PARAMETER ROWS
+					param_set<-params[SAMPLE,]
 
+					# Make duplicates of the parameters to match the number of replicate runs	
+					PARAMS<-NULL
+					for(paramval in 1:ncol(param_set))
+					{
+						PARAMS<-cbind(PARAMS,param_set[[paramval]])
+					}
+
+					
+					DUP_PARAMS<-NULL
+					for(r in 1:nrow(TIMESTEP_RESULTS)-1)
+					{
+						DUP_PARAMS<-rbind(DUP_PARAMS,PARAMS)
+					}
+
+					# NOW WE CAN ADD THE RESULTS FOR EACH NETLOGO RUN
 					for(RESPONSE in 1:length(MEASURES))
 					{
-						MEDIANSFORALLMEASURES<-cbind(MEDIANSFORALLMEASURES,median(TIMESTEP_RESULTS[MEASURES[RESPONSE]][,1]))
+						DUP_PARAMS<-cbind(DUP_PARAMS,TIMESTEP_RESULTS[MEASURES[RESPONSE]][,1])
 					}
 
-					# NAME THE COLUMNS TO MATCH THE MEASURES
-					colnames(MEDIANSFORALLMEASURES)<-MEASURES
-
-					PARAM_RESULTFILEPATH = paste(FILEPATH,"/",CURVENUM,"/",PARAMNUM,"/",SAMPLE,"/",RESULTFILENAME,sep="")
-
-					if(RESULTFILEFORMAT=="csv")
-					{
-						write.csv(MEDIANSFORALLMEASURES,paste(PARAM_RESULTFILEPATH,".csv",sep=""),quote = FALSE,row.names=FALSE)
-					}
-					else if(RESULTFILEFORMAT=="xml")
-					{
-						RESULTSDF<-data.frame(MEDIANSFORALLMEASURES)
-			
-						#xml <- xmlTree()
-						xml<-xmlOutputDOM()
-						xml$addTag("simResults", close=FALSE)
-						for (i in 1:nrow(RESULTSDF)) 
-						{
-							xml$addTag("runMedians", close=FALSE)
-							for (j in names(RESULTSDF)) 
-							{
-								xml$addTag(j, RESULTSDF[i, j])
-							}
-							xml$closeTag()
-						}
-						xml$closeTag()	
-			
-						saveXML(xml,file=paste(PARAM_RESULTFILEPATH,".xml",sep=""),indent=FALSE)
-					}
-				
+					CURVE_PARAM_RESULT<-rbind(CURVE_PARAM_RESULT,DUP_PARAMS)				
 				}
 				else
 				{
@@ -80,6 +75,12 @@ function(FILEPATH,EFASTSAMPLE_RESULTFILENAME,PARAMETERS,NUMCURVES,NUMSAMPLES,MEA
 
 				}
 			}
+
+			colnames(CURVE_PARAM_RESULT)<-c(colnames(params),MEASURES)
+
+			# Write this file out to the FILEPATH
+			RESULTSFILE = paste(FILEPATH,"/Curve",CURVENUM,"_Parameter",PARAMNUM,"_Results.csv",sep="")
+			write.csv(CURVE_PARAM_RESULT,RESULTSFILE,quote = FALSE,row.names=FALSE)
 		}
 
 		print(paste("Analysis of Netlogo Results for Curve ",CURVENUM," Complete",sep=""))

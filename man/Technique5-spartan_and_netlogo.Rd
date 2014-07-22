@@ -5,65 +5,44 @@
 \alias{efast_netlogo_run_Analysis}
 \alias{efast_process_netlogo_result}
 \alias{lhc_generate_lhc_sample_netlogo}
-\alias{lhc_generate_netlogo_LHCSummary}
 \alias{lhc_generate_netlogo_PRCoEffs}
 \alias{lhc_netlogo_graphMeasuresForParameterChange}
 \alias{lhc_process_netlogo_result}
-\alias{oat_netlogo_analyseAllParams}
-\alias{oat_netlogo_graphATestsForSampleSize}
-\alias{oat_netlogo_plotResultDistribution}
 \alias{oat_process_netlogo_result}
 \title{Technique 5: SPARTAN and Netlogo}
 \description{
-Versions 1.0-1.2 of SPARTAN focused on performing an analysis of simulations, but such demonstrations were never paired with tools that are used by researchers to develop such simulations. Version 1.3 offers the additional functionality of linking SPARTAN with Netlogo, allowing the user to automatically generate Netlogo experiment scripts using SPARTAN, then analysing the resultant simulation response using the techniques developed above. This makes use of Netlogo's BehaviourSpace feature, which allows the researcher to perform a sweep of potential parameter values, storing the results in a CSV table. The weakness with this feature is that the researcher is left to develop tools to analyse the simulation responses. Now, SPARTAN can process this table, generating a robust sensitivity analysis of the parameters of interest. On our laboratory website (www.ycil.org.uk), we have made available a slightly modified version of the Netlogo Virus model, and a tutorial demonstrating how SPARTAN can be used to develop parameter value samples for the techniques described above, and then used to analyse the resultant Netlogo simulations.\cr
+Versions 1.0-1.2 of SPARTAN focused on performing an analysis of simulations, but such demonstrations were never paired with tools that are used by researchers to develop such simulations. Version 1.3 offered the additional functionality of linking SPARTAN with Netlogo, allowing the user to automatically generate Netlogo experiment scripts using SPARTAN, then analysing the resultant simulation response using the techniques developed above. This makes use of Netlogo's BehaviourSpace feature, which allows the researcher to perform a sweep of potential parameter values, storing the results in a CSV table. The weakness with this feature is that the researcher is left to develop tools to analyse the simulation responses. Now, SPARTAN can process this table, generating a robust sensitivity analysis of the parameters of interest. On our laboratory website (www.ycil.org.uk), we have made available a slightly modified version of the Netlogo Virus model, and a tutorial demonstrating how SPARTAN can be used to develop parameter value samples for the techniques described above, and then used to analyse the resultant Netlogo simulations.\cr
 \cr
 \bold{Note: } Netlogo BehaviourSpace functionality can produce two forms of output: 'Spreadsheet' or 'Table'. This technique has been designed to work with the later. This is explained fully in the tutorial on our lab website.\cr
 \cr
-The reader should make themselves familiar with the techniques described above, as this is not repeated here. Yet due to the change in format of the output, the method calls for each technique are different, to ensure R deals with the BehaviourSpace output format.\cr
+The reader should make themselves familiar with the techniques described above, as this is not repeated here. The only difference is in the preparation of the Netlogo data: once this is done the methods described in Techniques 2-4 are applied.\cr
 \cr
 The relevant Netlogo Parameter Robustness Methods (Technique 2) are described below. See Technique 2 for a full description of each method:\cr
 \bold{oat_generate_netlogo_behaviour_space_XML}: This generates a Netlogo XML Experiment file, to be used with the BehaviourSpace feature or Headless Netlogo, which perturbs each parameter over a set value space, as described in Technique 2.\cr
-\bold{oat_process_netlogo_result}: Whereas the other methods here are slight modifications of those in Technique 2, this method has been introduced and is Netlogo specific. When the experiment file generated above is run, all the results are stored in one file. To perform the robustness analysis using SPARTAN, the results need to be retrieved from the file and processed. This method creates the file structure demonstrated in the figure in Technique 2, where each parameter has its own folder containing results for a range of values it has been assigned. With this complete, the methods already available in SPARTAN can be used, removing the need to write additional analysis methods.\cr
-\bold{oat_netlogo_analyseAllParams}: Examines each parameter in turn, reading in the medians of each output measure generated above and comparing them to that of the simulation baseline results using the A-Test. \cr
-\bold{oat_netlogo_graphATestsForSampleSize}: This takes each parameter in turn and creates a plot showing A-Test score against parameter value.  This makes it easy to determine how the effect that changing the parameter has had on simulation results.\cr
-\bold{oat_netlogo_plotResultDistribution}: This takes each parameter in turn, and creates a boxplot for each output measure, showing the result distribution for each value of that parameter.\cr
+\bold{oat_process_netlogo_result}: Takes the Netlogo behaviour space file and extracts the required timepoint information from it, storing this in a Spartan compatible CSV file. This CSV file is then processed using the methods described in Technique 2, with A-Test scores determined for each value assigned to each parameter. Once this method has been called, the researcher should use the oat_graphATestsForSampleSize and oat_plotResultDistribution methods of Technique 2 to graph the results.\cr
 \cr
 The relevant Netlogo Latin-Hypercube Sampling and Analysis methods (Technique 3) are described below. See Technique 3 for a full description of each method:\cr
 \bold{lhc_generate_lhc_sample_netlogo}: This generates a specified number of simulation parameters sets using latin-hypercube sampling. These are then processed into Netlogo XML experiment files, one for each set of parameters.\cr
-\bold{lhc_process_netlogo_result}: Takes each parameter value set generated by the hypercube in turn, and analyses the Netlogo simulation results.  For each parameter set, there will be n simulation results. This method goes through these results, producing a file containing the median of each output measure for each of the n runs. Thus, if a Netlogo simulation was replicated 10 times, the median file will contain 10 medians for each simulation output measure.\cr
-\bold{lhc_generate_netlogo_LHCSummary}:This method goes through each parameter value set generated by the hypercube and calculates the median of each output measure, from those in the median output measure from each run calculated above. Thus for each parameter value set, we go from n medians for each measure to 1.  A summary file is produced, containing the parameter values in that set alongside the median of each output measure when the simulation is run under these conditions.\cr
-\bold{lhc_generate_netlogo_PRCoEffs}: For each parameter, and each simulation output measure, calculates the Partial Rank Correlation Coefficient between the parameter value and the simulation results, giving a statistical measurement of any effect that is present.  This is output to a CSV file.\cr
-\bold{lhc_netlogo_graphMeasuresForParameterChange}: Produces a graph for each parameter, and each output measure, showing the simulation output achieved when that parameter was assigned that value.  Eases identification of any non-linear effects.\cr
+
+\bold{lhc_process_netlogo_result}: Takes each parameter value set generated by the hypercube in turn, and analyses the Netlogo simulation results.  For each parameter set, there will be n simulation results. This method goes through these results, producing a file containing the median of each output measure for each of the n runs. Thus, if a Netlogo simulation was replicated 10 times, the median file will contain 10 medians for each simulation output measure. Once this has been created, the user should run the lhc_generateLHCSummary, lhc_generatePRCoEffs. and lhc_graphMeasuresForParameterChange methods of Technique 3.\cr
 \cr
 The relevant eFAST methods (Technique 4) are desribed below. See Technique 4 for a full description of each method:\cr
 \bold{efast_generate_sample_netlogo}: Creates a set of parameter values, over the specified value space, as described in Technique 4. Then processes each of these into a Netlogo experiment XML file, from which a simulation can be run.\cr
-\bold{efast_process_netlogo_result}: Takes each parameter value set generated by eFAST in turn, and analyses the Netlogo simulation results.  For each parameter set, there will be n simulation results. This method goes through these results, producing a file containing the median of each output measure for each of the n runs. Thus, if a Netlogo simulation was replicated 10 times, the median file will contain 10 medians for each simulation output measure.\cr
-\bold{efast_netlogo_get_overall_medians}: This method produces a summary of the results for a particular resampling curve. This shows, for each parameter of interest, the median of each simulation output measure for each of the parameter value sets generated (full description in Technique 4).
-\bold{efast_netlogo_run_Analysis}: Produces a file summarising the analysis; partitioning the variance between parameters and providing relevant statistics. These include, for each parameter of interest, first-order sensitivity index (Si), total-order sensitivity index (STi), complementary parameters sensitivity index (SCi), and relevant p-values and error bar data calculated using a two-sample t-test and standard error respectively.\cr
+\bold{efast_process_netlogo_result}: Takes each parameter value set generated by eFAST in turn, and analyses the Netlogo simulation results.  For each parameter set, there will be n simulation results. This method goes through these results, producing a file containing the median of each output measure for each of the n runs. Thus, if a Netlogo simulation was replicated 10 times, the median file will contain 10 medians for each simulation output measure. The user should then run the efast_get_overall_medians and efast_run_Analysis methods of Technique 4.\cr
+\cr
+Note that for all three methods, it is important to run the PARAMETERS and MEASURES parameters through the method table_header_check first (see examples below), as Netlogo converts any spaces or hyphens in these names to periods. This method will take care of this for you.
 
 }
 \usage{
+
 oat_generate_netlogo_behaviour_space_XML(FILEPATH,
 	NETLOGO_SETUPFILE_NAME,PARAMETERS,PARAMVALS,
 	NETLOGO_SETUP_FUNCTION,NETLOGO_RUN_FUNCTION,MEASURES,
 	EXPERIMENT_REPETITIONS,RUNMETRICS_EVERYSTEP)
 
-oat_process_netlogo_result(FILEPATH,
-	NETLOGO_BEHAVIOURSPACEFILE,PARAMETERS,BASELINE,
-	PMIN,PMAX,PINC,MEASURES,RESULTFILEFORMAT,
-	RESULTFILENAME,TIMESTEP)
-
-oat_netlogo_analyseAllParams(FILEPATH,PARAMETERS,BASELINE,
-	PMIN,PMAX,PINC,MEASURES,MEDIANSFILEFORMAT,
-	MEDIANSFILENAME,ATESTRESULTSFILENAME)
-
-oat_netlogo_graphATestsForSampleSize(FILEPATH,PARAMETERS,
-	PMIN,PMAX,PINC,MEASURES,ATESTSIGLEVEL,
-	ATESTRESULTSFILENAME,TIMEPOINTS,TIMEPOINTSCALE)
-
-oat_netlogo_plotResultDistribution(FILEPATH,PARAMETERS,PMIN,
-	PMAX,PINC,MEASURES,MEASURE_SCALE,MEDIANSFILEFORMAT,
-	MEDIANSFILENAME,TIMEPOINTS,TIMEPOINTSCALE)
+oat_process_netlogo_result(FILEPATH,NETLOGO_BEHAVIOURSPACEFILE,
+	PARAMETERS,BASELINE,PMIN,PMAX,PINC,MEASURES,
+	RESULTFILENAME,ATESTRESULTSFILENAME,TIMESTEP)
 
 lhc_generate_lhc_sample_netlogo(FILEPATH,PARAMETERS,
 	PARAMVALS,NUMSAMPLES,ALGORITHM,
@@ -71,21 +50,8 @@ lhc_generate_lhc_sample_netlogo(FILEPATH,PARAMETERS,
 	NETLOGO_SETUP_FUNCTION,NETLOGO_RUN_FUNCTION,MEASURES)
 
 lhc_process_netlogo_result(FILEPATH,LHCSAMPLE_RESULTFILENAME,
-	NUMSAMPLES,MEASURES,RESULTFILEFORMAT,RESULTFILENAME,
-	TIMESTEP)
-
-lhc_generate_netlogo_LHCSummary(FILEPATH,
-	LHC_PARAM_CSV_LOCATION,PARAMETERS,NUMSAMPLES,
-	MEASURES,MEDIANSFILEFORMAT,MEDIANSFILENAME,
-	LHCSUMMARYFILENAME)
-
-lhc_generate_netlogo_PRCoEffs(FILEPATH,PARAMETERS,MEASURES,
-	LHCSUMMARYFILENAME,CORCOEFFSOUTPUTFILE)
-
-lhc_netlogo_graphMeasuresForParameterChange(FILEPATH,
-	PARAMETERS,MEASURES,MEASURE_SCALE,
-	CORCOEFFSOUTPUTFILE,LHCSUMMARYFILENAME,TIMEPOINTS,
-	TIMEPOINTSCALE)
+	SPARTAN_PARAMETER_FILE,NUMSAMPLES,MEASURES,
+	LHC_ALL_SIM_RESULTS_FILE,TIMESTEP)
 
 efast_generate_sample_netlogo(FILEPATH,NUMCURVES,NUMSAMPLES,
 	MEASURES,PARAMETERS,PARAMVALS,EXPERIMENT_REPETITIONS,
@@ -94,18 +60,7 @@ efast_generate_sample_netlogo(FILEPATH,NUMCURVES,NUMSAMPLES,
 
 efast_process_netlogo_result(FILEPATH,
 	EFASTSAMPLE_RESULTFILENAME,PARAMETERS,NUMCURVES,
-	NUMSAMPLES,MEASURES,RESULTFILEFORMAT,RESULTFILENAME,
-	TIMESTEP)
-
-efast_netlogo_get_overall_medians(FILEPATH,NUMCURVES,
-	PARAMETERS,NUMSAMPLES,MEASURES,MEDIANSFILEFORMAT,
-	MEDIANSFILENAME,CURVERESULTSFILENAME)
-
-efast_netlogo_run_Analysis(FILEPATH,MEASURES,PARAMETERS,
-	NUMCURVES,NUMSAMPLES,OUTPUTMEASURES_TO_TTEST,
-	TTEST_CONF_INT,GRAPH_FLAG,CURVERESULTSFILENAME,
-	EFASTRESULTFILENAME,TIMEPOINTS,TIMEPOINTSCALE)
-
+	NUMSAMPLES,MEASURES,RESULTFILENAME,TIMESTEP)
 }
 \arguments{
   \item{FILEPATH}{Directory where either the parameter samples are to be stored, or the simulation runs can be found}
@@ -122,31 +77,78 @@ efast_netlogo_run_Analysis(FILEPATH,MEASURES,PARAMETERS,
   \item{PMIN}{Array containing the minimum value that should be used for each parameter.  Sets a lower bound on sampling space.}
   \item{PMAX}{Array containing the maximum value that should be used for each parameter.  Sets an upper bound on sampling space.}
   \item{PINC}{Array containing the increment value that should be applied for each parameter. For example, a parameter could have a minimum value of 10, and maximum value of 100, and be incremented by 10.}
-  \item{RESULTFILEFORMAT}{The file format output by the simulation. Spartan can process XML or CSV output formats}
-  \item{RESULTFILENAME}{In Technique 2, where SPARTAN is producing files showing the result for each parameter value, the name of the file that should be produced. For the other techniques, this is the name of the result file produced by Netlogo.}
+  \item{RESULTFILENAME}{In Technique 2, where SPARTAN is producing files showing the modified Netlogo CSV file, the name of the file that should be produced. For the other techniques, this is the name of the result file produced by Netlogo.}
   \item{TIMESTEP}{For Technique 2, the timestep of the Netlogo simulation being analysed.}
-  \item{MEDIANSFILEFORMAT}{File format for the median distribution files produced from simulation results. Can be either XML or CSV.} 
-  \item{MEDIANSFILENAME}{Name of the median distribution file.}
   \item{ATESTRESULTSFILENAME}{File name of the ATests result summary file created by oat_netlogo_analyseAllParams.}
-  \item{ATESTSIGLEVEL}{Used in Technique 2, the A-Test determines if there is a large difference between two sets if the result is greater than 0.21 either side of the 0.5 line. Should this not be suitable, this can be changed here.}
-  \item{TIMEPOINTS}{Used so this method can be used when analysing multiple simulation timepoints.}
-  \item{TIMEPOINTSCALE}{Used so this method can be used when analysing multiple simulation timepoints.}
-  \item{MEASURE_SCALE}{An array containing the measure used for each of the output measures (i.e. microns, microns/min).  Used to label graphs.}
   \item{NUMSAMPLES}{The number of parameter subsets that were generated in the LHC or eFAST design.}
   \item{ALGORITHM}{Choice of algorithm to use to generate the hypercube. Can be set to either 'normal' or 'optimum'. Beware optimum can take a long time to generate an optimised parameter set (more than 24 hours in some circumstances).}
-  \item{LHC_PARAM_CSV_LOCATION}{Location of the file output by the latin-hypercube sampling method.}
+  \item{SPARTAN_PARAMETER_FILE}{Location of the file output by the latin-hypercube sampling method.}
   \item{LHCSAMPLE_RESULTFILENAME}{Name of the result file generated by Netlogo, for a LHC parameter sample.}
-  \item{LHCSUMMARYFILENAME}{Name of the LHC Summary file to be generated by lhc_generateLHCSummary. Contains each parameter set alongside the result gained when the simulation was run under that criteria.}
-  \item{CORCOEFFSOUTPUTFILE}{Name of the file to be generated by lhc_generatePRCoEffs.  Contains the Partial Rank Correlation Coefficients for each parameter.}
+  \item{LHC_ALL_SIM_RESULTS_FILE}{Name of the LHC Summary file to be generated by lhc_process_netlogo_result. Contains each parameter set alongside the result gained when the simulation was run under that criteria.}
   \item{NUMCURVES}{The number of 'resamples' to perform (see eFAST documentation) - recommend using at least 3.}
   \item{EFASTSAMPLE_RESULTFILENAME}{Name of the result file generated by Netlogo, for a LHC parameter sample.}
-  \item{CURVERESULTSFILENAME}{Processes each sample point for each parameter, for each curve in turn, producing a summary file for each curve. This specifies the output file name for this result file.}
-  \item{EFASTRESULTFILENAME}{File name under which the full eFAST analysis should be stored. This will contain the partitioning of variance for each parameter.}
-  \item{TTEST_CONF_INT}{The level of significance to use for the T-Test.}
-  \item{GRAPH_FLAG}{Whether graphs should be produced summarising the output - should be TRUE or FALSE.}
-  \item{OUTPUTMEASURES_TO_TTEST}{Which measures in the range should be tested to see if the result is statistically significant.  To do all, and if there were 3 measures, this would be set to 1:3.}
 }
+\examples{
+# THE CODE IN THIS EXAMPLE IS THE SAME AS THAT USED IN THE TUTORIAL, AND
+# THUS YOU NEED TO DOWNLOAD THE TUTORIAL DATA SET AND SET FILEPATH
+# CORRECTLY TO RUN THIS
+\dontrun{
+## Example for Robustness Analysis
+## INCLUDE THESE TWO LINES FOR NETLOGO - REMOVES ANY PERIODS PLACED IN THE
+## PARAMETERS AND MEASURES IN THE SPREADSHEET
+PARAMETERS<-table_header_check(PARAMETERS)
+MEASURES<-table_header_check(MEASURES)
 
+oat_process_netlogo_result(FILEPATH,NETLOGO_BEHAVIOURSPACEFILE,
+	PARAMETERS,BASELINE,PMIN,PMAX,PINC,MEASURES,CSV_FILE_NAME,
+	ATESTRESULTSFILENAME,TIMESTEP)
+
+
+oat_graphATestsForSampleSize(FILEPATH,PARAMETERS,MEASURES,
+	ATESTSIGLEVEL,ATESTRESULTSFILENAME,BASELINE,
+	PMIN=PMIN,PMAX=PMAX,PINC=PINC,PARAMVALS=NULL)
+
+oat_plotResultDistribution(FILEPATH,PARAMETERS,MEASURES,MEASURE_SCALE,
+	CSV_FILE_NAME,BASELINE,PMIN=PMIN,PMAX=PMAX,PINC=PINC,
+	PARAMVALS=NULL,TIMEPOINTS,TIMEPOINTSCALE)
+
+## Example for Latin-Hypercube Analysis
+lhc_process_netlogo_result(FILEPATH,LHCSAMPLE_RESULTFILENAME,
+	SPARTAN_PARAMETER_FILE,NUMSAMPLES,MEASURES,
+	LHC_ALL_SIM_RESULTS_FILE,TIMESTEP)
+
+PARAMETERS<-table_header_check(PARAMETERS)
+MEASURES<-table_header_check(MEASURES)
+
+lhc_generateLHCSummary(FILEPATH,PARAMETERS,MEASURES,
+	LHC_ALL_SIM_RESULTS_FILE,LHCSUMMARYFILENAME,
+	SPARTAN_PARAMETER_FILE,TIMEPOINTS,TIMEPOINTSCALE)
+
+lhc_generatePRCoEffs(FILEPATH,PARAMETERS,MEASURES,
+	LHCSUMMARYFILENAME,CORCOEFFSOUTPUTFILE,
+	TIMEPOINTS,TIMEPOINTSCALE)
+
+lhc_graphMeasuresForParameterChange(FILEPATH,PARAMETERS,
+	MEASURES,MEASURE_SCALE,CORCOEFFSOUTPUTFILE,
+	LHCSUMMARYFILENAME,TIMEPOINTS,TIMEPOINTSCALE)
+
+## Example for eFAST Analysis
+efast_process_netlogo_result(FILEPATH,
+	EFASTSAMPLE_RESULTFILENAME,PARAMETERS,NUMCURVES,
+	NUMSAMPLES,MEASURES,RESULTFILENAME,TIMESTEP)
+
+PARAMETERS<-table_header_check(PARAMETERS)
+MEASURES<-table_header_check(MEASURES)
+
+efast_get_overall_medians(FILEPATH,NUMCURVES,PARAMETERS,NUMSAMPLES,
+	MEASURES,TIMEPOINTS,TIMEPOINTSCALE)
+
+efast_run_Analysis(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,
+	NUMSAMPLES,OUTPUTMEASURES_TO_TTEST,TTEST_CONF_INT,
+	GRAPH_FLAG,EFASTRESULTFILENAME,
+	TIMEPOINTS,TIMEPOINTSCALE)
+}
+}
 \keyword{Netlogo}
 \keyword{OAT}
 \keyword{Parameter}

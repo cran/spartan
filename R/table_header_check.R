@@ -6,7 +6,5 @@ table_header_check <- function(VECTOR)
 		VECTOR[ENTRY]<-gsub("-",".",VECTOR[ENTRY])
 		VECTOR[ENTRY]<-gsub(" ",".",VECTOR[ENTRY])
 	}
-
 	return(VECTOR)
-}	
-
+}

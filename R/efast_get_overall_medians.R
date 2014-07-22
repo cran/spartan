@@ -1,91 +1,128 @@
 efast_get_overall_medians <-
-function(FILEPATH,NUMCURVES,PARAMETERS,NUMSAMPLES,MEASURES,MEDIANSFILEFORMAT,MEDIANSFILENAME,CURVERESULTSFILENAME)
+function(FILEPATH,NUMCURVES,PARAMETERS,NUMSAMPLES,MEASURES,TIMEPOINTS=NULL,TIMEPOINTSCALE=NULL)
 {
-	if(file.exists(FILEPATH))
+	# SPARTAN 2.0 - THIS NOW TAKES THE INFORMATION FROM A SPREADSHEET CONTAINING THE PARAMETERS AND THE MEDIAN OF RESULTS FROM ALL RUNS
+	# UNDER THAT PARAMETER. THERE IS ONE OF THESE FOR EACH PARAMETER UNDER EACH CURVE
+
+	if(is.null(TIMEPOINTS) || length(TIMEPOINTS)==1)
 	{
-		print("Calculating overall medians responses for each parameter set (efast_get_overall_medians)")
-		# CURVERESULTSFILENAME IS ALLRESULTS.CSV FOR ONE TIMEPOINT
-		# ALL RESULTS - WILL HOLD THE MEDIAN VALUE RESULTS FOR ALL RUNS
-		# IN ORDER ON ROW - 
-		for(CURVE in 1:NUMCURVES)			# CURVE
+		if(file.exists(FILEPATH))
 		{
-			ALLRESULTS<-NULL
+			print("Calculating overall medians responses for each parameter set (efast_get_overall_medians)")
 
-			print(paste("Generating results summary for Curve ",CURVE,sep=""))
-
-			for(SAMPLE in 1:NUMSAMPLES)
+			for(CURVE in 1:NUMCURVES)			# CURVE
 			{
-				ALLRESULTSROW<-NULL
-				
+				#ALLRESULTS<-NULL
+
+				print(paste("Generating results summary for Curve ",CURVE,sep=""))
+
+				# SUMMARY TABLE WILL STORE THE PARAMETERS USED IN THE RUN SET, AND THE MEDIAN OUTPUT MEASURES, FOR EACH SET	
+				SUMMARYTABLE<-NULL
+		
 				for(PARAM in 1:length(PARAMETERS))
 				{
-					# READ IN THE MEDIANS FILE FOR THIS PARAMETER SET
-					MEDIANSFILEPATH<-paste(FILEPATH,"/",CURVE,"/",PARAM,"/",SAMPLE,sep="")
-					
-					if(file.exists(paste(MEDIANSFILEPATH,"/",MEDIANSFILENAME,".csv",sep="")) | 
-							file.exists(paste(MEDIANSFILEPATH,"/",MEDIANSFILENAME,".xml",sep="")))
+					# PARAM SUMMARY WILL BE A COLUMN FOR EACH PARAMETER, THAT IS THEN BOUND TO SUMMARY TABLE
+					PARAM_SUMMARY<-NULL
+
+					# READ IN THE CSV FILE FOR THIS CURVE AND PARAMETER
+					# CONSTRUCT FILE NAME, TAKING TIMEPOINT INTO ACCOUNT
+					if(is.null(TIMEPOINTS))
 					{
-						if(MEDIANSFILEFORMAT=="csv")
-						{
-							MODELRESULT<-read.csv(paste(MEDIANSFILEPATH,"/",MEDIANSFILENAME,".csv",sep=""),header=TRUE)
-						}
-						else if(MEDIANSFILEFORMAT=="xml")
-						{
-							# XML Median Set
-							MODELRESULT<-xmlToDataFrame(paste(MEDIANSFILEPATH,"/",MEDIANSFILENAME,".xml",sep=""))
-						}
-		
-						# FOR THIS PARAMETER SET, GENERATE THE OVERALL MEDIANS FOR EACH OF MEASURE
-						MEDIANSFORALLMEASURES<-NULL
-						
-						for(l in 1:length(MEASURES))
-						{
-							MEASURE_RESULT<-as.matrix(MODELRESULT[MEASURES[l]])
-							MEASUREMEDIAN<-median(as.numeric(MEASURE_RESULT),na.rm=TRUE)
-							MEDIANSFORALLMEASURES<-cbind(MEDIANSFORALLMEASURES,MEASUREMEDIAN[[1]])
-							
-							#MEASUREMEDIAN <- median(ALLMEDIANS[MEASURES[l]][,1],na.rm=TRUE)
-							#MEDIANSFORALLMEASURES<-cbind(MEDIANSFORALLMEASURES,MEASUREMEDIAN)
-						}
-		
-						# APPEND THESE TO THE ALL RESULTS NEW ROW
-						ALLRESULTSROW<-cbind(ALLRESULTSROW,MEDIANSFORALLMEASURES)				
+						SIM_RESPONSES<-read.csv(paste(FILEPATH,"/Curve",CURVE,"_Parameter",PARAM,"_Results.csv",sep=""))
 					}
 					else
 					{
-						print(paste("No simulation responses found for Curve ",CURVE," Parameter ",PARAM," Sample Set ",SAMPLE,sep=""))
+						SIM_RESPONSES<-read.csv(paste(FILEPATH,"/Curve",CURVE,"_Parameter",PARAM,"_",TIMEPOINTS,"_Results.csv",sep=""))
 					}
+
+					# NOW WE ARE PROCESSING A FILE WITH MULTIPLE RUNS OF THE SAME PARAMETER SET. TO SAVE IMPORTING THE PARAMETER FILE
+					# (AS THIS MAY NOT ALWAYS BE AVAILABLE), THIS READS THE PARAMETERS IN. THUS WE PUT A CHECK IN TO MAKE SURE WE DO
+					# NOT PROCESS THE SAME SET OF PARAMETERS TWICE (WHICH WE ASSUME ARE IN ORDER)
+					# WE DO THIS BY COMPARING THE SET WE HAVE JUST PROCESSED TO THE ONE IN THE NEXT ROW
+					# THUS IT IS IMPORTANT THIS FILE IS IN ORDER
+					STRING_SIM_PARAMS_LAST_PROCESSED<-""
+					#count<-0
+
+					for(row in 1:nrow(SIM_RESPONSES))
+					{
+						#print(row)
+						SIM_PARAMS<-SIM_RESPONSES[row,1:length(PARAMETERS)]
+						# CONVERT TO A STRING TO DO THE COMPARISON DISCUSSED ABOVE
+						STRING_SIM_PARAMS<-paste(SIM_PARAMS,collapse=" ")
+
+						if(STRING_SIM_PARAMS!=STRING_SIM_PARAMS_LAST_PROCESSED)
+						{
+
+							STRING_SIM_PARAMS_LAST_PROCESSED<-STRING_SIM_PARAMS
+							#count<-count+1
+							#print(paste(count," ",SIM_PARAMS,sep=""))
+
+							# NOW TO SUBSET THE RESULTS (WHICH CONTAIN MULTIPLE SIM RESULTS FOR THIS SET OF PARAMETERS) TO CALC MEDIANS
+							PARAM_RESULT<-subset_results_by_param_value_set(PARAMETERS,SIM_RESPONSES,SIM_PARAMS)
+							
+							SUMMARY_SIM_ROW<-NULL
+
+							# NOW WE CAN CALCULATE MEDIANS FOR EACH MEASURE
+							for(l in 1:length(MEASURES))
+							{
+								SUMMARY_SIM_ROW<-cbind(SUMMARY_SIM_ROW,median(PARAM_RESULT[[MEASURES[l]]]))
+							
+							}
+							
+		
+					
+							PARAM_SUMMARY<-rbind(PARAM_SUMMARY,SUMMARY_SIM_ROW)
+							# NOW ADD THE ROW TO THE SET FOR ALL SIMULATIONS
+							#SUMMARYTABLE<-rbind(SUMMARYTABLE,SUMMARY_SIM_ROW)
+						}
+					}
+					
+					COLUMNNAMES<-NULL
+					# SET COLUMN NAMES BEFORE MOVING ON TO NEXT PARAMETER
+					for(l in 1:length(MEASURES))
+					{
+						COLUMNNAMES<-cbind(COLUMNNAMES,paste(PARAMETERS[PARAM],"_Median",MEASURES[l],sep=""))
+					}
+					colnames(PARAM_SUMMARY)<-COLUMNNAMES
+
+					# NOW TO BIND THIS COLUMN ONTO THE RESULTS FOR ALL PARAMETERS
+					SUMMARYTABLE<-cbind(SUMMARYTABLE,PARAM_SUMMARY)
 				}
-				
-				#print(ALLRESULTSROW)
-				if(!is.null(ALLRESULTSROW))
+
+				# WRITE THE CURVE RESULTS TO THE FILE
+				if(is.null(TIMEPOINTS))
 				{
-					ALLRESULTS<-rbind(ALLRESULTS,ALLRESULTSROW)
+					SUMMARYRESULTSFILE<-paste(FILEPATH,"/Curve",CURVE,"_Results_Summary.csv",sep="")
 				}
-	
-			}
-	
-			# NOW WRITE THE RESULTS FOR THIS CURVE TO A FILE
-			ALLRESULTSFILE = paste(FILEPATH,"/",CURVE,"/",CURVERESULTSFILENAME,".csv",sep="")
-	
-			# GENERATE THE COLHEADERS FOR PRESENTATION SAKE
-			COLHEADERS<-NULL
-			for(p in 1:length(PARAMETERS))
-			{
-				for(m in 1:length(MEASURES))
+				else
 				{
-					COLHEADERS<-cbind(COLHEADERS,paste(PARAMETERS[p],"_Median",MEASURES[m],sep=""))
+					SUMMARYRESULTSFILE<-paste(FILEPATH,"/Curve",CURVE,"_",TIMEPOINTS,"_Results_Summary.csv",sep="")
 				}
-			}
+				write.csv(SUMMARYTABLE,SUMMARYRESULTSFILE,quote = FALSE,row.names=FALSE)
 	
-			colnames(ALLRESULTS)<-COLHEADERS
-			write.csv(ALLRESULTS,ALLRESULTSFILE,quote = FALSE,row.names=FALSE)
-			print(paste("Summary file for Curve ",CURVE," Complete. Output to ",ALLRESULTSFILE,sep=""))
+				print(paste("eFAST Summary file output to ",SUMMARYRESULTSFILE,sep=""))
+
+			}
+		}
+		else
+		{
+			print("The directory specified in FILEPATH does not exist. No analysis completed")
 		}
 	}
 	else
 	{
-		print("The directory specified in FILEPATH does not exist. No analysis completed")
-	}
-}
+		# PROCESS EACH TIMEPOINT, BY AMENDING THE FILENAMES AND RECALLING THIS FUNCTION
+		for(n in 1:length(TIMEPOINTS))
+		{
+			TIMEPOINTPROCESSING<-TIMEPOINTS[n]
+			print(paste("PROCESSING TIMEPOINT: ",TIMEPOINTPROCESSING,sep=""))
 
+			# NOW CALL THIS FUNCTION AGAIN TO DO THE TIMEPOINTS - WE SET THE TIMEPOINTS AND TIMEPOINTSCALE TO NULL NOW SO WE DONT END UP BACK IN THIS ELSE
+			efast_get_overall_medians(FILEPATH,NUMCURVES,PARAMETERS,NUMSAMPLES,MEASURES,TIMEPOINTS=TIMEPOINTPROCESSING,TIMEPOINTSCALE=NULL)
+
+		}
+	}
+
+
+
+}

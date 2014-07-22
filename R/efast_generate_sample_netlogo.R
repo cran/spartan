@@ -227,7 +227,7 @@ function(FILEPATH,NUMCURVES,NUMSAMPLES,MEASURES,PARAMETERS,PARAMVALS,EXPERIMENT_
 		{
 			for(PARAMNUM in 1:NUMPARAMS)
 			{
-				parameterFile = paste(FILEPATH,"/Curve",CURVENUM,"_",PARAMETERS[PARAMNUM],".csv",sep="")
+				parameterFile = paste(FILEPATH,"/Curve",CURVENUM,"_",PARAMSOFINTEREST[PARAMNUM],".csv",sep="")
 				outputParams <- PARAMETERVALS[,,PARAMNUM,CURVENUM]
 				colnames(outputParams)<-c(PARAMSOFINTEREST)
 				

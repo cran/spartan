@@ -60,9 +60,6 @@ For detailed information on how eFAST works, see either of the following: (a) Ma
 # CORRECTLY TO RUN THIS
 
 ##---Firstly,declare the parameters required for the functions--
-library(spartan)
-# Import the graphing package
-library(gplots)
 # Folder containing the simulation results, or CSV files
 FILEPATH<-"/home/user/Downloads/eFAST/"
 # Number of resample curves employed when the parameter space was
@@ -118,8 +115,9 @@ TIMEPOINTS<-c(12,36,48,60); TIMEPOINTSCALE<-"Hours"
 # DONTRUN IS SET SO THIS IS NOT EXECUTED WHEN PACKAGE IS COMPILED - BUT THIS
 # HAS BEEN TESTED WITH THE TUTORIAL DATA
 
-
-
+library(spartan)
+# Import the graphing package
+library(gplots)
 
 ##--- NOW RUN THE FOUR METHODS IN THIS ORDER ----
 # FIRSTLY, WHERE MULTIPLE RUNS ARE PERFORMED,

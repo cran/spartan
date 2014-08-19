@@ -51,7 +51,14 @@ function(FILEPATH,PARAMETERS,RESULTFILENAME,OUTPUTCOLSTART,OUTPUTCOLEND,PARAMETE
 
 								}else if(RESULTFILEFORMAT=="xml")
 								{
-									MODELRESULT<-xmlToDataFrame(paste(FILEADDRESS,".xml",sep=""))
+									if(requireNamespace("XML",quietly=TRUE))
+									{
+										MODELRESULT<-XML::xmlToDataFrame(paste(FILEADDRESS,".xml",sep=""))
+									}
+									else
+									{
+										print("The oat_countResponsesOfDesiredValue function requires the XML package to be installed")
+									}
 								}
 
 

@@ -30,7 +30,14 @@ function(FILEPATH,NUMRUNSPERSAMPLE,MEASURES,RESULTFILENAME,ALTFILENAME,OUTPUTFIL
 
 			}else if(substr(RESULTFILENAME,(nchar(RESULTFILENAME)+1)-3,nchar(RESULTFILENAME))=="xml")
 			{
-				MODELRESULT<-xmlToDataFrame(FILEADDRESS)
+				if(requireNamespace("XML",quietly=TRUE))
+				{
+					MODELRESULT<-XML::xmlToDataFrame(FILEADDRESS)
+				}
+				else
+				{
+					print("The getMediansSubset function requires the XML package to be installed")
+				}
 			}
 			
 			if(nrow(MODELRESULT)>0)
@@ -65,7 +72,14 @@ function(FILEPATH,NUMRUNSPERSAMPLE,MEASURES,RESULTFILENAME,ALTFILENAME,OUTPUTFIL
 					}
 					else if(substr(ALTFILENAME,(nchar(ALTFILENAME)+1)-3,nchar(ALTFILENAME))=="xml")
 					{
-						MODELRESULT<-xmlToDataFrame(paste(FILEADDRESS,".xml",sep=""))
+						if(requireNamespace("XML",quietly=TRUE))
+						{
+							MODELRESULT<-XML::xmlToDataFrame(FILEADDRESS)
+						}
+						else
+						{
+							print("The getMediansSubset function requires the XML package to be installed")
+						}
 					}
 					
 					if(nrow(MODELRESULT)>0)

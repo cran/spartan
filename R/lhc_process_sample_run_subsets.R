@@ -13,10 +13,11 @@ function(FILEPATH,SPARTAN_PARAMETER_FILE,PARAMETERS,NUMSAMPLES,NUMRUNSPERSAMPLE,
 			print("Generating Simulation Median Responses (process_sample_run_subsets)")
 
 			# READ IN THE SPARTAN PARAMETER FILE
-			LHCTABLE<-read.csv(paste(FILEPATH,"/",SPARTAN_PARAMETER_FILE,sep=""),header=TRUE)
+			LHCTABLE<-read.csv(paste(FILEPATH,"/",SPARTAN_PARAMETER_FILE,sep=""),header=TRUE, check.names=FALSE)
 
+			# Not using as now applying check.names=FALSE instead
 			# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
-			MEASURES<-table_header_check(MEASURES)
+			#MEASURES<-table_header_check(MEASURES)
 			
 			# NOW ALL THE MEDIANS ARE HELD TOGETHER, ACCOMPANIED BY THEIR SIMULATION PARAMETERS BEING ANALYSED
 			ALL_SIM_MEDIAN_RESULTS<-NULL

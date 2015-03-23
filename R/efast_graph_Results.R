@@ -22,7 +22,7 @@ function(RESULTS_FILE_PATH,PARAMETERS,Si,STi,errorsSi,errorsSTi,MEASURES,TIMEPOI
 			labelspacing<-seq(2,(length(PARAMETERS)*3),3)
 		
 			# DATA TO GRAPH RETRIEVES THE PARAMETERS, Si AND STi TO BE GRAPHED FROM THE MAIN RESULT SET
-			dataToGraph <- data.frame(cbind(Si[,,MEASURE],STi[,,MEASURE]))
+			dataToGraph <- data.frame(cbind(Si[,,MEASURE],STi[,,MEASURE]),check.names=FALSE)
 
 			# CONSTRUCT THE ERROR BAR
 			highSi<-dataToGraph[,1] + errorsSi[,MEASURE]

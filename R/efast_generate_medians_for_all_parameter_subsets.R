@@ -18,7 +18,7 @@ function(FILEPATH,NUMCURVES,PARAMETERS,NUMSAMPLES,NUMRUNSPERSAMPLE,MEASURES,RESU
 					print(paste("Generating Median Simulation Results for Curve: ",CURVE," Parameter: ",PARAM,sep=""))
 
 					# Open the parameter file
-					params<-read.csv(paste(FILEPATH,"/Curve",CURVE,"_Param",PARAM,".csv",sep=""))
+					params<-read.csv(paste(FILEPATH,"/Curve",CURVE,"_Param",PARAM,".csv",sep=""),header=TRUE,check.names=FALSE)
 
 					CURVE_PARAM_RESULT<-NULL
 

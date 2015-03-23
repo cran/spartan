@@ -6,17 +6,18 @@ function(FILEPATH,MEASURES,MAXSAMPLESIZE,SMALL,MEDIUM,LARGE,SUMMARYFILENAME,GRAP
 		# NOW DRAW THE GRAPH
 		print("Creating Summary Graph")
 		
+		# No longer required as using check.names=FALSE in CSV file reading
 		# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
-		MEASURES<-table_header_check(MEASURES)
+		#MEASURES<-table_header_check(MEASURES)
 	
 		if(file.exists(paste(FILEPATH,"/",SUMMARYFILENAME,sep="")))
 		{
-			aTestResults <- read.csv(paste(FILEPATH,"/",SUMMARYFILENAME,sep=""),header=TRUE)
+			aTestResults <- read.csv(paste(FILEPATH,"/",SUMMARYFILENAME,sep=""),header=TRUE,check.names=FALSE)
 
 			# Where the resulting graph should go (ATESTMAXES.PDF USED IF ONE TIMEPOINT)
-			graphFile = paste(FILEPATH,"/",GRAPHOUTPUTFILE,sep="")
-			pdf(graphFile,width=12,height=7)
-			par(xpd=NA,oma=c(0,0,0,14))
+			graphFile = paste(FILEPATH,"/",GRAPHOUTPUTFILE,sep="")			
+			pdf(graphFile, width=12, height=7)
+			par(xpd=NA,mar=c(4,4,2,17))
 
 			# NOW PLOT FOR EACH MEASURE
 			# THE PLOT BEGINS WITH THE FIRST MEASURE
@@ -45,7 +46,11 @@ function(FILEPATH,MEASURES,MAXSAMPLESIZE,SMALL,MEDIUM,LARGE,SUMMARYFILENAME,GRAP
 		
 			axis(1,at=seq(0,MAXSAMPLESIZE,by=100))
 			axis(2, at=seq(0.5,1.0, by=0.05))
-			legend(par("usr")[2],par("usr")[4],title="MEASURES",MEASURES,pch=1:length(MEASURES),lty=1,xjust=0,yjust=2.0)
+			#legend(par("usr")[2],par("usr")[4],title="MEASURES",MEASURES,pch=1:length(MEASURES),lty=1,xjust=0,yjust=2.0)
+			
+			par(xpd=TRUE)
+			legend(par("usr")[2],par("usr")[4],title="MEASURES",MEASURES, pch=1:length(MEASURES),cex=0.7,ncol=1)
+			
 			par(xpd=FALSE)
 	
 			# ADD THE LINES TO SHOW WHERE THE A-TEST EFFECTS ARE

@@ -7,13 +7,14 @@ function(FILEPATH,SAMPLESIZES,MEASURES,ATESTRESULTSFILENAME,SUMMARYFILENAME,TIME
 
 		print("Producing Analysis Summary (aa_sampleSizeSummary)")
 		
+		# No need to check the measures now we're using check.names=FALSE
 		# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
-		MEASURES<-table_header_check(MEASURES)
+		#MEASURES<-table_header_check(MEASURES)
 
 		if(file.exists(paste(FILEPATH,"/",ATESTRESULTSFILENAME,sep="")))
 		{
 			# SPARTAN 2.0 - ALL ATEST SCORES ARE NOW IN 1 CSV FILE - OPEN THIS AND PROCESS IT
-			ALLSUBSET_ATEST_SCORES<-read.csv(paste(FILEPATH,"/",ATESTRESULTSFILENAME,sep=""))	
+			ALLSUBSET_ATEST_SCORES<-read.csv(paste(FILEPATH,"/",ATESTRESULTSFILENAME,sep=""),header=TRUE,check.names=FALSE)	
 
 			for(k in 1:length(SAMPLESIZES))
 			{
@@ -21,7 +22,7 @@ function(FILEPATH,SAMPLESIZES,MEASURES,ATESTRESULTSFILENAME,SUMMARYFILENAME,TIME
 				print(paste("Processing Sample Size: ",SAMPLEPROCESSING,sep=""))
 
 				# SUBSET THE RESULTS ON THE SAMPLE SIZE
-				SAMPLE_SIZE_RESULT<-subset(ALLSUBSET_ATEST_SCORES,ALLSUBSET_ATEST_SCORES[["Sample.Size"]]==as.numeric(SAMPLEPROCESSING))
+				SAMPLE_SIZE_RESULT<-subset(ALLSUBSET_ATEST_SCORES,ALLSUBSET_ATEST_SCORES[["Sample Size"]]==as.numeric(SAMPLEPROCESSING))
 
 				# NOW WORK OUT MAX AND MEDIAN A-TEST RESULTS FOR EACH SAMPLE SIZE, FOR GRAPHING LATER
 				SAMPLE_SIZE_SUMMARY<-c(SAMPLEPROCESSING)

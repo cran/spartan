@@ -12,10 +12,11 @@ function(FILEPATH,PARAMETERS,MEASURES,ATESTSIGLEVEL,ATESTRESULTFILENAME,BASELINE
 			print("Creating graphs of A-Test results (oat_graphATestsForSampleSize)") 
 
 			# FIRSTLY READ IN THE ATESTS FILE (NOW ALL IN ONE FILE)
-			RESULT<-read.csv(paste(FILEPATH,"/",ATESTRESULTFILENAME,sep=""),sep=",",header=T)
+			RESULT<-read.csv(paste(FILEPATH,"/",ATESTRESULTFILENAME,sep=""),sep=",",header=TRUE, check.names=FALSE)
 
+			# No longer in use as have changed the method of reading in CSV files (check.names=FALSE)
 			# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
-			MEASURES<-table_header_check(MEASURES)
+			#MEASURES<-table_header_check(MEASURES)
 
 			for(PARAM in 1:length(PARAMETERS))
 			{
@@ -63,8 +64,10 @@ function(FILEPATH,PARAMETERS,MEASURES,ATESTSIGLEVEL,ATESTRESULTFILENAME,BASELINE
 					GRAPHTITLE <- paste("A-Test Scores when adjusting parameter \n",PARAMETERS[PARAM]," at Timepoint: ",TIMEPOINTS," ",TIMEPOINTSCALE,sep="")
 				}
 				
-				pdf(GRAPHFILE,width=12,height=7)
-				par(xpd=NA,oma=c(0,0,0,14))
+				#pdf(GRAPHFILE,width=12,height=7)
+				#par(xpd=NA,oma=c(0,0,0,14))
+				pdf(GRAPHFILE, width=12, height=7)
+				par(xpd=NA,mar=c(4,4,4,17))
 		
 				# NOW PLOT THE MEASURES
 				# START WITH THE FIRST
@@ -83,7 +86,8 @@ function(FILEPATH,PARAMETERS,MEASURES,ATESTSIGLEVEL,ATESTRESULTFILENAME,BASELINE
 				}
 			
 				axis(1,PARAM_VAL_LIST)
-				legend(par("usr")[2],par("usr")[4],title="Measures",MEASURES,pch=1:length(MEASURES),lty=1,xjust=0,yjust=2.0)
+				#legend(par("usr")[2],par("usr")[4],title="Measures",MEASURES,pch=1:length(MEASURES),lty=1,xjust=0,yjust=2.0)
+				legend(par("usr")[2],par("usr")[4],title="Measures",MEASURES, pch=1:length(MEASURES),cex=0.7,ncol=1)
 				par(xpd=FALSE)
 		
 				abline(a=0.5,b=0,lty=4)

@@ -25,7 +25,7 @@ function(x,y,z,use="mat",calcMethod="p",na.rm=TRUE){
 
 	x <- c(x)
 	y <- c(y)
-	z <- as.data.frame(z)
+	z <- as.data.frame(z,check.names=FALSE)
 
 	if(use == "mat"){
 		p.use <- "Var-Cov matrix"
@@ -49,7 +49,7 @@ function(x,y,z,use="mat",calcMethod="p",na.rm=TRUE){
 	}
 
 	# sample number
-	n <- dim(na.omit(data.frame(x,y,z)))[1]
+	n <- dim(na.omit(data.frame(x,y,z,check.names=FALSE)))[1]
 	
 	# given variables' number
 	gn <- dim(z)[2]
@@ -64,6 +64,6 @@ function(x,y,z,use="mat",calcMethod="p",na.rm=TRUE){
   		p.value <- 2*pnorm(-abs(statistic))
 	}
 
-	data.frame(estimate=pcor,p.value=p.value,statistic=statistic,n=n,gn=gn,Method=p.method,Use=p.use)
+	data.frame(estimate=pcor,p.value=p.value,statistic=statistic,n=n,gn=gn,Method=p.method,Use=p.use,check.names=FALSE)
 }
 

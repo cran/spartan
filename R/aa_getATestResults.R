@@ -10,11 +10,12 @@ function(FILEPATH,SAMPLESIZES,NUMSUBSETSPERSAMPLESIZE,MEASURES,AA_SIM_RESULTS,AT
 		SIZE_RESULTS<-NULL
 
 		# READ IN THE SUMMARY FILE
-		RESULT<-read.csv(paste(FILEPATH,"/",AA_SIM_RESULTS,sep=""),sep=",",header=T)
+		RESULT<-read.csv(paste(FILEPATH,"/",AA_SIM_RESULTS,sep=""),sep=",",header=TRUE,check.names=FALSE)
 		print("Generating A-Test Scores for Consistency Analysis")
 		
+		# Table header check no longer needed now that check.names=FALSE in read.csv.
 		# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
-		MEASURES<-table_header_check(MEASURES)
+		#MEASURES<-table_header_check(MEASURES)
 
 		# GENERATE COLUMN HEADINGS - WE USE THIS TWICE LATER
 		ATESTRESULTSHEADER<-cbind("Sample Size","Sample")
@@ -79,8 +80,7 @@ function(FILEPATH,SAMPLESIZES,NUMSUBSETSPERSAMPLESIZE,MEASURES,AA_SIM_RESULTS,AT
 			if(is.null(GRAPHNAME))
 			{
 				GRAPHOUTPUTNAME<-paste(SAMPLESIZES[s],"Samples.pdf",sep="")
-			}
-			else
+			}else
 			{
 				GRAPHOUTPUTNAME<-paste(SAMPLESIZES[s],"Samples_",GRAPHNAME,".pdf",sep="")
 			}

@@ -9,13 +9,14 @@ function(FILEPATH,PARAMETERS,MEASURES,LHCSUMMARYFILENAME,CORCOEFFSOUTPUTFILE,TIM
 			# CORCOEFFSOUTPUTFILE IS corCoefs.csv FOR 1 TIMEPOINT
 			if(file.exists(paste(FILEPATH,"/",LHCSUMMARYFILENAME,sep="")))
 			{
-				LHCRESULTFILE<-read.csv(paste(FILEPATH,"/",LHCSUMMARYFILENAME,sep=""),header=TRUE)
+				LHCRESULTFILE<-read.csv(paste(FILEPATH,"/",LHCSUMMARYFILENAME,sep=""),header=TRUE, check.names=FALSE)
 				PARAMCOEFFSTRUCT<-NULL
 				COEFFRESULTS<-NULL
 				print("Generating Partial Rank Correlation Coefficients (lhc_generatePRCoEffs)")
 				
+				# Not using anymore as we're using check.names=FALSE on CSV file reading
 				# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
-				MEASURES<-table_header_check(MEASURES)
+				#MEASURES<-table_header_check(MEASURES)
 		
 				# NEED TO GENERATE A COEFFICIENT FOR EACH PARAMETER BEING EXAMINED
 				for(k in 1:length(PARAMETERS))

@@ -4,8 +4,9 @@ aa_summariseReplicateRuns<-function(FILEPATH,SAMPLESIZES,MEASURES,RESULTFILENAME
 	{
 		SAMPLE_SIZE_RESULTS<-NULL
 		
+		# No longer required as using check.names=FALSE when reading CSV files
 		# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
-		MEASURES<-table_header_check(MEASURES)
+		#MEASURES<-table_header_check(MEASURES)
 
 		for(SAMPLESIZE in 1:length(SAMPLESIZES))
 		{

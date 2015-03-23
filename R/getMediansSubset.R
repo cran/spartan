@@ -20,13 +20,13 @@ function(FILEPATH,NUMRUNSPERSAMPLE,MEASURES,RESULTFILENAME,ALTFILENAME,OUTPUTFIL
 				# import model result
 				if(OUTPUTFILECOLSTART>1)
 				{
-					import<-read.csv(FILEADDRESS,colClasses=c(rep('NULL',OUTPUTFILECOLSTART-1),rep(NA,OUTPUTFILECOLEND-OUTPUTFILECOLSTART+1)))
+					import<-read.csv(FILEADDRESS,colClasses=c(rep('NULL',OUTPUTFILECOLSTART-1),rep(NA,OUTPUTFILECOLEND-OUTPUTFILECOLSTART+1)),header=TRUE,check.names=FALSE)
 				}else
 				{
-					import<-read.csv(FILEADDRESS,colClasses=c(rep(NA,OUTPUTFILECOLEND)))
+					import<-read.csv(FILEADDRESS,colClasses=c(rep(NA,OUTPUTFILECOLEND)),header=TRUE,check.names=FALSE)
 				}
 
-				MODELRESULT<-data.frame(import)
+				MODELRESULT<-data.frame(import,check.names=FALSE)
 
 			}else if(substr(RESULTFILENAME,(nchar(RESULTFILENAME)+1)-3,nchar(RESULTFILENAME))=="xml")
 			{
@@ -67,8 +67,8 @@ function(FILEPATH,NUMRUNSPERSAMPLE,MEASURES,RESULTFILENAME,ALTFILENAME,OUTPUTFIL
 					{
 						# DEALING WITH A CSV FILE
 						com <- paste("cut -d, -f",OUTPUTFILECOLSTART,"-",OUTPUTFILECOLEND," ",FILEADDRESS,sep="")
-						import<-read.csv(pipe(com))
-						MODELRESULT<-data.frame(import)
+						import<-read.csv(pipe(com),header=TRUE,check.names=FALSE)
+						MODELRESULT<-data.frame(import,check.names=FALSE)
 					}
 					else if(substr(ALTFILENAME,(nchar(ALTFILENAME)+1)-3,nchar(ALTFILENAME))=="xml")
 					{

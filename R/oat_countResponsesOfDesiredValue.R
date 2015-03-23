@@ -41,13 +41,13 @@ function(FILEPATH,PARAMETERS,RESULTFILENAME,OUTPUTCOLSTART,OUTPUTCOLEND,PARAMETE
 								{
 									if(OUTPUTCOLSTART>1)
 									{
-										import<-read.csv(paste(FILEADDRESS,".csv",sep=""),colClasses=c(rep('NULL',OUTPUTCOLSTART-1),rep(NA,OUTPUTCOLEND-OUTPUTCOLSTART+1)))
+										import<-read.csv(paste(FILEADDRESS,".csv",sep=""),colClasses=c(rep('NULL',OUTPUTCOLSTART-1),rep(NA,OUTPUTCOLEND-OUTPUTCOLSTART+1)), header=TRUE, check.names=FALSE)
 									}else
 									{
-										import<-read.csv(paste(FILEADDRESS,".csv",sep=""),colClasses=c(rep(NA,OUTPUTCOLEND)))
+										import<-read.csv(paste(FILEADDRESS,".csv",sep=""),colClasses=c(rep(NA,OUTPUTCOLEND)), header=TRUE, check.names=FALSE)
 									}
 
-									MODELRESULT<-data.frame(import)
+									MODELRESULT<-data.frame(import,check.names=FALSE)
 
 								}else if(RESULTFILEFORMAT=="xml")
 								{

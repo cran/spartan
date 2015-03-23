@@ -12,10 +12,11 @@ function(FILEPATH,PARAMETERS,MEASURES,MEASURE_SCALE,CSV_FILE_NAME,BASELINE,PMIN=
 			# IN A CHANGE TO SPARTAN 1, THE FIRST FUNCTION THAT PROCESSES SIMULATION RESPONSES CREATES THIS FILE, NOT MEDIANS FOR EACH PARAMETER AS IT USED TO 
 			# THIS WAY WE ARE NOT DEALING WITH TWO METHODS OF SIMULATION RESULT SPECIFICATION
 			# READ IN THE OAT RESULT FILE
-			RESULT<-read.csv(paste(FILEPATH,"/",CSV_FILE_NAME,sep=""),sep=",",header=T)
+			RESULT<-read.csv(paste(FILEPATH,"/",CSV_FILE_NAME,sep=""),sep=",",header=TRUE, check.names=FALSE)
 			
+			# No longer in use as have changed the method of reading CSV files (check.names=FALSE)
 			# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
-			MEASURES<-table_header_check(MEASURES)
+			#MEASURES<-table_header_check(MEASURES)
 
 			for(PARAM in 1:length(PARAMETERS))
 			{

@@ -6,8 +6,9 @@ function(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,NUMSAMPLES,OUTPUTMEASURES_TO_TTE
 	{
 		if(file.exists(FILEPATH))
 		{
+			# Not checking measures anymore as we are not checking row names on CSV read in (check.names=FALSE)
 			# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
-			MEASURES<-table_header_check(MEASURES)
+			#MEASURES<-table_header_check(MEASURES)
 			
 			NUMPARAMS<-length(PARAMETERS) # of input factors (parameters varied)
 		
@@ -40,7 +41,7 @@ function(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,NUMSAMPLES,OUTPUTMEASURES_TO_TTE
 			# READ IN THE FIRST CURVE
 			if(file.exists(CURVE1RESULTSFILENAME))
 			{
-				RESULTS<-read.csv(CURVE1RESULTSFILENAME,sep=",")
+				RESULTS<-read.csv(CURVE1RESULTSFILENAME,sep=",",header=TRUE,check.names=FALSE)
 
 				# NOW READ IN ANY FURTHER CURVES
 				if(NUMCURVES>1)
@@ -59,7 +60,7 @@ function(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,NUMSAMPLES,OUTPUTMEASURES_TO_TTE
 
 						if(file.exists(CURVERESULTSFILENAME))
 						{
-							CURVERESULTS<-read.csv(CURVERESULTSFILENAME,sep=",")
+							CURVERESULTS<-read.csv(CURVERESULTSFILENAME,sep=",",header=TRUE,check.names=FALSE)
 							# NOTE THIS ASSUMES THAT THE RESULTS HAVE BEEN GENERATED WITH THE FIRST COLUMN CONTAINING NO SAMPLE COUNT
 							# ADD TO THE PREVIOUS CURVES
 							RESULTS<-cbind(RESULTS,CURVERESULTS[1:length(CURVERESULTS)])

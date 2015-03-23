@@ -10,8 +10,9 @@ function(FILEPATH,NUMCURVES,PARAMETERS,NUMSAMPLES,MEASURES,TIMEPOINTS=NULL,TIMEP
 		{
 			print("Calculating overall medians responses for each parameter set (efast_get_overall_medians)")
 			
+			# Not using header check now we're using check.names=FALSE on table read in
 			# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
-			MEASURES<-table_header_check(MEASURES)
+			#MEASURES<-table_header_check(MEASURES)
 
 			for(CURVE in 1:NUMCURVES)			# CURVE
 			{
@@ -31,11 +32,11 @@ function(FILEPATH,NUMCURVES,PARAMETERS,NUMSAMPLES,MEASURES,TIMEPOINTS=NULL,TIMEP
 					# CONSTRUCT FILE NAME, TAKING TIMEPOINT INTO ACCOUNT
 					if(is.null(TIMEPOINTS))
 					{
-						SIM_RESPONSES<-read.csv(paste(FILEPATH,"/Curve",CURVE,"_Parameter",PARAM,"_Results.csv",sep=""))
+						SIM_RESPONSES<-read.csv(paste(FILEPATH,"/Curve",CURVE,"_Parameter",PARAM,"_Results.csv",sep=""),header=TRUE,check.names=FALSE)
 					}
 					else
 					{
-						SIM_RESPONSES<-read.csv(paste(FILEPATH,"/Curve",CURVE,"_Parameter",PARAM,"_",TIMEPOINTS,"_Results.csv",sep=""))
+						SIM_RESPONSES<-read.csv(paste(FILEPATH,"/Curve",CURVE,"_Parameter",PARAM,"_",TIMEPOINTS,"_Results.csv",sep=""),header=TRUE,check.names=FALSE)
 					}
 
 					# NOW WE ARE PROCESSING A FILE WITH MULTIPLE RUNS OF THE SAME PARAMETER SET. TO SAVE IMPORTING THE PARAMETER FILE

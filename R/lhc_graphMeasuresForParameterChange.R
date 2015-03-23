@@ -10,6 +10,9 @@ function(FILEPATH,PARAMETERS,MEASURES,MEASURE_SCALE,CORCOEFFSOUTPUTFILE,LHCSUMMA
 			if(file.exists(paste(FILEPATH,"/",CORCOEFFSOUTPUTFILE,sep="")))
 			{
 				CORCOEFFS<-read.csv(paste(FILEPATH,"/",CORCOEFFSOUTPUTFILE,sep=""),header=TRUE)
+				
+				# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
+				MEASURES<-table_header_check(MEASURES)
 
 				if(file.exists(paste(FILEPATH,"/",LHCSUMMARYFILENAME,sep="")))
 				{

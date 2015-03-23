@@ -13,6 +13,9 @@ function(FILEPATH,PARAMETERS,MEASURES,LHCSUMMARYFILENAME,CORCOEFFSOUTPUTFILE,TIM
 				PARAMCOEFFSTRUCT<-NULL
 				COEFFRESULTS<-NULL
 				print("Generating Partial Rank Correlation Coefficients (lhc_generatePRCoEffs)")
+				
+				# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
+				MEASURES<-table_header_check(MEASURES)
 		
 				# NEED TO GENERATE A COEFFICIENT FOR EACH PARAMETER BEING EXAMINED
 				for(k in 1:length(PARAMETERS))

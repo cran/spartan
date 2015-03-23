@@ -6,6 +6,9 @@ function(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,NUMSAMPLES,OUTPUTMEASURES_TO_TTE
 	{
 		if(file.exists(FILEPATH))
 		{
+			# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
+			MEASURES<-table_header_check(MEASURES)
+			
 			NUMPARAMS<-length(PARAMETERS) # of input factors (parameters varied)
 		
 			NUMOUTMEASURES<-length(MEASURES)

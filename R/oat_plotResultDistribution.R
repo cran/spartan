@@ -13,6 +13,9 @@ function(FILEPATH,PARAMETERS,MEASURES,MEASURE_SCALE,CSV_FILE_NAME,BASELINE,PMIN=
 			# THIS WAY WE ARE NOT DEALING WITH TWO METHODS OF SIMULATION RESULT SPECIFICATION
 			# READ IN THE OAT RESULT FILE
 			RESULT<-read.csv(paste(FILEPATH,"/",CSV_FILE_NAME,sep=""),sep=",",header=T)
+			
+			# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
+			MEASURES<-table_header_check(MEASURES)
 
 			for(PARAM in 1:length(PARAMETERS))
 			{

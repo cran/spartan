@@ -3,6 +3,9 @@ aa_summariseReplicateRuns<-function(FILEPATH,SAMPLESIZES,MEASURES,RESULTFILENAME
 	if(is.null(TIMEPOINTS))
 	{
 		SAMPLE_SIZE_RESULTS<-NULL
+		
+		# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
+		MEASURES<-table_header_check(MEASURES)
 
 		for(SAMPLESIZE in 1:length(SAMPLESIZES))
 		{

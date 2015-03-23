@@ -6,6 +6,9 @@ function(FILEPATH,SAMPLESIZES,MEASURES,ATESTRESULTSFILENAME,SUMMARYFILENAME,TIME
 		ATESTMAXES <-NULL
 
 		print("Producing Analysis Summary (aa_sampleSizeSummary)")
+		
+		# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
+		MEASURES<-table_header_check(MEASURES)
 
 		if(file.exists(paste(FILEPATH,"/",ATESTRESULTSFILENAME,sep="")))
 		{

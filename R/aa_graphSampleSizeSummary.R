@@ -5,6 +5,9 @@ function(FILEPATH,MEASURES,MAXSAMPLESIZE,SMALL,MEDIUM,LARGE,SUMMARYFILENAME,GRAP
 	{
 		# NOW DRAW THE GRAPH
 		print("Creating Summary Graph")
+		
+		# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
+		MEASURES<-table_header_check(MEASURES)
 	
 		if(file.exists(paste(FILEPATH,"/",SUMMARYFILENAME,sep="")))
 		{
@@ -20,11 +23,14 @@ function(FILEPATH,MEASURES,MAXSAMPLESIZE,SMALL,MEDIUM,LARGE,SUMMARYFILENAME,GRAP
 			measureLabel<-paste(MEASURES[1],"MaxA",sep="")
 			plot(aTestResults$SampleSize,aTestResults[measureLabel][,1],type="o",lty=1,ylim=c(0.5,1.0),pch=1,xlab = "Sample Size",ylab = "A Test Score",xaxt="n",yaxt="n")
 	
-			# NOW DO ALL OTHER MEASURES
-			for(l in 2:length(MEASURES))
+			# NOW DO ALL OTHER MEASURES, IF THERE ARE MORE THAN ONE
+			if(length(MEASURES)>1)
 			{
-				measureLabel<-paste(MEASURES[l],"MaxA",sep="")
-				lines(aTestResults$SampleSize,aTestResults[measureLabel][,1],type="o",lty=5,pch=l)
+				for(l in 2:length(MEASURES))
+				{
+					measureLabel<-paste(MEASURES[l],"MaxA",sep="")
+					lines(aTestResults$SampleSize,aTestResults[measureLabel][,1],type="o",lty=5,pch=l)
+				}
 			}
 	
 			# NOW COMPLETE GRAPH - TITLE DEPENDING ON WHETHER THIS IS ONE TIMEPOINT OR MANY

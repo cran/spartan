@@ -12,6 +12,9 @@ function(FILEPATH,SAMPLESIZES,NUMSUBSETSPERSAMPLESIZE,MEASURES,AA_SIM_RESULTS,AT
 		# READ IN THE SUMMARY FILE
 		RESULT<-read.csv(paste(FILEPATH,"/",AA_SIM_RESULTS,sep=""),sep=",",header=T)
 		print("Generating A-Test Scores for Consistency Analysis")
+		
+		# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
+		MEASURES<-table_header_check(MEASURES)
 
 		# GENERATE COLUMN HEADINGS - WE USE THIS TWICE LATER
 		ATESTRESULTSHEADER<-cbind("Sample Size","Sample")

@@ -10,6 +10,9 @@ oat_csv_result_file_analysis<-function(FILEPATH,CSV_FILE_NAME,PARAMETERS,BASELIN
 		# READ IN THE OAT RESULT FILE
 		RESULT<-read.csv(paste(FILEPATH,"/",CSV_FILE_NAME,sep=""),sep=",",header=T)
 
+		# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
+		MEASURES<-table_header_check(MEASURES)
+		
 		# FIRSTLY FILTER THE SIMULATION RESULTS WHEN AT BASELINE VALUES
 		BASELINE_RESULT<-subset_results_by_param_value_set(PARAMETERS,RESULT,BASELINE)
 

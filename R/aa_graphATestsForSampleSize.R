@@ -15,11 +15,14 @@ function(FILEPATH,ATESTS,MEASURES,LARGEDIFFINDICATOR,GRAPHOUTPUTNAME,TIMEPOINT,T
 
 	plot(ATESTS["Sample"][,1],ATESTS[MEASURELABEL][,1],type="o",lty=1,ylim=c(0,1),pch=1,xlab = "Run Subset / Parameter Value (Dummy)",ylab = "A Test Score",xaxt="n",xlim=c(2,20))
 
-	# NOW DO THE REST OF THE VALUES
-	for(l in 2:length(MEASURES))
+	# NOW DO THE REST OF THE VALUES, IF THERE IS MORE THAN ONE MEASURE
+	if(length(MEASURES)>1)
 	{
-		MEASURELABEL<-paste("ATest",MEASURES[l],sep="")
-		lines(ATESTS["Sample"][,1],ATESTS[MEASURELABEL][,1],type="o",lty=5,pch=l)	
+		for(l in 2:length(MEASURES))
+		{
+			MEASURELABEL<-paste("ATest",MEASURES[l],sep="")
+			lines(ATESTS["Sample"][,1],ATESTS[MEASURELABEL][,1],type="o",lty=5,pch=l)	
+		}
 	}
 
 	# NOW COMPLETE GRAPH

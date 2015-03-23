@@ -13,7 +13,9 @@ function(FILEPATH,PARAMETERS,MEASURES,ATESTSIGLEVEL,ATESTRESULTFILENAME,BASELINE
 
 			# FIRSTLY READ IN THE ATESTS FILE (NOW ALL IN ONE FILE)
 			RESULT<-read.csv(paste(FILEPATH,"/",ATESTRESULTFILENAME,sep=""),sep=",",header=T)
-			
+
+			# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
+			MEASURES<-table_header_check(MEASURES)
 
 			for(PARAM in 1:length(PARAMETERS))
 			{

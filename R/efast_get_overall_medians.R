@@ -9,6 +9,9 @@ function(FILEPATH,NUMCURVES,PARAMETERS,NUMSAMPLES,MEASURES,TIMEPOINTS=NULL,TIMEP
 		if(file.exists(FILEPATH))
 		{
 			print("Calculating overall medians responses for each parameter set (efast_get_overall_medians)")
+			
+			# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
+			MEASURES<-table_header_check(MEASURES)
 
 			for(CURVE in 1:NUMCURVES)			# CURVE
 			{

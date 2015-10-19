@@ -4,6 +4,8 @@
 \alias{oat_graphATestsForSampleSize}
 \alias{oat_plotResultDistribution}
 \alias{oat_countResponsesOfDesiredValue}
+\alias{plotATestsFromTimepointFiles}
+\alias{oat_graph_Leish_ATestsMultipleTimepoints}
 \title{One-At-A-Time - Perform Analysis of Results}
 \description{The robustness of a simulation to parameter alteration can be determined through the use of this approach. Following the method described by Read et al in the reference below, the value of each parameter is adjusted independently, with the remaining parameters staying unchanged from their calibrated value. Distributions of simulation responses under the perturbed parameter condition are compared with those at simulation baseline/calibrated values using the Vargha-Delaney A-Test. This test gives an indication of how different the two sets of results are. The set of A-Test results for each parameter is output to a CSV file for reference. Finally, a graph for each parameter is produced, showing the A-Test result for each parameter value and each simulation output measure. In addition, from Version 2.0, an additional method has been introduced that can be applied to stochastic simulations, capable of producing a count of the number of responses for a particular parameter that are equal to a certain criteria (such as true or false). This may provide additional information concerning how a simulation is behaving.\cr
 \cr
@@ -19,6 +21,9 @@ This technique consists of five methods:\cr
 \bold{oat_graphATestsForSampleSize}: This takes each parameter in turn and creates a plot showing A-Test score against parameter value.  This makes it easy to determine how the effect that changing the parameter has had on simulation results.  Two examples can be found in the extdata folder of this package (OAT_chemoLowerLinearAdjust_Displacement.pdf and OAT_chemoUpperLinearAdjust.pdf).\cr
 \bold{oat_plotResultDistribution}: Only applicable for stochastic simulations where the results are provided in the folder strutcure: this takes each parameter in turn, and creates a boxplot for each output measure, showing the result distribution for each value of that parameter. An example can be found in the extdata folder of this package (chemoLowerLinearAdjust_DisplacementBP.pdf).\cr
 \bold{oat_countResponsesOfDesiredValue}: Counts the number of simulation responses where a output response equals a desired result, for a specified parameter. Outputs this information as a CSV file.
+There is an additional two methods for plotting A-Tests per parameter at different times throughout the simulation (in separate output files): \cr
+\bold{plotATestsFromTimepointFiles:} Graph the results at different timepoint intervals, coming from different simulation result files. \cr
+\bold{oat_graph_Leish_ATestsMultipleTimepoints:} Graph the results at different timepoint intervals.\cr
 } 
 \usage{
 oat_processParamSubsets(FILEPATH,PARAMETERS,NUMRUNSPERSAMPLE,
@@ -48,6 +53,14 @@ oat_countResponsesOfDesiredValue(FILEPATH,PARAMETERS,
 	OUTPUTFILENAME,BASELINE,PMIN=NULL,PMAX=NULL,
 	PINC=NULL,PARAMVALS=NULL,TIMEPOINTS=NULL,
 	TIMEPOINTSCALE=NULL)
+	
+plotATestsFromTimepointFiles(FILEPATH,PARAMETERS,
+	ATESTRESULTFILENAME,ATESTSIGLEVEL,MEASURES,PMIN,
+	PMAX,PINC,TIMEPOINTS)
+	
+oat_graph_Leish_ATestsMultipleTimepoints(FILEPATH,PARAMETERS,
+	MEASURES,PMIN,PMAX,PINC,PARAMVALS,BASELINE,
+	ATESTRESULTFILENAME,ATESTSIGLEVEL,TIMEPOINTS)
 
 }
 \arguments{
@@ -175,9 +188,21 @@ oat_plotResultDistribution(FILEPATH,PARAMETERS,MEASURES,MEASURE_SCALE,
 
 # E - COUNT THE NUMBER OF TIMES A PARAMETER (SUCH AS vcamSlope 
 # PRODUCES AN OUTPUT RESPONSE OF 0 FOR AREA
-oat_countResponsesOfDesiredValue(FILEPATH,PARAMETERS,RESULTFILENAME,OUTPUTCOLSTART,
-	OUTPUTCOLEND,"vcamSlope",NUMRUNSPERSAMPLE,"Area",0,OUTPUTFILENAME,
-	BASELINE,PMIN,PMAX,PINC,PARAMVALS,TIMEPOINTS,TIMEPOINTSCALE)
+oat_countResponsesOfDesiredValue(FILEPATH,PARAMETERS,RESULTFILENAME,
+	OUTPUTCOLSTART,OUTPUTCOLEND,"vcamSlope",NUMRUNSPERSAMPLE,"Area",
+	0,OUTPUTFILENAME,BASELINE,PMIN,PMAX,PINC,PARAMVALS,TIMEPOINTS,
+	TIMEPOINTSCALE)
+	
+# IF ANALYSING A SIMULATION OF A NUMBER OF TIMEPOINTS, EACH IN A 
+# SEPARATE RESULT FILE. USE THIS FUNCTION TO PLOT THE A-TESTS FOR 
+# EACH PARAMETER VALUE OVER TIME
+plotATestsFromTimepointFiles(FILEPATH,PARAMETERS,ATESTRESULTFILENAME,
+	ATESTSIGLEVEL,MEASURES,PMIN,PMAX,PINC,TIMEPOINTS)
+	
+# Similar function, dealing with multiple timepoint files
+oat_graph_Leish_ATestsMultipleTimepoints(FILEPATH,PARAMETERS,MEASURES,
+	PMIN,PMAX,PINC,PARAMVALS,BASELINE,ATESTRESULTFILENAME,
+	ATESTSIGLEVEL,TIMEPOINTS)
 }
 }
 \keyword{OAT}

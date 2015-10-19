@@ -2,6 +2,7 @@
 \alias{efast_generate_medians_for_all_parameter_subsets}
 \alias{efast_get_overall_medians}
 \alias{efast_run_Analysis}
+\alias{ploteFASTSiFromTimepointFiles}
 \title{eFAST: Perform Analysis of Results}
 \description{This technique analyses simulation results generated through parametering using the eFAST approach (extended Fourier Amplitude Sampling Test, Saltelli et al, reference below). This perturbs the value of all parameters at the same time, with the aim of partitioning the variance in simulation output between input parameters. Values for each parameter are chosen using fourier frequency curves through a parameters potential range of values. A selected number of values are selected from points along the curve. Though all parameters are perturbed simultaneously, the method does focus on one parameter of interest in turn, by giving this a very different sampling frequency to that assigned to the other parameters. Thus for each parameter of interest in turn, a sampling frequency is assigned to each parameter and values chosen at points along the curve. So a set of simulation parameters then exists for each parameter of interest.  As this is the case, this method can be computationally expensive, especially if a large number of samples is taken on the parameter search curve, or there are a large number of parameters. On top of this, to ensure adequate sampling each curve is also resampled with a small adjustment to the frequency, creating more parameter sets on which the simulation should be run. This attempts to limit any correlations and limit the effect of repeated parameter value sets being chosen. Thus, for a system where 8 parameters are being analysed, and 3 different sample curves used, 24 different sets of parameter value sets will be produced. Each of these 24 sets then contains the parameter values chosen from the frequency curves. This number of samples should be no lower than 65 (see the Marino paper for an explanation of how to select sample size).\cr
 \cr
@@ -16,6 +17,7 @@ There are three methods to this process:\cr
 \bold{efast_generate_medians_for_all_parameter_subsets:} Only to be applied in cases where simulation responses are supplied in the folder structure (as in all previous versions of Spartan), useful for cases where the simulation is agent-based. Iterates through the folder structure analysing the result of each replicate run under the same parameter conditions, creating a CSV file for each curve/parameter pair. This will hold the parameters of the run and the median of each simulation response for that run. As stated earlier, more than one run result can exist in this file. Where a simulation is being analysed for multiple timepoints, this will iterate through the results at all timepoints, creating curve/parameter pair CSV files for all specified timepoints.\cr
 \bold{efast_get_overall_medians:}This method produces a summary of the results for a particular resampling curve. This shows, for each parameter of interest, the median of each simulation output measure for each of the 65 parameter value sets generated. Here's an example. We examine resampling curve 1, and firstly examine parameter 1. For this parameter of interest, a number of different parameter value sets were generated from the frequency curves (lets say 65), thus we have 65 different sets of simulation results. The previous method produced a summary showing the median of each output measure for each run. Now, this method calculates the median of these medians, for each output measure, and stores these in the summary. Thus, for each parameter of interest, the medians of each of the 65 sets of results are stored. The next parameter is then examined, until all have been analysed. This produces a snapshot showing the median simulation output for all parameter value sets generated for the first resample curve. These are stored with the file name Curve[Number]_Results_Summary in the directory specified in FILEPATH. Again this can be done recursively for a number of timepoints if required.\cr
 \bold{efast_run_Analysis:} Produces a file summarising the analysis; partitioning the variance between parameters and providing relevant statistics. These include, for each parameter of interest, first-order sensitivity index (Si), total-order sensitivity index (STi), complementary parameters sensitivity index (SCi), and relevant p-values and error bar data calculated using a two-sample t-test and standard error respectively. For a more detailed examination of this analysis, see the Marino paper or Saltelli book references, or the tutorial on the package website. An example of the output file generated can be seen in the data folder of this package (eFAST_Analysis.csv) For ease of representation, the method also produces a graph showing this data for each simulation output measure. Two examples can be seen in the extdata folder of this package (eFAST_Displacement.pdf and eFAST_Velocity.pdf). Again, these graphs and summaries can be produced for multiple timepoints.
+There is an additional method that can plot the Si measure for each parameter at different timepoints, \bold{ploteFASTSiFromTimepointFiles}
 }
 \usage{
 efast_generate_medians_for_all_parameter_subsets(FILEPATH,
@@ -32,6 +34,9 @@ efast_run_Analysis(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,
 	NUMSAMPLES,OUTPUTMEASURES_TO_TTEST,TTEST_CONF_INT,
 	GRAPH_FLAG,EFASTRESULTFILENAME,
 	TIMEPOINTS=NULL,TIMEPOINTSCALE=NULL)
+	
+ploteFASTSiFromTimepointFiles(FILEPATH,PARAMETERS,MEASURES,
+	EFASTRESULTFILENAME,TIMEPOINTS,TIMEPOINTSCALE)
 }
 \arguments{
   \item{FILEPATH}{Directory where the simulation runs can be found, in folders or in CSV file format}
@@ -141,6 +146,11 @@ efast_run_Analysis(FILEPATH,MEASURES,PARAMETERS,NUMCURVES,
 	NUMSAMPLES,OUTPUTMEASURES_TO_TTEST,TTEST_CONF_INT,
 	GRAPH_FLAG,EFASTRESULTFILENAME,
 	TIMEPOINTS,TIMEPOINTSCALE)
+
+# IF ANALYSING A SIMULATION AT SET TIMEPOINTS, YOU CAN PLOT THE Si
+# MEASURE OVER TIME
+ploteFASTSiFromTimepointFiles(FILEPATH,PARAMETERS,MEASURES,
+	EFASTRESULTFILENAME,TIMEPOINTS,TIMEPOINTSCALE)
 
 }
 }

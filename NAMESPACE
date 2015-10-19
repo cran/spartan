@@ -1,1 +1,5 @@
 exportPattern(".")
+importFrom("grDevices", "dev.off", "pdf", "png")
+importFrom("graphics", "abline", "axis", "barplot", "boxplot","legend", "lines", "par", "plot", "text", "title")
+importFrom("stats", "cor", "cov", "cov2cor", "median", "na.omit", "pnorm", "runif", "sd", "t.test")
+importFrom("utils", "read.csv", "write.csv")

@@ -13,7 +13,7 @@ prepare_parameter_value_list<-function(PMIN,PMAX,PINC,PARAMVALS,PARAM_OF_INT)
 		for(i in 1:length(PARAM_VAL_LIST))
 		{
 			dp<-num.decimals(PINC[PARAM_OF_INT])
-			PARAM_VAL_LIST[i]<-round(PARAM_VAL_LIST[i],digits=dp)
+			PARAM_VAL_LIST[i]<-round(PARAM_VAL_LIST[i],digits=dp+2)
 		}
 		# Convert to char - stops any trailing zeros that may lead to results not being found
 		PARAM_VAL_LIST<-as.character(PARAM_VAL_LIST)

@@ -8,15 +8,17 @@ oat_csv_result_file_analysis<-function(FILEPATH,CSV_FILE_NAME,PARAMETERS,BASELIN
 		# IN A CHANGE TO SPARTAN 1, THE FIRST FUNCTION THAT PROCESSES SIMULATION RESPONSES CREATES THIS FILE, NOT MEDIANS FOR EACH PARAMETER AS IT USED TO 
 		# THIS WAY WE ARE NOT DEALING WITH TWO METHODS OF SIMULATION RESULT SPECIFICATION
 		# READ IN THE OAT RESULT FILE
+		#print(paste(FILEPATH," ",CSV_FILE_NAME,sep=""))
 		RESULT<-read.csv(paste(FILEPATH,"/",CSV_FILE_NAME,sep=""),sep=",",header=TRUE, check.names=FALSE)
-
+		#print(nrow(RESULT))
+		
 		# Redundant April 2015 - changed method of reading in CSV files
 		# Check the Measures and Parameters for Spaces - R will have replaced these with a dot
 		#MEASURES<-table_header_check(MEASURES)
 		
 		# FIRSTLY FILTER THE SIMULATION RESULTS WHEN AT BASELINE VALUES
 		BASELINE_RESULT<-subset_results_by_param_value_set(PARAMETERS,RESULT,BASELINE)
-
+		#print(nrow(BASELINE_RESULT))
 		if(nrow(BASELINE_RESULT)==0)
 		{
 			print("No results in the CSV file for simulation at specified baseline values. No analysis performed")
@@ -56,8 +58,16 @@ oat_csv_result_file_analysis<-function(FILEPATH,CSV_FILE_NAME,PARAMETERS,BASELIN
 	
 						PARAM_RESULT<-subset_results_by_param_value_set(PARAMETERS,RESULT,EXP_PARAMS)
 	
-						# NOW WE CAN COMPARE THIS BEHAVIOUR TO THAT AT THE BASELINE USING THE A-TEST. DO THIS FOR EACH MEASURE
-						ALL_ATEST_SCORES<-rbind(ALL_ATEST_SCORES,perform_aTest_for_all_sim_measures(EXP_PARAMS, BASELINE_RESULT,PARAM_RESULT,MEASURES))
+						if(nrow(PARAM_RESULT)>0)
+						{
+							# NOW WE CAN COMPARE THIS BEHAVIOUR TO THAT AT THE BASELINE USING THE A-TEST. DO THIS FOR EACH MEASURE
+							ALL_ATEST_SCORES<-rbind(ALL_ATEST_SCORES,perform_aTest_for_all_sim_measures(EXP_PARAMS, BASELINE_RESULT,PARAM_RESULT,MEASURES))
+						}
+						else
+						{
+							print(paste("No Results for Parameter ",PARAMETERS[PARAM]," Value: ",PARAM_VAL_LIST[PARAMVAL],". No A-Test Calculated",sep=""))
+						}
+						
 					}
 				}	
 			}
@@ -84,15 +94,14 @@ oat_csv_result_file_analysis<-function(FILEPATH,CSV_FILE_NAME,PARAMETERS,BASELIN
 		{
 
 			TIMEPOINTPROCESSING<-TIMEPOINTS[n]
-			print(paste("PROCESSING TIMEPOINT: ",TIMEPOINTPROCESSING,sep=""))
+			print(paste("Processing Timepoint: ",TIMEPOINTPROCESSING,sep=""))
 			
 			CSV_FILE_NAME_FORMAT<-substr(CSV_FILE_NAME,(nchar(CSV_FILE_NAME)+1)-3,nchar(CSV_FILE_NAME))
 			CSV_FILE_NAME_FULL<-paste(substr(CSV_FILE_NAME,0,nchar(CSV_FILE_NAME)-4),"_",TIMEPOINTPROCESSING,".",CSV_FILE_NAME_FORMAT,sep="")
 
 			ATESTRESULTFILENAME_FORMAT<-substr(ATESTRESULTFILENAME,(nchar(ATESTRESULTFILENAME)+1)-3,nchar(ATESTRESULTFILENAME))
 			ATESTRESULTFILENAME_FULL<-paste(substr(ATESTRESULTFILENAME,0,nchar(ATESTRESULTFILENAME)-4),"_",TIMEPOINTPROCESSING,".",ATESTRESULTFILENAME_FORMAT,sep="")
-			
-			
+						
 			oat_csv_result_file_analysis(FILEPATH,CSV_FILE_NAME_FULL,PARAMETERS,BASELINE,MEASURES,ATESTRESULTFILENAME_FULL,PMIN,PMAX,
 							PINC,PARAMVALS,TIMEPOINTS=NULL,TIMEPOINTSCALE=NULL)
 

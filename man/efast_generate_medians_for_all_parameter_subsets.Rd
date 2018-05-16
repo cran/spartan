@@ -7,7 +7,7 @@
 efast_generate_medians_for_all_parameter_subsets(FILEPATH, NUMCURVES,
   PARAMETERS, NUMSAMPLES, NUMRUNSPERSAMPLE, MEASURES, RESULTFILENAME,
   ALTERNATIVEFILENAME, OUTPUTCOLSTART, OUTPUTCOLEND, TIMEPOINTS = NULL,
-  TIMEPOINTSCALE = NULL)
+  TIMEPOINTSCALE = NULL, check_done = FALSE, current_time = NULL)
 }
 \arguments{
 \item{FILEPATH}{Directory where the simulation runs can be found, in folders
@@ -52,6 +52,10 @@ e.g. c(12,36,48,60)}
 
 \item{TIMEPOINTSCALE}{Sets the scale of the timepoints being analysed,
 e.g. "Hours"}
+
+\item{check_done}{If multiple timepoints, whether the input has been checked}
+
+\item{current_time}{If multiple timepoints, the current timepoint being processed}
 }
 \description{
 Only to be applied in cases where simulation responses are supplied in the

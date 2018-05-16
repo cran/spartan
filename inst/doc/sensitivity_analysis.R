@@ -14,7 +14,8 @@
 #  RESULTFILENAME <- "trackedCells_Close.csv"
 #  # Not used in this case. Useful where two result files exist (e.g.\ if tracking cells
 #  # close and those further away, two output files could be used). Here, results in a
-#  # second file are processed if the first is blank or does not exist.
+#  # second file are processed if the first is blank or does not exist. Defaults to NULL
+#  # if not specified
 #  ALTFILENAME <- NULL
 #  # Notes the column in the CSV results file where the results start.
 #  # Useful as it restricts what is read in to R, getting round potential errors where
@@ -109,7 +110,7 @@
 #  PARAMVALS <- NULL
 #  # Example of 2:
 #  #PARAMVALS <- c("0, 50, 90","0.10, 0.3, 0.8","0.10, 0.25, 0.4",
-#  "0.015, 0.04, 0.08", "0.1, 0.5, 0.9","0.25, 1.25, 2.0, 3.0, 5.0")
+#  #"0.015, 0.04, 0.08", "0.1, 0.5, 0.9","0.25, 1.25, 2.0, 3.0, 5.0")
 #  # If using method 1, PARAMVALS must be set to NULL. If using method 2, PMIN,
 #  # PMAX, and PINC must be set to NULL
 #  oat_parameter_sampling(FILEPATH, PARAMETERS, BASELINE, PMIN, PMAX,
@@ -213,6 +214,8 @@
 #  # File name to give to the file showing the Partial Rank Correlation Coefficients
 #  # for each parameter.
 #  CORCOEFFSOUTPUTFILE <- "LHC_corCoeffs.csv"
+#  TIMEPOINTS<-NULL
+#  TIMEPOINTSCALE<-NULL
 
 ## ---- eval = FALSE-------------------------------------------------------
 #  lhc_process_sample_run_subsets(FILEPATH, LHC_PARAM_CSV_LOCATION, PARAMETERS, NUMSAMPLES, NUMRUNSPERSAMPLE, MEASURES, RESULTFILENAME, ALTERNATIVEFILENAME,
@@ -228,6 +231,11 @@
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  lhc_generatePRCoEffs(FILEPATH, PARAMETERS, MEASURES, LHCSUMMARYFILENAME, CORCOEFFSOUTPUTFILE, TIMEPOINTS, TIMEPOINTSCALE)
+#  # Depending on your application, you can change the method by which the PRCC is calculated, from the default Spearmans (s),
+#  # to Kendall (k) or Pearsons (p), as below:
+#  lhc_generatePRCoEffs(FILEPATH, PARAMETERS, MEASURES, LHCSUMMARYFILENAME, CORCOEFFSOUTPUTFILE, TIMEPOINTS, TIMEPOINTSCALE, cor_calc_method=c("p"))
+#  
+#  # Graphing:
 #  lhc_graphMeasuresForParameterChange(FILEPATH, PARAMETERS, MEASURES, MEASURE_SCALE, CORCOEFFSOUTPUTFILE, LHCSUMMARYFILENAME)
 #  
 #  # Note that from Spartan 3 you can choose the output format of this graph, by:

@@ -5,9 +5,10 @@
 \title{Summarises stochastic, repeated, simulations for all robustness parameter sets into a single file.}
 \usage{
 oat_processParamSubsets(FILEPATH, PARAMETERS, NUMRUNSPERSAMPLE, MEASURES,
-  RESULTFILENAME, ALTERNATIVEFILENAME, OUTPUTCOLSTART, OUTPUTCOLEND,
+  RESULTFILENAME, ALTERNATIVEFILENAME, OUTPUTFILECOLSTART, OUTPUTFILECOLEND,
   CSV_FILE_NAME, BASELINE, PMIN = NULL, PMAX = NULL, PINC = NULL,
-  PARAMVALS = NULL, TIMEPOINTS = NULL, TIMEPOINTSCALE = NULL)
+  PARAMVALS = NULL, TIMEPOINTS = NULL, TIMEPOINTSCALE = NULL,
+  check_done = FALSE)
 }
 \arguments{
 \item{FILEPATH}{Directory where either the simulation runs or single CSV file result can be found}
@@ -22,9 +23,9 @@ oat_processParamSubsets(FILEPATH, PARAMETERS, NUMRUNSPERSAMPLE, MEASURES,
 
 \item{ALTERNATIVEFILENAME}{In some cases, it may be relevant to read from a further results file if he initial file contains no results. This filename is set here.}
 
-\item{OUTPUTCOLSTART}{Column number in the simulation results file where output begins - saves (a) reading in unnecessary data, and (b) errors where the first column is a label, and therefore could contain duplicates.}
+\item{OUTPUTFILECOLSTART}{Column number in the simulation results file where output begins - saves (a) reading in unnecessary data, and (b) errors where the first column is a label, and therefore could contain duplicates.}
 
-\item{OUTPUTCOLEND}{Column number in the simulation results file where the last output measure is. Only required if running the first method.}
+\item{OUTPUTFILECOLEND}{Column number in the simulation results file where the last output measure is. Only required if running the first method.}
 
 \item{CSV_FILE_NAME}{Name of the file created that summarises the median value of each measure for every run. This specifies what that file should be called (e.g. Medians.csv).}
 
@@ -41,6 +42,8 @@ oat_processParamSubsets(FILEPATH, PARAMETERS, NUMRUNSPERSAMPLE, MEASURES,
 \item{TIMEPOINTS}{Implemented so this method can be used when analysing multiple simulation timepoints. If only analysing one timepoint, this should be set to NULL. If not, this should be an array of timepoints, e.g. c(12,36,48,60)}
 
 \item{TIMEPOINTSCALE}{Implemented so this method can be used when analysing multiple simulation timepoints. Sets the scale of the timepoints being analysed, e.g. "Hours"}
+
+\item{check_done}{Whether the input has been checked (used when doing multiple timepoints)}
 }
 \description{
 This method should only be used for stochastic simulations where the data is

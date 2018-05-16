@@ -12,7 +12,7 @@
 
 <meta name="author" content="Kieran Alden" />
 
-<meta name="date" content="2017-09-06" />
+<meta name="date" content="2018-05-16" />
 
 <title>Analysing Netlogo Simulations Using Netlogo</title>
 
@@ -20,46 +20,256 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 </head>
 
@@ -70,7 +280,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Analysing Netlogo Simulations Using Netlogo</h1>
 <h4 class="author"><em>Kieran Alden</em></h4>
-<h4 class="date"><em>2017-09-06</em></h4>
+<h4 class="date"><em>2018-05-16</em></h4>
 
 
 
@@ -97,93 +307,93 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="parameter-sampling" class="section level3">
 <h3>Parameter Sampling</h3>
 <p>Now we are going to declare the variables required by the package to produce the Netlogo experiment file. Firstly, the spartan and XML libraries are imported, the latter to aid production of the Netlogo file. The variables required for this analysis are then declared in capital letters. The line underneath, beginning with a #, is a description of that being declared. Set the FILEPATH variable correctly to match the folder where you would like the Netlogo experiment file to be output to.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(spartan)
-<span class="co"># Directory where the sample file should be stored</span>
-FILEPATH&lt;-<span class="st">&quot;/home/user/robustness/&quot;</span>
-<span class="co"># Name to give the setup file. No need for file extension</span>
-NETLOGO_SETUPFILE_NAME&lt;-<span class="st">&quot;nl_robustness_setup&quot;</span>
-<span class="co"># Parameters in simulation. List all the parameters that Netlogo is</span>
-<span class="co"># required to know,</span>
-PARAMETERS&lt;-<span class="kw">c</span>(<span class="st">&quot;people&quot;</span>,<span class="st">&quot;infectiousness&quot;</span>,<span class="st">&quot;chance-recover&quot;</span>,<span class="st">&quot;duration&quot;</span>)
-<span class="co"># Now values for each of the parameters above</span>
-<span class="co"># For parameters not being analysed, simply list the value</span>
-<span class="co"># For parameters being analysed, put the min, max and increment values</span>
-<span class="co"># of the parameter in square brackets, in double quotes, e.g.</span>
-<span class="co"># &quot;[0.1,0.5,0.1]&quot;</span>
-PARAMVALS&lt;-<span class="kw">c</span>(<span class="dv">150</span>,<span class="st">&quot;[10,90,10]&quot;</span>,<span class="st">&quot;[10,90,10]&quot;</span>,<span class="st">&quot;[5,40,5]&quot;</span>)
-<span class="co"># Name of the setup simulation function in Netlogo simulation</span>
-<span class="co"># Usually setup</span>
-NETLOGO_SETUP_FUNCTION&lt;-<span class="st">&quot;setup&quot;</span>
-<span class="co"># Name of the function that starts the simulation. Usually go</span>
-NETLOGO_RUN_FUNCTION&lt;-<span class="st">&quot;go&quot;</span>
-<span class="co"># Simulation output measures</span>
-MEASURES&lt;-<span class="kw">c</span>(<span class="st">&quot;death-thru-sickness&quot;</span>,<span class="st">&quot;death-but-immune&quot;</span>,
-<span class="st">&quot;death-old-age&quot;</span>,<span class="st">&quot;death-old-and-sick&quot;</span>)
-<span class="co"># Number of times Netlogo should repeat the experiment for each</span>
-<span class="co"># parameter set</span>
-EXPERIMENT_REPETITIONS&lt;-<span class="dv">1</span>
-<span class="co"># Whether Netlogo should collect metrics at each timestep</span>
-RUNMETRICS_EVERYSTEP&lt;-<span class="st">&quot;true&quot;</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(spartan)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="co"># Directory where the sample file should be stored</span></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">FILEPATH&lt;-<span class="st">&quot;/home/user/robustness/&quot;</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co"># Name to give the setup file. No need for file extension</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">NETLOGO_SETUPFILE_NAME&lt;-<span class="st">&quot;nl_robustness_setup&quot;</span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co"># Parameters in simulation. List all the parameters that Netlogo is</span></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co"># required to know,</span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8">PARAMETERS&lt;-<span class="kw">c</span>(<span class="st">&quot;people&quot;</span>,<span class="st">&quot;infectiousness&quot;</span>,<span class="st">&quot;chance-recover&quot;</span>,<span class="st">&quot;duration&quot;</span>)</a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co"># Now values for each of the parameters above</span></a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co"># For parameters not being analysed, simply list the value</span></a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co"># For parameters being analysed, put the min, max and increment values</span></a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co"># of the parameter in square brackets, in double quotes, e.g.</span></a>
+<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co"># &quot;[0.1,0.5,0.1]&quot;</span></a>
+<a class="sourceLine" id="cb1-14" data-line-number="14">PARAMVALS&lt;-<span class="kw">c</span>(<span class="dv">150</span>,<span class="st">&quot;[10,90,10]&quot;</span>,<span class="st">&quot;[10,90,10]&quot;</span>,<span class="st">&quot;[5,40,5]&quot;</span>)</a>
+<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co"># Name of the setup simulation function in Netlogo simulation</span></a>
+<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co"># Usually setup</span></a>
+<a class="sourceLine" id="cb1-17" data-line-number="17">NETLOGO_SETUP_FUNCTION&lt;-<span class="st">&quot;setup&quot;</span></a>
+<a class="sourceLine" id="cb1-18" data-line-number="18"><span class="co"># Name of the function that starts the simulation. Usually go</span></a>
+<a class="sourceLine" id="cb1-19" data-line-number="19">NETLOGO_RUN_FUNCTION&lt;-<span class="st">&quot;go&quot;</span></a>
+<a class="sourceLine" id="cb1-20" data-line-number="20"><span class="co"># Simulation output measures</span></a>
+<a class="sourceLine" id="cb1-21" data-line-number="21">MEASURES&lt;-<span class="kw">c</span>(<span class="st">&quot;death-thru-sickness&quot;</span>,<span class="st">&quot;death-but-immune&quot;</span>,</a>
+<a class="sourceLine" id="cb1-22" data-line-number="22"><span class="st">&quot;death-old-age&quot;</span>,<span class="st">&quot;death-old-and-sick&quot;</span>)</a>
+<a class="sourceLine" id="cb1-23" data-line-number="23"><span class="co"># Number of times Netlogo should repeat the experiment for each</span></a>
+<a class="sourceLine" id="cb1-24" data-line-number="24"><span class="co"># parameter set</span></a>
+<a class="sourceLine" id="cb1-25" data-line-number="25">EXPERIMENT_REPETITIONS&lt;-<span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-26" data-line-number="26"><span class="co"># Whether Netlogo should collect metrics at each timestep</span></a>
+<a class="sourceLine" id="cb1-27" data-line-number="27">RUNMETRICS_EVERYSTEP&lt;-<span class="st">&quot;true&quot;</span></a></code></pre></div>
 <p>To get the value sets for each parameter:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">oat_generate_netlogo_behaviour_space_XML</span>(FILEPATH, NETLOGO_SETUPFILE_NAME, PARAMETERS, 
-                                         PARAMVALS, NETLOGO_SETUP_FUNCTION, NETLOGO_RUN_FUNCTION, 
-                                         MEASURES, EXPERIMENT_REPETITIONS, RUNMETRICS_EVERYSTEP)</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">oat_generate_netlogo_behaviour_space_XML</span>(FILEPATH, NETLOGO_SETUPFILE_NAME, PARAMETERS, </a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">                                         PARAMVALS, NETLOGO_SETUP_FUNCTION, NETLOGO_RUN_FUNCTION, </a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">                                         MEASURES, EXPERIMENT_REPETITIONS, RUNMETRICS_EVERYSTEP)</a></code></pre></div>
 <p>This will produce one XML file, in the directory specified, containing a set-up for a Netlogo BehaviourSpace run. Run the experiment using Netlogo (we did this in the terminal in Linux using the headless version of Netlogo, code for this available on our website, but running this in Netlogo is fine too). This will in turn produce one CSV file, saved in the directory of your choosing when you run the experiment.</p>
 </div>
 <div id="analysing-the-simulation-data" class="section level3">
 <h3>Analysing The Simulation Data</h3>
 <p>This section shows an analysis using the example data from our lab website, but the steps are just as applicable if you ran the experiments yourself. Here, all the results, for all parameters and values, are in one file. The technique below processes this file, recovering the results for each parameter and value pair for the specified timepoint, extracting these into one CSV file. This CSV file can then be processed using the analysis methods detailed in Technique 2, reducing the need for specific Netlogo techniques.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Import the package</span>
-<span class="kw">library</span>(spartan)
-<span class="kw">library</span>(XML)
-<span class="co"># Folder containing the Netlogo Behaviour Space table, AND where the</span>
-<span class="co"># processed results will be written to</span>
-FILEPATH&lt;-<span class="st">&quot;/home/user/robustness/&quot;</span>
-<span class="co"># Name of the Netlogo Behaviour Space Table file</span>
-NETLOGO_BEHAVIOURSPACEFILE&lt;-<span class="st">&quot;virus_oat.csv&quot;</span>
-<span class="co"># Array of the parameters to be analysed, but ONLY those perturbed</span>
-PARAMETERS&lt;-<span class="kw">c</span>(<span class="st">&quot;infectiousness&quot;</span>,<span class="st">&quot;chance-recover&quot;</span>,<span class="st">&quot;duration&quot;</span>)
-<span class="co"># Value assigned to each parameter at calibration (the baseline value)</span>
-BASELINE&lt;-<span class="kw">c</span>(<span class="dv">60</span>,<span class="dv">50</span>,<span class="dv">20</span>)
-<span class="co"># The maximum value for each parameter</span>
-PMAX&lt;-<span class="kw">c</span>(<span class="dv">90</span>,<span class="dv">90</span>,<span class="dv">40</span>)
-<span class="co"># The minimum value explored for each parameter</span>
-PMIN&lt;-<span class="kw">c</span>(<span class="dv">10</span>,<span class="dv">10</span>,<span class="dv">5</span>)
-<span class="co"># Amount the parameter value was incremened during sampling</span>
-PINC&lt;-<span class="kw">c</span>(<span class="dv">10</span>,<span class="dv">10</span>,<span class="dv">5</span>)
-<span class="co"># Timestep of interest. The behaviour space table is likely to contain</span>
-<span class="co"># all timesteps - this narrows the analysis</span>
-TIMESTEP&lt;-<span class="dv">5200</span>
-<span class="co"># The simulation output measures being examined. Should be specified</span>
-<span class="co"># as they are in the Netlogo file</span>
-MEASURES&lt;-<span class="kw">c</span>(<span class="st">&quot;death-thru-sickness&quot;</span>,<span class="st">&quot;death-but-immune&quot;</span>,<span class="st">&quot;death-old-age&quot;</span>,
-<span class="st">&quot;death-old-and-sick&quot;</span>)
-<span class="co"># For each parameter value being analysed, a file is created</span>
-<span class="co"># containing the median of each output measure, of each simulation run</span>
-<span class="co"># for that value. This sets the name of this file. </span>
-RESULTFILENAME&lt;-<span class="st">&quot;ParamValResponses.csv&quot;</span>
-<span class="co"># The results of the A-Test comparisons of each parameter value</span>
-<span class="co"># against that of the parameters baseline value are output as a file.</span>
-<span class="co"># This sets the name of this file. </span>
-ATESTRESULTSFILENAME&lt;-<span class="st">&quot;VirusOAT_ATests.csv&quot;</span>
-<span class="co"># A-Test result value either side of 0.5 at which the difference</span>
-<span class="co"># between two sets of results is significant</span>
-ATESTSIGLEVEL&lt;-<span class="fl">0.21</span>
-<span class="co"># What each measure represents. Used in graphing results</span>
-MEASURE_SCALE&lt;-<span class="kw">c</span>(<span class="st">&quot;Number of People&quot;</span>,<span class="st">&quot;Number of People&quot;</span>,
-<span class="st">&quot;Number of People&quot;</span>,<span class="st">&quot;Number of People&quot;</span>)
-<span class="co"># Not used in this case, but when a simulation is analysed at multiple</span>
-<span class="co"># timepoints (see tutorials 1-4)</span>
-TIMEPOINTS&lt;-<span class="ot">NULL</span>; TIMEPOINTSCALE&lt;-<span class="ot">NULL</span>
-
-<span class="kw">oat_process_netlogo_result</span>(FILEPATH,NETLOGO_BEHAVIOURSPACEFILE, PARAMETERS, 
-                           BASELINE, PMIN, PMAX, PINC, MEASURES, RESULTFILENAME, 
-                           ATESTRESULTSFILENAME, TIMESTEP)
-
-<span class="co"># Note that PARAMVALS is set to NULL - we don't use that for Netlogo</span>
-<span class="kw">oat_graphATestsForSampleSize</span>(FILEPATH, PARAMETERS, MEASURES, ATESTSIGLEVEL, 
-                             ATESTRESULTSFILENAME, BASELINE, PMIN, PMAX, PINC, <span class="ot">NULL</span>, 
-                             TIMEPOINTS, TIMEPOINTSCALE)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># Import the package</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">library</span>(spartan)</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw">library</span>(XML)</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co"># Folder containing the Netlogo Behaviour Space table, AND where the</span></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co"># processed results will be written to</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">FILEPATH&lt;-<span class="st">&quot;/home/user/robustness/&quot;</span></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co"># Name of the Netlogo Behaviour Space Table file</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8">NETLOGO_BEHAVIOURSPACEFILE&lt;-<span class="st">&quot;virus_oat.csv&quot;</span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co"># Array of the parameters to be analysed, but ONLY those perturbed</span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10">PARAMETERS&lt;-<span class="kw">c</span>(<span class="st">&quot;infectiousness&quot;</span>,<span class="st">&quot;chance-recover&quot;</span>,<span class="st">&quot;duration&quot;</span>)</a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co"># Value assigned to each parameter at calibration (the baseline value)</span></a>
+<a class="sourceLine" id="cb3-12" data-line-number="12">BASELINE&lt;-<span class="kw">c</span>(<span class="dv">60</span>,<span class="dv">50</span>,<span class="dv">20</span>)</a>
+<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co"># The maximum value for each parameter</span></a>
+<a class="sourceLine" id="cb3-14" data-line-number="14">PMAX&lt;-<span class="kw">c</span>(<span class="dv">90</span>,<span class="dv">90</span>,<span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co"># The minimum value explored for each parameter</span></a>
+<a class="sourceLine" id="cb3-16" data-line-number="16">PMIN&lt;-<span class="kw">c</span>(<span class="dv">10</span>,<span class="dv">10</span>,<span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co"># Amount the parameter value was incremened during sampling</span></a>
+<a class="sourceLine" id="cb3-18" data-line-number="18">PINC&lt;-<span class="kw">c</span>(<span class="dv">10</span>,<span class="dv">10</span>,<span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb3-19" data-line-number="19"><span class="co"># Timestep of interest. The behaviour space table is likely to contain</span></a>
+<a class="sourceLine" id="cb3-20" data-line-number="20"><span class="co"># all timesteps - this narrows the analysis</span></a>
+<a class="sourceLine" id="cb3-21" data-line-number="21">TIMESTEP&lt;-<span class="dv">5200</span></a>
+<a class="sourceLine" id="cb3-22" data-line-number="22"><span class="co"># The simulation output measures being examined. Should be specified</span></a>
+<a class="sourceLine" id="cb3-23" data-line-number="23"><span class="co"># as they are in the Netlogo file</span></a>
+<a class="sourceLine" id="cb3-24" data-line-number="24">MEASURES&lt;-<span class="kw">c</span>(<span class="st">&quot;death-thru-sickness&quot;</span>,<span class="st">&quot;death-but-immune&quot;</span>,<span class="st">&quot;death-old-age&quot;</span>,</a>
+<a class="sourceLine" id="cb3-25" data-line-number="25"><span class="st">&quot;death-old-and-sick&quot;</span>)</a>
+<a class="sourceLine" id="cb3-26" data-line-number="26"><span class="co"># For each parameter value being analysed, a file is created</span></a>
+<a class="sourceLine" id="cb3-27" data-line-number="27"><span class="co"># containing the median of each output measure, of each simulation run</span></a>
+<a class="sourceLine" id="cb3-28" data-line-number="28"><span class="co"># for that value. This sets the name of this file. </span></a>
+<a class="sourceLine" id="cb3-29" data-line-number="29">RESULTFILENAME&lt;-<span class="st">&quot;ParamValResponses.csv&quot;</span></a>
+<a class="sourceLine" id="cb3-30" data-line-number="30"><span class="co"># The results of the A-Test comparisons of each parameter value</span></a>
+<a class="sourceLine" id="cb3-31" data-line-number="31"><span class="co"># against that of the parameters baseline value are output as a file.</span></a>
+<a class="sourceLine" id="cb3-32" data-line-number="32"><span class="co"># This sets the name of this file. </span></a>
+<a class="sourceLine" id="cb3-33" data-line-number="33">ATESTRESULTSFILENAME&lt;-<span class="st">&quot;VirusOAT_ATests.csv&quot;</span></a>
+<a class="sourceLine" id="cb3-34" data-line-number="34"><span class="co"># A-Test result value either side of 0.5 at which the difference</span></a>
+<a class="sourceLine" id="cb3-35" data-line-number="35"><span class="co"># between two sets of results is significant</span></a>
+<a class="sourceLine" id="cb3-36" data-line-number="36">ATESTSIGLEVEL&lt;-<span class="fl">0.21</span></a>
+<a class="sourceLine" id="cb3-37" data-line-number="37"><span class="co"># What each measure represents. Used in graphing results</span></a>
+<a class="sourceLine" id="cb3-38" data-line-number="38">MEASURE_SCALE&lt;-<span class="kw">c</span>(<span class="st">&quot;Number of People&quot;</span>,<span class="st">&quot;Number of People&quot;</span>,</a>
+<a class="sourceLine" id="cb3-39" data-line-number="39"><span class="st">&quot;Number of People&quot;</span>,<span class="st">&quot;Number of People&quot;</span>)</a>
+<a class="sourceLine" id="cb3-40" data-line-number="40"><span class="co"># Not used in this case, but when a simulation is analysed at multiple</span></a>
+<a class="sourceLine" id="cb3-41" data-line-number="41"><span class="co"># timepoints (see tutorials 1-4)</span></a>
+<a class="sourceLine" id="cb3-42" data-line-number="42">TIMEPOINTS&lt;-<span class="ot">NULL</span>; TIMEPOINTSCALE&lt;-<span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb3-43" data-line-number="43"></a>
+<a class="sourceLine" id="cb3-44" data-line-number="44"><span class="kw">oat_process_netlogo_result</span>(FILEPATH,NETLOGO_BEHAVIOURSPACEFILE, PARAMETERS, </a>
+<a class="sourceLine" id="cb3-45" data-line-number="45">                           BASELINE, PMIN, PMAX, PINC, MEASURES, RESULTFILENAME, </a>
+<a class="sourceLine" id="cb3-46" data-line-number="46">                           ATESTRESULTSFILENAME, TIMESTEP)</a>
+<a class="sourceLine" id="cb3-47" data-line-number="47"></a>
+<a class="sourceLine" id="cb3-48" data-line-number="48"><span class="co"># Note that PARAMVALS is set to NULL - we don't use that for Netlogo</span></a>
+<a class="sourceLine" id="cb3-49" data-line-number="49"><span class="kw">oat_graphATestsForSampleSize</span>(FILEPATH, PARAMETERS, MEASURES, ATESTSIGLEVEL, </a>
+<a class="sourceLine" id="cb3-50" data-line-number="50">                             ATESTRESULTSFILENAME, BASELINE, PMIN, PMAX, PINC, <span class="ot">NULL</span>, </a>
+<a class="sourceLine" id="cb3-51" data-line-number="51">                             TIMEPOINTS, TIMEPOINTSCALE)</a></code></pre></div>
 </div>
 </div>
 <div id="latin-hypercube-sampling-and-analysis-technique-3-in-spartan" class="section level2">
@@ -192,83 +402,84 @@ TIMEPOINTS&lt;-<span class="ot">NULL</span>; TIMEPOINTSCALE&lt;-<span class="ot"
 <div id="parameter-sampling-1" class="section level3">
 <h3>Parameter Sampling</h3>
 <p>Parameter samples for Netlogo simulations can be generated using the code below, detailed fully in the vignette for Technique 2. The last variable, ALGORITHM, controls whether a fully optimised latin-hypercube algorithm is used, or parameter values chosen from each section of the hypercube randomly. Both these algorithms are taken from the lhs package. Note that although an optimised sample may be preferable, the generation of parameter values using an optimal algorithm may take a long time (in our experience, over 24 hours for just 7 parameters). The ALGORITHM variable can be set to either ”normal” or ”optimal”</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(spartan)
-<span class="co"># Directory where the samples should be stored</span>
-FILEPATH&lt;-<span class="st">&quot;/home/user/LHC/&quot;</span>
-<span class="co"># Parameters in simulation. List all the parameters that Netlogo is</span>
-<span class="co"># required to know,</span>
-PARAMETERS&lt;-<span class="kw">c</span>(<span class="st">&quot;people&quot;</span>,<span class="st">&quot;infectiousness&quot;</span>,<span class="st">&quot;chance-recover&quot;</span>,<span class="st">&quot;duration&quot;</span>)
-<span class="co"># Now values for each of the parameters above</span>
-<span class="co"># For parameters not being analysed, simply list the value</span>
-<span class="co"># For parameters being analysed, put the min and max values of the</span>
-<span class="co"># parameter in square brackets, in double quotes, e.g. &quot;[0.1,0.5]&quot;</span>
-<span class="co"># Encapsulate strings, i.e.: &quot;\&quot;/home/user/Experiment/\&quot;&quot;</span>
-PARAMVALS&lt;-<span class="kw">c</span>(<span class="dv">150</span>,<span class="st">&quot;[10,90]&quot;</span>,<span class="st">&quot;[10,90]&quot;</span>,<span class="st">&quot;[5,40]&quot;</span>)
-<span class="co"># Number of parameter samples to take from hypercube</span>
-NUMSAMPLES&lt;-<span class="dv">500</span>
-<span class="co"># Name of function that sets up Netlogo simulation. Usually setup</span>
-NETLOGO_SETUP_FUNCTION&lt;-<span class="st">&quot;setup&quot;</span>
-<span class="co"># Name of function that starts Netlogo simulation. Usually go</span>
-NETLOGO_RUN_FUNCTION&lt;-<span class="st">&quot;go&quot;</span>
-<span class="co"># Simulation output measures</span>
-MEASURES&lt;-<span class="kw">c</span>(<span class="st">&quot;death-thru-sickness&quot;</span>,<span class="st">&quot;death-but-immune&quot;</span>,<span class="st">&quot;death-old-age&quot;</span>,
-<span class="st">&quot;death-old-and-sick&quot;</span>)
-<span class="co"># Number of times the Netlogo experiment is repeated for each parameter</span>
-<span class="co"># set</span>
-EXPERIMENT_REPETITIONS&lt;-<span class="dv">1</span>
-<span class="co"># Whether Netlogo metrics should be collected at each timestep</span>
-RUNMETRICS_EVERYSTEP&lt;-<span class="st">&quot;true&quot;</span>
-<span class="co"># Algorithm to use to generate the hypercube (normal or optimal)</span>
-ALGORITHM&lt;-<span class="st">&quot;normal&quot;</span>
-
-<span class="kw">lhc_generate_lhc_sample_netlogo</span>(FILEPATH,PARAMETERS,PARAMVALS,NUMSAMPLES,ALGORITHM,
-                              EXPERIMENT_REPETITIONS,RUNMETRICS_EVERYSTEP,NETLOGO_SETUP_FUNCTION,
-                              NETLOGO_RUN_FUNCTION,MEASURES)</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">library</span>(spartan)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co"># Directory where the samples should be stored</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">FILEPATH&lt;-<span class="st">&quot;/home/user/LHC/&quot;</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co"># Parameters in simulation. List all the parameters that Netlogo is</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co"># required to know,</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6">PARAMETERS&lt;-<span class="kw">c</span>(<span class="st">&quot;people&quot;</span>,<span class="st">&quot;infectiousness&quot;</span>,<span class="st">&quot;chance-recover&quot;</span>,<span class="st">&quot;duration&quot;</span>)</a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co"># Now values for each of the parameters above</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co"># For parameters not being analysed, simply list the value</span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co"># For parameters being analysed, put the min and max values of the</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co"># parameter in square brackets, in double quotes, e.g. &quot;[0.1,0.5]&quot;</span></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co"># Encapsulate strings, i.e.: &quot;\&quot;/home/user/Experiment/\&quot;&quot;</span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12">PARAMVALS&lt;-<span class="kw">c</span>(<span class="dv">150</span>,<span class="st">&quot;[10,90]&quot;</span>,<span class="st">&quot;[10,90]&quot;</span>,<span class="st">&quot;[5,40]&quot;</span>)</a>
+<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co"># Number of parameter samples to take from hypercube</span></a>
+<a class="sourceLine" id="cb4-14" data-line-number="14">NUMSAMPLES&lt;-<span class="dv">500</span></a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co"># Name of function that sets up Netlogo simulation. Usually setup</span></a>
+<a class="sourceLine" id="cb4-16" data-line-number="16">NETLOGO_SETUP_FUNCTION&lt;-<span class="st">&quot;setup&quot;</span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co"># Name of function that starts Netlogo simulation. Usually go</span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18">NETLOGO_RUN_FUNCTION&lt;-<span class="st">&quot;go&quot;</span></a>
+<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co"># Simulation output measures</span></a>
+<a class="sourceLine" id="cb4-20" data-line-number="20">MEASURES&lt;-<span class="kw">c</span>(<span class="st">&quot;death-thru-sickness&quot;</span>,<span class="st">&quot;death-but-immune&quot;</span>,<span class="st">&quot;death-old-age&quot;</span>,</a>
+<a class="sourceLine" id="cb4-21" data-line-number="21"><span class="st">&quot;death-old-and-sick&quot;</span>)</a>
+<a class="sourceLine" id="cb4-22" data-line-number="22"><span class="co"># Number of times the Netlogo experiment is repeated for each parameter</span></a>
+<a class="sourceLine" id="cb4-23" data-line-number="23"><span class="co"># set</span></a>
+<a class="sourceLine" id="cb4-24" data-line-number="24">EXPERIMENT_REPETITIONS&lt;-<span class="dv">1</span></a>
+<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="co"># Whether Netlogo metrics should be collected at each timestep</span></a>
+<a class="sourceLine" id="cb4-26" data-line-number="26">RUNMETRICS_EVERYSTEP&lt;-<span class="st">&quot;true&quot;</span></a>
+<a class="sourceLine" id="cb4-27" data-line-number="27"><span class="co"># Algorithm to use to generate the hypercube (normal or optimal)</span></a>
+<a class="sourceLine" id="cb4-28" data-line-number="28">ALGORITHM&lt;-<span class="st">&quot;normal&quot;</span></a>
+<a class="sourceLine" id="cb4-29" data-line-number="29"></a>
+<a class="sourceLine" id="cb4-30" data-line-number="30"><span class="kw">lhc_generate_lhc_sample_netlogo</span>(FILEPATH,PARAMETERS,PARAMVALS,NUMSAMPLES,ALGORITHM,</a>
+<a class="sourceLine" id="cb4-31" data-line-number="31">                              EXPERIMENT_REPETITIONS,RUNMETRICS_EVERYSTEP,NETLOGO_SETUP_FUNCTION,</a>
+<a class="sourceLine" id="cb4-32" data-line-number="32">                              NETLOGO_RUN_FUNCTION,MEASURES)</a></code></pre></div>
 </div>
 <div id="analysing-the-results" class="section level3">
 <h3>Analysing the Results</h3>
 <p>Again the example shown here is for the example data from our lab website. Note for space reasons that the Netlogo parameter files themselves are not included in the download. This method iterates through all the Netlogo results for all parameter sets and collapses these into one CSV file, which can then be analysed using the techniques detailed in Technique 3.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Import the package</span>
-<span class="kw">library</span>(spartan)
-<span class="co"># Folder containing the Netlogo Behaviour Space table,</span>
-<span class="co"># and where the processed results will be written to</span>
-FILEPATH&lt;-<span class="st">&quot;/home/user/LHC/&quot;</span>
-<span class="co"># Name of the result file generated by Netlogo.</span>
-LHCSAMPLE_RESULTFILENAME&lt;-<span class="st">&quot;lhcResult.csv&quot;</span>
-<span class="co"># Location of a file containing the parameter value sets</span>
-<span class="co"># generated by the hypercube sampling (i.e. the file generated</span>
-<span class="co"># in the previous method of this tutorial. U</span>
-SPARTAN_PARAMETER_FILE&lt;-<span class="st">&quot;LHC_Parameters_for_Runs.csv&quot;</span>
-<span class="co"># Number of parameter samples generated from the hypercube</span>
-NUMSAMPLES&lt;-<span class="dv">500</span>
-<span class="co"># The simulation output measures being examined. Should be specified</span>
-<span class="co"># as they are in the Netlogo file</span>
-MEASURES&lt;-<span class="kw">c</span>(<span class="st">&quot;death-thru-sickness&quot;</span>,<span class="st">&quot;death-but-immune&quot;</span>,<span class="st">&quot;death-old-age&quot;</span>,
-<span class="st">&quot;death-old-and-sick&quot;</span>)
-<span class="co"># File name to give to the summary file that is produced showing</span>
-<span class="co"># the parameter value sets alongside the median results for each</span>
-<span class="co"># simulation output measure. </span>
-LHC_ALL_SIM_RESULTS_FILE&lt;-<span class="st">&quot;Virus_LHCSummary.csv&quot;</span>
-<span class="co"># Timestep of interest. The behaviour space table is likely to contain</span>
-<span class="co"># all timesteps - this narrows the analysis</span>
-TIMESTEP&lt;-<span class="dv">5200</span>
-<span class="co"># Parameters of interest in this analysis</span>
-PARAMETERS&lt;-<span class="kw">c</span>(<span class="st">&quot;infectiousness&quot;</span>,<span class="st">&quot;chance-recover&quot;</span>,<span class="st">&quot;duration&quot;</span>)
-<span class="co"># What each measure represents. Used in graphing results</span>
-MEASURE_SCALE&lt;-<span class="kw">c</span>(<span class="st">&quot;Number of People&quot;</span>,<span class="st">&quot;Number of People&quot;</span>,
-<span class="st">&quot;Number of People&quot;</span>,<span class="st">&quot;Number of People&quot;</span>)
-<span class="co"># File name to give to the file showing the Partial Rank Correlation</span>
-<span class="co"># Coefficients for each parameter. Again note no file extension</span>
-CORCOEFFSOUTPUTFILE&lt;-<span class="st">&quot;EgSet_corCoeffs&quot;</span>
-<span class="co"># Not used in this case, but when a simulation is analysed at</span>
-<span class="co"># multiple timepoints (see Tutorials 1-4)</span>
-TIMEPOINTS&lt;-<span class="ot">NULL</span>; TIMEPOINTSCALE&lt;-<span class="ot">NULL</span>
-
-<span class="kw">lhc_process_netlogo_result</span>(FILEPATH, LHCSAMPLE_RESULTFILENAME, SPARTAN_PARAMETER_FILE, NUMSAMPLES, MEASURES, LHC_ALL_SIM_RESULTS_FILE, TIMESTEP)
-
-<span class="kw">lhc_generatePRCoEffs</span>(FILEPATH, PARAMETERS, MEASURES, LHC_ALL_SIM_RESULTS_FILE, CORCOEFFSOUTPUTFILE)
-
-<span class="kw">lhc_graphMeasuresForParameterChange</span>(FILEPATH, PARAMETERS, MEASURES, MEASURE_SCALE, CORCOEFFSOUTPUTFILE, LHC_ALL_SIM_RESULTS_FILE)</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># Import the package</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw">library</span>(spartan)</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co"># Folder containing the Netlogo Behaviour Space table,</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co"># and where the processed results will be written to</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">FILEPATH&lt;-<span class="st">&quot;/home/user/LHC/&quot;</span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co"># Name of the result file (csv) generated by Netlogo, with no file</span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co"># extension</span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">LHCSAMPLE_RESULTFILENAME&lt;-<span class="st">&quot;lhcResult&quot;</span></a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co"># Location of a file containing the parameter value sets</span></a>
+<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co"># generated by the hypercube sampling (i.e. the file generated</span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co"># in the previous method of this tutorial. U</span></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12">SPARTAN_PARAMETER_FILE&lt;-<span class="st">&quot;LHC_Parameters_for_Runs.csv&quot;</span></a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co"># Number of parameter samples generated from the hypercube</span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14">NUMSAMPLES&lt;-<span class="dv">500</span></a>
+<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co"># The simulation output measures being examined. Should be specified</span></a>
+<a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co"># as they are in the Netlogo file</span></a>
+<a class="sourceLine" id="cb5-17" data-line-number="17">MEASURES&lt;-<span class="kw">c</span>(<span class="st">&quot;death-thru-sickness&quot;</span>,<span class="st">&quot;death-but-immune&quot;</span>,<span class="st">&quot;death-old-age&quot;</span>,</a>
+<a class="sourceLine" id="cb5-18" data-line-number="18"><span class="st">&quot;death-old-and-sick&quot;</span>)</a>
+<a class="sourceLine" id="cb5-19" data-line-number="19"><span class="co"># File name to give to the summary file that is produced showing</span></a>
+<a class="sourceLine" id="cb5-20" data-line-number="20"><span class="co"># the parameter value sets alongside the median results for each</span></a>
+<a class="sourceLine" id="cb5-21" data-line-number="21"><span class="co"># simulation output measure. </span></a>
+<a class="sourceLine" id="cb5-22" data-line-number="22">LHC_ALL_SIM_RESULTS_FILE&lt;-<span class="st">&quot;Virus_LHCSummary.csv&quot;</span></a>
+<a class="sourceLine" id="cb5-23" data-line-number="23"><span class="co"># Timestep of interest. The behaviour space table is likely to contain</span></a>
+<a class="sourceLine" id="cb5-24" data-line-number="24"><span class="co"># all timesteps - this narrows the analysis</span></a>
+<a class="sourceLine" id="cb5-25" data-line-number="25">TIMESTEP&lt;-<span class="dv">5200</span></a>
+<a class="sourceLine" id="cb5-26" data-line-number="26"><span class="co"># Parameters of interest in this analysis</span></a>
+<a class="sourceLine" id="cb5-27" data-line-number="27">PARAMETERS&lt;-<span class="kw">c</span>(<span class="st">&quot;infectiousness&quot;</span>,<span class="st">&quot;chance-recover&quot;</span>,<span class="st">&quot;duration&quot;</span>)</a>
+<a class="sourceLine" id="cb5-28" data-line-number="28"><span class="co"># What each measure represents. Used in graphing results</span></a>
+<a class="sourceLine" id="cb5-29" data-line-number="29">MEASURE_SCALE&lt;-<span class="kw">c</span>(<span class="st">&quot;Number of People&quot;</span>,<span class="st">&quot;Number of People&quot;</span>,</a>
+<a class="sourceLine" id="cb5-30" data-line-number="30"><span class="st">&quot;Number of People&quot;</span>,<span class="st">&quot;Number of People&quot;</span>)</a>
+<a class="sourceLine" id="cb5-31" data-line-number="31"><span class="co"># File name to give to the file showing the Partial Rank Correlation</span></a>
+<a class="sourceLine" id="cb5-32" data-line-number="32"><span class="co"># Coefficients for each parameter. Again note no file extension</span></a>
+<a class="sourceLine" id="cb5-33" data-line-number="33">CORCOEFFSOUTPUTFILE&lt;-<span class="st">&quot;EgSet_corCoeffs&quot;</span></a>
+<a class="sourceLine" id="cb5-34" data-line-number="34"><span class="co"># Not used in this case, but when a simulation is analysed at</span></a>
+<a class="sourceLine" id="cb5-35" data-line-number="35"><span class="co"># multiple timepoints (see Tutorials 1-4)</span></a>
+<a class="sourceLine" id="cb5-36" data-line-number="36">TIMEPOINTS&lt;-<span class="ot">NULL</span>; TIMEPOINTSCALE&lt;-<span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb5-37" data-line-number="37"></a>
+<a class="sourceLine" id="cb5-38" data-line-number="38"><span class="kw">lhc_process_netlogo_result</span>(FILEPATH, LHCSAMPLE_RESULTFILENAME, SPARTAN_PARAMETER_FILE, NUMSAMPLES, MEASURES, LHC_ALL_SIM_RESULTS_FILE, TIMESTEP)</a>
+<a class="sourceLine" id="cb5-39" data-line-number="39"></a>
+<a class="sourceLine" id="cb5-40" data-line-number="40"><span class="kw">lhc_generatePRCoEffs</span>(FILEPATH, PARAMETERS, MEASURES, LHC_ALL_SIM_RESULTS_FILE, CORCOEFFSOUTPUTFILE)</a>
+<a class="sourceLine" id="cb5-41" data-line-number="41"></a>
+<a class="sourceLine" id="cb5-42" data-line-number="42"><span class="kw">lhc_graphMeasuresForParameterChange</span>(FILEPATH, PARAMETERS, MEASURES, MEASURE_SCALE, CORCOEFFSOUTPUTFILE, LHC_ALL_SIM_RESULTS_FILE)</a></code></pre></div>
 </div>
 </div>
 <div id="technique-4-efast-sampling-and-analysis-technique-4" class="section level2">
@@ -278,78 +489,78 @@ TIMEPOINTS&lt;-<span class="ot">NULL</span>; TIMEPOINTSCALE&lt;-<span class="ot"
 <div id="parameter-sampling-2" class="section level3">
 <h3>Parameter Sampling</h3>
 <p>The method below constructs parameter sets using the eFAST approach, detailed fully in the vignette for Technique 4. Note here the additional parameter: Dummy. Statistical inference in eFAST is generated though comparing the variance of each parameter to that of a parameter known to have no influence on the simulation. The dummy parameter sample fulfils this role.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(spartan)
-<span class="co"># The directory where the samples should be stored</span>
-FILEPATH&lt;-<span class="st">&quot;/home/user/eFAST/&quot;</span>
-<span class="co"># Parameters for this simulation. List ALL the parameters that Netlogo needs to know, even those not being perturbed. Make # sure you include the dummy</span>
-PARAMETERS&lt;-<span class="kw">c</span>(<span class="st">&quot;people&quot;</span>,<span class="st">&quot;infectiousness&quot;</span>,<span class="st">&quot;chance-recover&quot;</span>,<span class="st">&quot;duration&quot;</span>, <span class="st">&quot;dummy&quot;</span>)
-<span class="co"># Now values for each of the parameters above. For parameters not being analysed, simply list the value</span>
-<span class="co"># For parameters being analysed, put the min and max values of the parameter in square brackets, in double quotes, e.g. </span>
-<span class="co"># &quot;[0.1,0.5]&quot; Encapsulate strings, i.e.: &quot;\&quot;/home/user/Experiment/\&quot;&quot;</span>
-PARAMVALS&lt;-<span class="kw">c</span>(<span class="dv">150</span>,<span class="st">&quot;[10,90]&quot;</span>,<span class="st">&quot;[10,90]&quot;</span>,<span class="st">&quot;[5,40]&quot;</span>,<span class="st">&quot;[1,10]&quot;</span>)
-<span class="co"># Number of resampling curves to use</span>
-NUMCURVES&lt;-<span class="dv">3</span>
-<span class="co"># Number of value samples to take from each parameter curve</span>
-NUMSAMPLES&lt;-<span class="dv">65</span>
-<span class="co"># The name of the function in Netlogo that sets up the simulation (Usually setup)</span>
-NETLOGO_SETUP_FUNCTION&lt;-<span class="st">&quot;setup&quot;</span>
-<span class="co"># Name of the function in Netlogo that starts the simulation (Usually go)</span>
-NETLOGO_RUN_FUNCTION&lt;-<span class="st">&quot;go&quot;</span>
-MEASURES&lt;-<span class="kw">c</span>(<span class="st">&quot;death-thru-sickness&quot;</span>,<span class="st">&quot;death-but-immune&quot;</span>,<span class="st">&quot;death-old-age&quot;</span>,<span class="st">&quot;death-old-and-sick&quot;</span>)
-<span class="co"># Number of times the Netlogo run should be repeated for each parameter set</span>
-EXPERIMENT_REPETITIONS&lt;-<span class="dv">1</span>
-<span class="co"># Whether Netlogo should collect metrics at all timesteps</span>
-RUNMETRICS_EVERYSTEP&lt;-<span class="st">&quot;true&quot;</span>
-
-<span class="kw">efast_generate_sample_netlogo</span>(FILEPATH,NUMCURVES,NUMSAMPLES,MEASURES,PARAMETERS,PARAMVALS,EXPERIMENT_REPETITIONS,
-                              RUNMETRICS_EVERYSTEP,NETLOGO_SETUP_FUNCTION,NETLOGO_RUN_FUNCTION)</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">library</span>(spartan)</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co"># The directory where the samples should be stored</span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">FILEPATH&lt;-<span class="st">&quot;/home/user/eFAST/&quot;</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co"># Parameters for this simulation. List ALL the parameters that Netlogo needs to know, even those not being perturbed. Make # sure you include the dummy</span></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5">PARAMETERS&lt;-<span class="kw">c</span>(<span class="st">&quot;people&quot;</span>,<span class="st">&quot;infectiousness&quot;</span>,<span class="st">&quot;chance-recover&quot;</span>,<span class="st">&quot;duration&quot;</span>, <span class="st">&quot;dummy&quot;</span>)</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co"># Now values for each of the parameters above. For parameters not being analysed, simply list the value</span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co"># For parameters being analysed, put the min and max values of the parameter in square brackets, in double quotes, e.g. </span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co"># &quot;[0.1,0.5]&quot; Encapsulate strings, i.e.: &quot;\&quot;/home/user/Experiment/\&quot;&quot;</span></a>
+<a class="sourceLine" id="cb6-9" data-line-number="9">PARAMVALS&lt;-<span class="kw">c</span>(<span class="dv">150</span>,<span class="st">&quot;[10,90]&quot;</span>,<span class="st">&quot;[10,90]&quot;</span>,<span class="st">&quot;[5,40]&quot;</span>,<span class="st">&quot;[1,10]&quot;</span>)</a>
+<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co"># Number of resampling curves to use</span></a>
+<a class="sourceLine" id="cb6-11" data-line-number="11">NUMCURVES&lt;-<span class="dv">3</span></a>
+<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="co"># Number of value samples to take from each parameter curve</span></a>
+<a class="sourceLine" id="cb6-13" data-line-number="13">NUMSAMPLES&lt;-<span class="dv">65</span></a>
+<a class="sourceLine" id="cb6-14" data-line-number="14"><span class="co"># The name of the function in Netlogo that sets up the simulation (Usually setup)</span></a>
+<a class="sourceLine" id="cb6-15" data-line-number="15">NETLOGO_SETUP_FUNCTION&lt;-<span class="st">&quot;setup&quot;</span></a>
+<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co"># Name of the function in Netlogo that starts the simulation (Usually go)</span></a>
+<a class="sourceLine" id="cb6-17" data-line-number="17">NETLOGO_RUN_FUNCTION&lt;-<span class="st">&quot;go&quot;</span></a>
+<a class="sourceLine" id="cb6-18" data-line-number="18">MEASURES&lt;-<span class="kw">c</span>(<span class="st">&quot;death-thru-sickness&quot;</span>,<span class="st">&quot;death-but-immune&quot;</span>,<span class="st">&quot;death-old-age&quot;</span>,<span class="st">&quot;death-old-and-sick&quot;</span>)</a>
+<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co"># Number of times the Netlogo run should be repeated for each parameter set</span></a>
+<a class="sourceLine" id="cb6-20" data-line-number="20">EXPERIMENT_REPETITIONS&lt;-<span class="dv">1</span></a>
+<a class="sourceLine" id="cb6-21" data-line-number="21"><span class="co"># Whether Netlogo should collect metrics at all timesteps</span></a>
+<a class="sourceLine" id="cb6-22" data-line-number="22">RUNMETRICS_EVERYSTEP&lt;-<span class="st">&quot;true&quot;</span></a>
+<a class="sourceLine" id="cb6-23" data-line-number="23"></a>
+<a class="sourceLine" id="cb6-24" data-line-number="24"><span class="kw">efast_generate_sample_netlogo</span>(FILEPATH,NUMCURVES,NUMSAMPLES,MEASURES,PARAMETERS,PARAMVALS,EXPERIMENT_REPETITIONS,</a>
+<a class="sourceLine" id="cb6-25" data-line-number="25">                              RUNMETRICS_EVERYSTEP,NETLOGO_SETUP_FUNCTION,NETLOGO_RUN_FUNCTION)</a></code></pre></div>
 </div>
 <div id="analysing-simulation-data" class="section level3">
 <h3>Analysing Simulation Data</h3>
 <p>The below example analyses the Netlogo virus model results obtained for an eFAST sample, available from the project website. The objective is to get the Netlogo results into one file, one that is then compatible with the analysis methods detailed in the vignette for Technique 4.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(spartan)
-<span class="co"># The directory where the netlogo experiment file should be stored</span>
-FILEPATH&lt;-<span class="st">&quot;/home/kieran/Documents/Tutorial/eFAST/&quot;</span>
-<span class="co"># Name of the result file generated by Netlogo. The sample number and</span>
-<span class="co"># .csv are added to this</span>
-EFASTSAMPLE_RESULTFILENAME&lt;-<span class="st">&quot;efast_result_set&quot;</span>
-<span class="co"># The parameters being examined in this analysis. Include the dummy</span>
-PARAMETERS&lt;-<span class="kw">c</span>(<span class="st">&quot;infectiousness&quot;</span>,<span class="st">&quot;chance-recover&quot;</span>,<span class="st">&quot;duration&quot;</span>,<span class="st">&quot;dummy&quot;</span>)
-<span class="co"># Number of resampling curves to use</span>
-NUMCURVES&lt;-<span class="dv">3</span>
-<span class="co"># Number of value samples to take from each curve</span>
-NUMSAMPLES&lt;-<span class="dv">65</span>
-<span class="co"># The output measures by which you are analysing the results.</span>
-MEASURES&lt;-<span class="kw">c</span>(<span class="st">&quot;death-thru-sickness&quot;</span>,<span class="st">&quot;death-but-immune&quot;</span>,<span class="st">&quot;death-old-age&quot;</span>,<span class="st">&quot;death-old-and-sick&quot;</span>)
-<span class="co"># File created containing the median of each output measure, of each</span>
-<span class="co"># simulation for this parameter set. Note no file extension</span>
-RESULTFILENAME&lt;-<span class="st">&quot;ParamValResponses&quot;</span>
-<span class="co"># Timestep of interest. The behaviour space table is likely to contain</span>
-<span class="co"># all timesteps. This narrows the analysis</span>
-TIMESTEP&lt;-<span class="dv">5200</span>
-<span class="co"># Output measures to t-test to gain statistical significance</span>
-OUTPUTMEASURES_TO_TTEST&lt;-<span class="dv">1</span>:<span class="dv">4</span>
-<span class="co"># T-Test confidence interval</span>
-TTEST_CONF_INT&lt;-<span class="fl">0.95</span>
-<span class="co"># Boolean noting whether graphs should be produced</span>
-GRAPH_FLAG&lt;-<span class="ot">TRUE</span>
-<span class="co"># Name of the final result file summarising the analysis, showing the</span>
-<span class="co"># partitioning of the variance between parameters. Note no file</span>
-<span class="co"># extension</span>
-EFASTRESULTFILENAME&lt;-<span class="st">&quot;Virus_eFAST_Analysis&quot;</span>
-<span class="co"># Not used in this case, but when a simulation is analysed at</span>
-<span class="co"># multiple timepoints (see Tutorials 1-4)</span>
-TIMEPOINTS&lt;-<span class="ot">NULL</span>; TIMEPOINTSCALE&lt;-<span class="ot">NULL</span>
-
-<span class="kw">efast_process_netlogo_result</span>(FILEPATH, EFASTSAMPLE_RESULTFILENAME, PARAMETERS, NUMCURVES,
-           NUMSAMPLES, MEASURES, RESULTFILENAME, TIMESTEP)
-
-<span class="co"># Get all the results for each curve into one summary file for each curve</span>
-<span class="kw">efast_get_overall_medians</span>(FILEPATH, NUMCURVES, PARAMETERS, NUMSAMPLES, MEASURES)
-
-<span class="co"># Run the eFAST analysis</span>
-<span class="kw">efast_run_Analysis</span>(FILEPATH, MEASURES, PARAMETERS, NUMCURVES, NUMSAMPLES, OUTPUTMEASURES_TO_TTEST, TTEST_CONF_INT, 
-            GRAPH_FLAG, EFASTRESULTFILENAME, TIMEPOINTS, TIMEPOINTSCALE)</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">library</span>(spartan)</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co"># The directory where the netlogo experiment file should be stored</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">FILEPATH&lt;-<span class="st">&quot;/home/kieran/Documents/Tutorial/eFAST/&quot;</span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co"># Name of the result file generated by Netlogo. The sample number and</span></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co"># .csv are added to this</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">EFASTSAMPLE_RESULTFILENAME&lt;-<span class="st">&quot;efast_result_set&quot;</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co"># The parameters being examined in this analysis. Include the dummy</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8">PARAMETERS&lt;-<span class="kw">c</span>(<span class="st">&quot;infectiousness&quot;</span>,<span class="st">&quot;chance-recover&quot;</span>,<span class="st">&quot;duration&quot;</span>,<span class="st">&quot;dummy&quot;</span>)</a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co"># Number of resampling curves to use</span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10">NUMCURVES&lt;-<span class="dv">3</span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co"># Number of value samples to take from each curve</span></a>
+<a class="sourceLine" id="cb7-12" data-line-number="12">NUMSAMPLES&lt;-<span class="dv">65</span></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co"># The output measures by which you are analysing the results.</span></a>
+<a class="sourceLine" id="cb7-14" data-line-number="14">MEASURES&lt;-<span class="kw">c</span>(<span class="st">&quot;death-thru-sickness&quot;</span>,<span class="st">&quot;death-but-immune&quot;</span>,<span class="st">&quot;death-old-age&quot;</span>,<span class="st">&quot;death-old-and-sick&quot;</span>)</a>
+<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="co"># File created containing the median of each output measure, of each</span></a>
+<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co"># simulation for this parameter set. Note no file extension</span></a>
+<a class="sourceLine" id="cb7-17" data-line-number="17">RESULTFILENAME&lt;-<span class="st">&quot;ParamValResponses&quot;</span></a>
+<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co"># Timestep of interest. The behaviour space table is likely to contain</span></a>
+<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co"># all timesteps. This narrows the analysis</span></a>
+<a class="sourceLine" id="cb7-20" data-line-number="20">TIMESTEP&lt;-<span class="dv">5200</span></a>
+<a class="sourceLine" id="cb7-21" data-line-number="21"><span class="co"># Output measures to t-test to gain statistical significance</span></a>
+<a class="sourceLine" id="cb7-22" data-line-number="22">OUTPUTMEASURES_TO_TTEST&lt;-<span class="dv">1</span><span class="op">:</span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb7-23" data-line-number="23"><span class="co"># T-Test confidence interval</span></a>
+<a class="sourceLine" id="cb7-24" data-line-number="24">TTEST_CONF_INT&lt;-<span class="fl">0.95</span></a>
+<a class="sourceLine" id="cb7-25" data-line-number="25"><span class="co"># Boolean noting whether graphs should be produced</span></a>
+<a class="sourceLine" id="cb7-26" data-line-number="26">GRAPH_FLAG&lt;-<span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb7-27" data-line-number="27"><span class="co"># Name of the final result file summarising the analysis, showing the</span></a>
+<a class="sourceLine" id="cb7-28" data-line-number="28"><span class="co"># partitioning of the variance between parameters. Note no file</span></a>
+<a class="sourceLine" id="cb7-29" data-line-number="29"><span class="co"># extension</span></a>
+<a class="sourceLine" id="cb7-30" data-line-number="30">EFASTRESULTFILENAME&lt;-<span class="st">&quot;Virus_eFAST_Analysis&quot;</span></a>
+<a class="sourceLine" id="cb7-31" data-line-number="31"><span class="co"># Not used in this case, but when a simulation is analysed at</span></a>
+<a class="sourceLine" id="cb7-32" data-line-number="32"><span class="co"># multiple timepoints (see Tutorials 1-4)</span></a>
+<a class="sourceLine" id="cb7-33" data-line-number="33">TIMEPOINTS&lt;-<span class="ot">NULL</span>; TIMEPOINTSCALE&lt;-<span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb7-34" data-line-number="34"></a>
+<a class="sourceLine" id="cb7-35" data-line-number="35"><span class="kw">efast_process_netlogo_result</span>(FILEPATH, EFASTSAMPLE_RESULTFILENAME, PARAMETERS, NUMCURVES,</a>
+<a class="sourceLine" id="cb7-36" data-line-number="36">           NUMSAMPLES, MEASURES, RESULTFILENAME, TIMESTEP)</a>
+<a class="sourceLine" id="cb7-37" data-line-number="37"></a>
+<a class="sourceLine" id="cb7-38" data-line-number="38"><span class="co"># Get all the results for each curve into one summary file for each curve</span></a>
+<a class="sourceLine" id="cb7-39" data-line-number="39"><span class="kw">efast_get_overall_medians</span>(FILEPATH, NUMCURVES, PARAMETERS, NUMSAMPLES, MEASURES)</a>
+<a class="sourceLine" id="cb7-40" data-line-number="40"></a>
+<a class="sourceLine" id="cb7-41" data-line-number="41"><span class="co"># Run the eFAST analysis</span></a>
+<a class="sourceLine" id="cb7-42" data-line-number="42"><span class="kw">efast_run_Analysis</span>(FILEPATH, MEASURES, PARAMETERS, NUMCURVES, NUMSAMPLES, OUTPUTMEASURES_TO_TTEST, TTEST_CONF_INT, </a>
+<a class="sourceLine" id="cb7-43" data-line-number="43">            GRAPH_FLAG, EFASTRESULTFILENAME, TIMEPOINTS, TIMEPOINTSCALE)</a></code></pre></div>
 </div>
 </div>
 

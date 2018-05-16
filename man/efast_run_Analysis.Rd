@@ -6,7 +6,8 @@
 \usage{
 efast_run_Analysis(FILEPATH, MEASURES, PARAMETERS, NUMCURVES, NUMSAMPLES,
   OUTPUTMEASURES_TO_TTEST, TTEST_CONF_INT, GRAPH_FLAG, EFASTRESULTFILENAME,
-  TIMEPOINTS = NULL, TIMEPOINTSCALE = NULL, GRAPHTIME = NULL)
+  TIMEPOINTS = NULL, TIMEPOINTSCALE = NULL, GRAPHTIME = NULL,
+  check_done = FALSE)
 }
 \arguments{
 \item{FILEPATH}{Directory where the simulation runs can be found, in folders
@@ -48,6 +49,9 @@ e.g. "Hours"}
 
 \item{GRAPHTIME}{Value never needs stating, used internally to produce
 graphs when processing multiple timepoints}
+
+\item{check_done}{If using multiple timepoints, whether data entry has been
+checked}
 }
 \description{
 Produces a file summarising the analysis; partitioning the variance between

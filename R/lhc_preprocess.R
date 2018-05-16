@@ -20,7 +20,7 @@ lhc_generateTimepointFiles <- function(FILEPATH, SPARTAN_PARAMETER_FILE,
   # TIMEPOINT FILES FOR THIS DATA  SO THE FILES ARE COMPATIBLE WITH SPARTAN
 
   if (file.exists(FILEPATH)) {
-    print("Generating Simulation Timestep files compatible for
+    message("Generating Simulation Timestep files compatible for
           Spartan Analysis")
 
     # READ IN THE SPARTAN PARAMETER FILE
@@ -29,8 +29,9 @@ lhc_generateTimepointFiles <- function(FILEPATH, SPARTAN_PARAMETER_FILE,
 
     # NOW FOR LEISHSIM WE NEED TO DO 168 ROWS, SO:
     for (t in 1:length(TIMEPOINTS)) {
-      TIMEPOINTPROCESSING <- TIMEPOINTS[t]
-      print(paste("Processing Timepoint: ", TIMEPOINTPROCESSING, sep = ""))
+
+      current_timepoint <- TIMEPOINTS[t]
+      message(paste("Processing Timepoint: ", current_timepoint, sep = ""))
       ALL_SIM_RESULTS_FOR_TIMEPOINT <- NULL
 
       for (k in 1:NUMSAMPLES) {
@@ -39,7 +40,7 @@ lhc_generateTimepointFiles <- function(FILEPATH, SPARTAN_PARAMETER_FILE,
                                          RUN_SUMMARY_FILE_NAME, sep = ""),
                                    header = TRUE)
 
-        RESULT <- cbind(LHCTABLE[k, ], MEDIAN_RESULTS[TIMEPOINTPROCESSING, ])
+        RESULT <- cbind(LHCTABLE[k, ], MEDIAN_RESULTS[current_timepoint, ])
 
         # NOW ADD THIS TO THE LIST OF ALL MEDIANS BEING PROCESSED IN THIS
         # ANALYSIS
@@ -49,7 +50,7 @@ lhc_generateTimepointFiles <- function(FILEPATH, SPARTAN_PARAMETER_FILE,
 
       # WRITE THE RESULTS FILE FOR THIS TIMEPOINT
       if (!is.null(ALL_SIM_RESULTS_FOR_TIMEPOINT)) {
-        RESULTSFILE <- paste(FILEPATH, "/Results_Time_", TIMEPOINTPROCESSING,
+        RESULTSFILE <- paste(FILEPATH, "/Results_Time_", current_timepoint,
                              ".csv", sep = "")
         write.csv(ALL_SIM_RESULTS_FOR_TIMEPOINT,
                   RESULTSFILE, quote = FALSE, row.names = FALSE)

@@ -11,24 +11,32 @@ pcor.mat <- function (x, y, z, cor_method = "p", na.rm = TRUE) {
   }
 
   data <- data.frame(x, y, z, check.names = FALSE)
+  #write.csv(data, file=file.path("/home/kja505/Downloads/ed_260318/var-cov.csv"),row.names=F,quote=F)
+  #print(data)
 
   if (na.rm == TRUE) {
     data <- na.omit(data)
   }
 
+  # x data is just the parameter value column and the measure result
   xdata <- na.omit(data.frame(data[, c(1, 2)]), check.names = FALSE)
   Sxx <- cov(xdata, xdata, method = cor_method)
+
 
   xzdata <- na.omit(data)
   xdata <- data.frame(xzdata[, c(1, 2)], check.names = FALSE)
   zdata <- data.frame(xzdata[, -c(1, 2)], check.names = FALSE)
+  # All results bar parameter value and measure result columns:
   Sxz <- cov(xdata, zdata, method = cor_method)
 
   zdata <- na.omit(data.frame(data[, -c(1, 2)]), check.names = FALSE)
   Szz <- cov(zdata, zdata, method = cor_method)
 
+  #write.csv(Szz, file=file.path("/home/kja505/Downloads/ed_260318/Szz.csv"),row.names=F,quote=F)
+
   # is Szz positive definite?
   zz.ev <- eigen(Szz)$values
+
   if (min(zz.ev)[1] < 0) {
     stop("\'Szz\' is not positive definite!\n")
   }
@@ -159,7 +167,7 @@ lhc_calculatePRCCForMultipleTimepoints <- function(FILEPATH,
                                                     TIMEPOINTPROCESSING,
                                                     sep = ""))
       } else {
-        print(paste("Correlation Coefficients file for Timepoint ",
+        message(paste("Correlation Coefficients file for Timepoint ",
                     TIMEPOINTPROCESSING, " does not exist", sep = ""))
       }
     }
@@ -177,8 +185,6 @@ lhc_calculatePRCCForMultipleTimepoints <- function(FILEPATH,
       RESULTSFILE <- paste(FILEPATH, "/All_Timepoint_PVALS_", MEASURE, ".csv",
                            sep = "")
       write.csv(PVALS_OVER_TIME, RESULTSFILE, quote = FALSE, row.names = FALSE)
-    } else {
-      print("No Correlation Coefficients to write to file")
     }
   }
 }
@@ -209,8 +215,7 @@ lhc_generate_netlogo_PRCoEffs <- function(FILEPATH, PARAMETERS, MEASURES,
                                           LHCSUMMARYFILENAME,
                                           CORCOEFFSOUTPUTFILE) {
   # Call the spartan function
-  lhc_generatePRCoEffs(FILEPATH, PARAMETERS, MEASURES, LHCSUMMARYFILENAME,
-                       CORCOEFFSOUTPUTFILE)
+  message("Now deprecated. Use lhc_generatePRCoEffs instead")
 }
 
 
@@ -249,15 +254,9 @@ pcor.test <- function(x, y, z, use = "mat", calc_method ="p", na.rm = TRUE) {
   y <- c(y)
   z <- as.data.frame(z, check.names = FALSE)
 
-  if (use == "mat") {
-    p.use <- "Var-Cov matrix"
-    pcor <- pcor.mat(x, y, z, cor_method = calc_method, na.rm = na.rm)
-  } else if (use == "rec") {
-    p.use <- "Recursive formula"
-    pcor <- pcor.rec(x, y, z, cor_method = calc_method, na.rm = na.rm)
-  } else {
-    stop("\'use\' should be either \"rec\" or \"mat\"!\n")
-  }
+
+  useOk <- TRUE
+  methodOk <- TRUE
 
   # print the method
   if (gregexpr("p", calc_method)[[1]][1] == 1){
@@ -267,28 +266,46 @@ pcor.test <- function(x, y, z, use = "mat", calc_method ="p", na.rm = TRUE) {
   }else if (gregexpr("k", calc_method)[[1]][1] == 1){
     p.method <- "Kendall"
   }else{
-    stop("\'method\' should be \"pearson\" or \"spearman\" or \"kendall\"!\n")
+    message("\'method\' should be \"pearson\" or \"spearman\" or \"kendall\"!\n")
+    methodOk <- FALSE
   }
 
-  # sample number
-  n <- dim(na.omit(data.frame(x, y, z, check.names = FALSE)))[1]
-
-  # given variables' number
-  gn <- dim(z)[2]
-
-  if (p.method == "Kendall"){
-    statistic <- pcor / sqrt(2 * (2 * (n - gn) + 5) / (9 * (n - gn) *
-                                                         (n - 1 - gn)))
-    p.value <- 2 * pnorm(-abs(statistic))
-
-  } else {
-    val_to_sqrt_l <- n - 2 - gn
-    val_to_sqrt_r <- 1 - pcor ^ 2
-    statistic <- pcor * sqrt(val_to_sqrt_l / val_to_sqrt_r)
-    p.value <- 2 * pnorm(-abs(statistic))
+  if(methodOk)
+  {
+    if (use == "mat") {
+      p.use <- "Var-Cov matrix"
+      pcor <- pcor.mat(x, y, z, cor_method = calc_method, na.rm = na.rm)
+    } else if (use == "rec") {
+      p.use <- "Recursive formula"
+      pcor <- pcor.rec(x, y, z, cor_method = calc_method, na.rm = na.rm)
+    } else {
+      message("\'use\' should be either \"rec\" or \"mat\"!\n")
+      useOk <- FALSE
+    }
   }
 
-  data.frame(estimate = pcor, p.value = p.value, statistic = statistic,
-             n = n, gn = gn, Method = p.method, Use = p.use,
-             check.names = FALSE)
+  if(useOk && methodOk)
+  {
+    # sample number
+    n <- dim(na.omit(data.frame(x, y, z, check.names = FALSE)))[1]
+
+    # given variables' number
+    gn <- dim(z)[2]
+
+    if (p.method == "Kendall"){
+      statistic <- pcor / sqrt(2 * (2 * (n - gn) + 5) / (9 * (n - gn) *
+                                                           (n - 1 - gn)))
+      p.value <- 2 * pnorm(-abs(statistic))
+
+    } else {
+      val_to_sqrt_l <- n - 2 - gn
+      val_to_sqrt_r <- 1 - pcor ^ 2
+      statistic <- pcor * sqrt(val_to_sqrt_l / val_to_sqrt_r)
+      p.value <- 2 * pnorm(-abs(statistic))
+    }
+
+    data.frame(estimate = pcor, p.value = p.value, statistic = statistic,
+               n = n, gn = gn, Method = p.method, Use = p.use,
+               check.names = FALSE)
+  }
 }

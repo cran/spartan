@@ -7,7 +7,7 @@
 lhc_graphMeasuresForParameterChange(FILEPATH, PARAMETERS, MEASURES,
   MEASURE_SCALE, CORCOEFFSOUTPUTFILE, LHCSUMMARYFILENAME,
   OUTPUT_TYPE = c("PDF"), TIMEPOINTS = NULL, TIMEPOINTSCALE = NULL,
-  GRAPHTIME = NULL)
+  GRAPHTIME = NULL, check_done = FALSE)
 }
 \arguments{
 \item{FILEPATH}{Directory where the simulation runs of single CSV file can
@@ -42,6 +42,8 @@ multiple simulation timepoints. Sets the scale of the timepoints being
 analysed, e.g. "Hours"}
 
 \item{GRAPHTIME}{The timepoint being processed, if any. NULL if not.}
+
+\item{check_done}{For multiple timepoints, whether input has been checked}
 }
 \description{
 Produces a graph for each parameter, and each output measure, showing

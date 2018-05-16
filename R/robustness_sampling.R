@@ -24,46 +24,155 @@
 #' @export
 oat_parameter_sampling <- function(FILEPATH, PARAMETERS, BASELINE, PMIN = NULL,
                                    PMAX = NULL, PINC = NULL, PARAMVALS = NULL) {
-  # SPARTAN 2.0 - CHANGES SUCH THAT SAMPLING CAN BE PERFORMED USING SPECIFIED
-  # PARAMETER VALUES AS WELL AS INCREMENTS
 
-  if (file.exists(FILEPATH)) {
+  # Version 3.1 adds pre-execution check functions as part of refactoring:
+  # Get the provided function arguments
+  input_check <- list("arguments"=as.list(match.call()),"names"=names(match.call())[-1])
+  # Run if all checks pass:
+  if(check_input_args(input_check$names, input_check$arguments)) {
+
     # CONSIDER EACH PARAMETER IN TURN
     for (PARAMOFINT in 1:length(PARAMETERS)) {
+
       # NOW GET THE LIST OF PARAMETER VALUES BEING EXPLORED FOR THIS PARAMETER
       # NOTE CONVERSION BACK TO NUMBERS: GETS RID OF TRAILING ZEROS MADE BY SEQ
       val_list <- as.numeric(prepare_parameter_value_list(PMIN, PMAX, PINC,
                                                           PARAMVALS,
                                                           PARAMOFINT))
-      PARAMETERTABLE <- NULL
 
-      for (PARAM in 1:length(PARAMETERS)) {
-        if (PARAMOFINT == PARAM)
-          PARAMETERTABLE <- cbind(PARAMETERTABLE, val_list)
-        else
-          PARAMETERTABLE <- cbind(PARAMETERTABLE,
-                                  array(BASELINE[PARAM],
-                                        dim = c(length(val_list))))
-      }
-
-
-      # FORMAT THEN OUTPUT THE PARAMETER TABLE FOR THIS PARAMETER OF INTEREST
-      colnames(PARAMETERTABLE) <- PARAMETERS
+      PARAMETERTABLE <- generate_parameter_table(PARAMETERS, BASELINE, PARAMOFINT, val_list)
 
       # WRITE THE A-TEST RESULTS TO FILE
       results_file <- make_path(c(FILEPATH,
                                   make_filename(c(PARAMETERS[PARAMOFINT],
                                                   "OAT_Values.csv"))))
+      write_data_to_csv(PARAMETERTABLE, results_file)
 
-      write.csv(PARAMETERTABLE, results_file, quote = FALSE, row.names = FALSE)
-
-      print(paste("Sample File Generated for parameter ",
+      message(paste("Sample File Generated for parameter ",
                   PARAMETERS[PARAMOFINT], " and output to ",
                   results_file, sep = ""))
     }
-  } else {
-    print("The directory specified in FILEPATH does not exist.
-          No parameter samples generated")
+  }
+}
+
+#' Takes the value list and generates the sample that is output to csv file
+#'
+#' @param PARAMETERS Array containing the names of the parameters of which parameter samples will be generated
+#' @param BASELINE Array containing the values assigned to each of these parameters in the calibrated baseline
+#' @param PARAMOFINT Number of the parameter for which samples are currently being built
+#' @param val_list List of parameter values to output for each parameter, to be combined with the baseline value of the complementary set
+#' @return Parameter table ready for output to CSV file
+generate_parameter_table <- function(PARAMETERS, BASELINE, PARAMOFINT, val_list) {
+
+  PARAMETERTABLE <- NULL
+
+  for (PARAM in 1:length(PARAMETERS)) {
+    if (PARAMOFINT == PARAM)
+      PARAMETERTABLE <- cbind(PARAMETERTABLE, val_list)
+    else
+      PARAMETERTABLE <- cbind(PARAMETERTABLE,
+                              array(BASELINE[PARAM],
+                                    dim = c(length(val_list))))
   }
 
+  # FORMAT THEN OUTPUT THE PARAMETER TABLE FOR THIS PARAMETER OF INTEREST
+  colnames(PARAMETERTABLE) <- PARAMETERS
+
+  return(PARAMETERTABLE)
 }
+
+#' Creates a Netlogo compatible behaviour space experiment for robustness analysis
+#'
+#' This generates a Netlogo XML Experiment file, to be used with the
+#' BehaviourSpace feature or Headless Netlogo, which perturbs each parameter
+#' over a set value space, altering one parameter at a time in this case
+#'
+#' @param FILEPATH Directory where the parameter samples are to be stored
+#' @param NETLOGO_SETUPFILE_NAME Name to give, or given to, the Netlogo XML experiment file(s) created in sampling. For more than one, a sample number is appended
+#' @param PARAMETERS Array containing the names of the parameters of which parameter samples will be generated
+#' @param PARAMVALS Array containing either the parameter value (if not of interest in the analysis), or range under which this is being explored (stated as as string e.g. "[5,50,5]" for a range of 5-50, increment of 5). See tutorial for more detail
+#' @param NETLOGO_SETUP_FUNCTION The name of the function in Netlogo that sets up the simulation. Commonly is named setup.
+#' @param NETLOGO_RUN_FUNCTION The name of the function in Netlogo that starts the simulation. Commonly named go.
+#' @param MEASURES Array containing the names of the Netlogo output measures which are used to analyse the simulation.
+#' @param EXPERIMENT_REPETITIONS The number of times Netlogo should repeat the experiment for each set of parameter values.
+#' @param RUNMETRICS_EVERYSTEP Boolean stating whether Netlogo should produce output for each timestep.
+#'
+#' @export
+oat_generate_netlogo_behaviour_space_XML <-
+  function(FILEPATH, NETLOGO_SETUPFILE_NAME, PARAMETERS, PARAMVALS,
+           NETLOGO_SETUP_FUNCTION, NETLOGO_RUN_FUNCTION, MEASURES,
+           EXPERIMENT_REPETITIONS, RUNMETRICS_EVERYSTEP) {
+
+    if (requireNamespace("XML", quietly = TRUE)) {
+
+      # START A NEW XML FILE, WITH EXPERIMENTS AS THE TOP TAG (AS REQUIRED BY
+      # NETLOGO)
+      xml <- XML::xmlOutputDOM(tag = "experiments")
+
+      # NEXT TAG IN IS EXPERIMENT
+      xml$addTag("experiment", attrs = c(
+        name = "OAT_Sample", repetitions = EXPERIMENT_REPETITIONS,
+        runMetricsEveryStep = RUNMETRICS_EVERYSTEP), close = FALSE)
+
+      # NOW THE PROCEDURES TO CALL SETUP, GO, AND OUTPUT MEASURES TO ANALYSE
+      xml$addTag("setup", NETLOGO_SETUP_FUNCTION)
+      xml$addTag("go", NETLOGO_RUN_FUNCTION)
+
+      ## NOW TO DO THE MEASURES
+      for (MEASURE in 1:length(MEASURES)) {
+        xml$addTag("metric", MEASURES[MEASURE])
+      }
+
+      for (PARAM in 1:length(PARAMETERS)) {
+        # NOW SOME PARAMETERS ARE BEING VARIED, SOME NOT
+        # THE ONES THAT ARE BEING VARIED HAVE A MIN, MAX, AND INCREMENT IN
+        # SQUARE BRACKETS, SEPARATED BY A COMMA
+        # THUS WE CAN DISTINGUISH THESE WITH A STRING TOKENIZER
+        PARAMVALSPLIT <- (strsplit(PARAMVALS[PARAM], ","))[[1]]
+
+        if (length(PARAMVALSPLIT) == 1) {
+
+          # THIS PARAMETER IS NOT BEING VARIED, AND THUS WE CAN JUST SPECIFY
+          # THE PARAMETER VALUE FOR EACH PARAMETER, ADD THE ENUMERATEDVALUESET
+          # TAG, SIMULATION VARIABLE NAME
+          xml$addTag("enumeratedValueSet",
+                     attrs = c(variable = (PARAMETERS[PARAM])), close = FALSE)
+
+          # NOW ADD THE VALUE
+          xml$addTag("value", attrs = c(value = (PARAMVALS[PARAM])))
+
+          # CLOSE THE ENUMERATED VALUE SET TAG
+          xml$closeTag()
+        } else {
+          # THIS IS A PARAMETER BEING ANALYSED, AND THUS WE NEED TO TELL NETLOGO
+          # TO ALTER THE VALUES
+          # GET THE MIN, MAX, AND INCREMENT
+          # NOTE FOR MIN AND INCREMENT, WE NEED TO REMOVE THE OPENING AND CLOSING
+          # SQUARE BRACKET
+          MIN <- substring(PARAMVALSPLIT[[1]], 2)
+          MAX <- PARAMVALSPLIT[[2]]
+          INC <- substring(PARAMVALSPLIT[[3]], 1, nchar(PARAMVALSPLIT[[3]]) - 1)
+
+          # NOW TO BUILD THE TAGS
+          xml$addTag("steppedValueSet", attrs = c(variable = (PARAMETERS[PARAM]),
+                                                  first = MIN, step = INC,
+                                                  last = MAX))
+        }
+      }
+
+
+      # CLOSE THE EXPERIMENT TAG
+      xml$closeTag()
+
+      # CLOSE THE EXPERIMENTS TAG
+      xml$closeTag()
+
+      xml <- XML::saveXML(xml, file = file.path(FILEPATH, paste(NETLOGO_SETUPFILE_NAME,
+                                     ".xml", sep = "")), indent = TRUE,
+                   prefix = '<?xml version="1.0" encoding="us-ascii"?>\n',
+                   doctype = '<!DOCTYPE experiments SYSTEM "behaviorspace.dtd">')
+
+      message(paste("Netlogo Robustness Setup file generated in ",FILEPATH, "/",NETLOGO_SETUPFILE_NAME,
+                                                                                  ".xml", sep = ""))
+    }
+  }

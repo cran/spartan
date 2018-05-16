@@ -19,117 +19,122 @@
 #' end
 #' @return Median Simulation responses under the parameter set in the
 #' result file
-#'
-#'
-getMediansSubset <- function(FILEPATH, NUMRUNSPERSAMPLE, MEASURES,
-                             RESULTFILENAME, ALTFILENAME,
+getMediansSubset <- function(FILEPATH, NUMRUNSPERSAMPLE, measures,
+                             resultfilename, altfilename = NULL,
                              outputfilecolstart, outputfilecolend) {
-  # FUNCTION AS PART OF SPARTAN VERSION 2
-  # THIS FUNCTION NO LONGER OUTPUTS A FILE, RETURNS LIST OF MEDIANS
 
-  RESULTS <- NULL
+  all_results <- NULL
 
   for (i in 1:NUMRUNSPERSAMPLE) {
 
-    fileaddress <- make_path(c(FILEPATH, toString(i), RESULTFILENAME))
-
+    #print(i)
+    fileaddress <- file.path(FILEPATH, toString(i))
     if (file.exists(fileaddress)) {
 
-      # CHECK WHAT KIND OF INPUT FILE IS BEING DEALT WITH
-      #print(check_file_extension(RESULTFILENAME))
-      if (check_file_extension(RESULTFILENAME) == "csv") {
+      model_result <- import_model_result(fileaddress, resultfilename,
+                                      altfilename, outputfilecolstart,
+                                      outputfilecolend)
 
-        # import model result
-        if (outputfilecolstart > 1) {
-          col_diff <- outputfilecolend - outputfilecolstart
-          import <- read.csv(fileaddress,
-                           colClasses = c(rep("NULL", outputfilecolstart - 1),
-                                        rep(NA, col_diff + 1)),
-                            header = TRUE, check.names = FALSE)
-        } else {
-          import <- read.csv(fileaddress,
-                           colClasses = c(rep(NA, outputfilecolend)),
-                           header = TRUE, check.names = FALSE)
-        }
-
-        MODELRESULT <- data.frame(import, check.names = FALSE)
-
-      } else if (check_file_extension(RESULTFILENAME) == "xml") {
-        if (requireNamespace("XML", quietly = TRUE))
-          MODELRESULT <- XML::xmlToDataFrame(fileaddress)
-        else
-          print("The getMediansSubset function requires the XML package")
-      }
-
-      if (nrow(MODELRESULT) > 0) {
-
-        MEDIANSFORALLMEASURES <- NULL
-
-        # NOW GET THE MEDIANS FOR EACH MEASURE
-        for (q in 1:length(MEASURES)) {
-          # STORE JUST THE RESULTS FOR THAT MEASURE (sapply CAN THEN BE USED)
-          MEASURE_RESULT <- as.matrix(MODELRESULT[MEASURES[q]])
-          MEASUREMEDIAN <- median(as.numeric(MEASURE_RESULT))
-          MEDIANSFORALLMEASURES <- cbind(MEDIANSFORALLMEASURES,
-                                         MEASUREMEDIAN[[1]])
-        }
-        RESULTS <- rbind(RESULTS, MEDIANSFORALLMEASURES)
-      } else {
-
-        if (!is.null(ALTFILENAME)) {
-          # USE THE ALTERNATIVE ON THIS OCCASION
-          # ASSUMES IN SAME FORMAT AS ORIGINAL
-          fileaddress <- paste(FILEPATH, toString(i), "/", ALTFILENAME,
-                               sep = "")
-          # import model result - again checking input type
-
-          if (check_file_extension(ALTFILENAME) == "csv") {
-            # DEALING WITH A CSV FILE
-            com <- paste("cut -d, -f", outputfilecolstart, "-",
-                         outputfilecolend, " ", fileaddress, sep = "")
-            import <- read.csv(pipe(com), header = TRUE, check.names = FALSE)
-            MODELRESULT <- data.frame(import, check.names = FALSE)
-
-          } else if (check_file_extension(ALTFILENAME) == "xml") {
-
-            if (requireNamespace("XML", quietly = TRUE))
-              MODELRESULT <- XML::xmlToDataFrame(fileaddress)
-            else
-              print("The getMediansSubset function requires the XML package")
-          }
-
-          if (nrow(MODELRESULT) > 0) {
-
-            MEDIANSFORALLMEASURES <- NULL
-
-            # NOW GET THE MEDIANS FOR EACH MEASURE
-            for (q in 1:length(MEASURES)) {
-              # STORE JUST THE RESULTS FOR THAT MEASURE (AS, INCASE OF XML,
-              # THIS WILL NEED TO BE TRANSFORMED TO A MATRIX. IT WOULD BE
-              # NICE TO SPECIFY THE XML FIELD TYPES BUT THIS IS DIFFICULT
-              # TO DO WHEN INPUT NEEDS TO BE GENERIC
-              MEASURE_RESULT <- as.matrix(MODELRESULT[MEASURES[q]])
-              MEASUREMEDIAN <- median(as.numeric(MEASURE_RESULT), na.rm = TRUE)
-              MEDIANSFORALLMEASURES <- cbind(MEDIANSFORALLMEASURES,
-                                             MEASUREMEDIAN[[1]])
-            }
-            RESULTS <- rbind(RESULTS, MEDIANSFORALLMEASURES)
-          }
-        }
+      if(nrow(model_result)>0) {
+        all_results <- rbind(all_results,
+                             get_median_results_for_all_measures(model_result,
+                                                                 measures))
       }
     } else {
-      print(paste("File ", fileaddress, " does not exist", sep = ""))
+      message(paste("File ", fileaddress, " does not exist", sep = ""))
     }
   }
 
-  if (!is.null(RESULTS)) {
-    if (nrow(RESULTS) > 0)
-      colnames(RESULTS) <- MEASURES
-  }
+  if(!is.null(all_results) & nrow(all_results) > 0)
+    colnames(all_results) <- measures
 
   # Now we return this set of medians
-  return (RESULTS)
+  return(all_results)
 }
+
+
+#' Import a model result from either a CSV or XML file
+#' @param fileaddress Directory where the file is
+#' @param resultfilename Name of the results file
+#' @param altfilename If no results in resultfile, can read an alternative
+#' @param outputfilecolstart Start column of output in CSV file
+#' @param outputfilecolend End column of output in CSV file
+#' @return Results for this simulation run
+import_model_result <- function(fileaddress, resultfilename,
+                                altfilename, outputfilecolstart = NULL,
+                                outputfilecolend = NULL) {
+
+  model_result <- read_model_result_file(fileaddress, resultfilename,
+                                           outputfilecolstart,
+                                           outputfilecolend)
+
+  if(nrow(model_result) == 0 & !is.null(altfilename))
+    model_result <- read_model_result_file(fileaddress, altfilename,
+                                           outputfilecolstart,
+                                           outputfilecolend)
+
+  return(model_result)
+
+
+}
+
+#' Reads a model result file, either CSV or XML
+#' @param fileaddress Folder where the result file can be found
+#' @param resultfilename Name of the result file
+#' @param outputfilecolstart Start column of output in CSV file
+#' @param outputfilecolend End column of output in CSV file
+#' @return Results for this simulation run
+read_model_result_file <- function(fileaddress, resultfilename,
+                                   outputfilecolstart = NULL,
+                                   outputfilecolend = NULL) {
+
+  filepath <- file.path(fileaddress, resultfilename)
+  if(file.exists(filepath)) {
+    if (check_file_extension(resultfilename) == "csv") {
+      # import model result
+      if (outputfilecolstart > 1) {
+        col_diff <- outputfilecolend - outputfilecolstart
+        import <- read.csv(filepath,
+                           colClasses = c(rep("NULL", outputfilecolstart - 1),
+                                          rep(NA, col_diff + 1)),
+                           header = TRUE, check.names = FALSE)
+      } else {
+        import <- read.csv(filepath,
+                           colClasses = c(rep(NA, outputfilecolend)),
+                           header = TRUE, check.names = FALSE)
+      }
+
+      return(data.frame(import, check.names = FALSE))
+
+    } else if (check_file_extension(resultfilename) == "xml")
+      return(XML::xmlToDataFrame(filepath))
+  }
+  else
+  {
+    ## Return an empty dataframe - no rows in result file
+    return(data.frame())
+  }
+}
+
+#' For a model result, calculate the medians of the desired measures
+#' @param model_result Simulation results
+#' @param measures Measures to summarise
+#' @return Median summary statistics for all measures
+get_median_results_for_all_measures <- function(model_result, measures) {
+
+  medians_all_measures <- NULL
+
+  # Calculate the median response for each measure
+  for (q in 1:length(measures)) {
+    measure_result <- as.matrix(model_result[measures[q]])
+    measure_median <- median(as.numeric(measure_result))
+    medians_all_measures <- cbind(medians_all_measures,
+                                   measure_median[[1]])
+  }
+  return(medians_all_measures)
+
+}
+
 
 #' Check the file extension of a file and return it
 #'
@@ -234,6 +239,14 @@ visualise_data_distribution <- function(dataset, measure, graphname,
   ggsave(paste(graphname, ".pdf", sep = ""), device = "pdf")
 }
 
+check_data_partitions <-function(train,test,validate)
+{
+  if((train+test+validate) == 100)
+    return(TRUE)
+  else
+    return(FALSE)
+}
+
 #' Partition latin-hypercube summary file to training, testing, and validation
 #'
 #' Used in the development of emulations of a simulation using a
@@ -256,6 +269,17 @@ visualise_data_distribution <- function(dataset, measure, graphname,
 #' @return Partitioned dataset containing training, testing, and validation
 #' sets, in addition to the sample mins and maxes such that any predictions
 #' that are generated using this normalised data can be rescaled correctly
+#' @examples
+#' data("sim_data_for_emulation")
+#' parameters<-c("stableBindProbability","chemokineExpressionThreshold",
+#' "initialChemokineExpressionValue","maxChemokineExpressionValue",
+#' "maxProbabilityOfAdhesion","adhesionFactorExpressionSlope")
+#' measures<-c("Velocity","Displacement","PatchArea")
+#' sampleMaxes <- cbind(100,0.9,0.5,0.08,1,5)
+#' sampleMins <-cbind(0,0.1,0.1,0.015,0.1,0.25)
+#' partitionedData <- partition_dataset(sim_data_for_emulation, parameters,
+#' percent_train=75, percent_test=15, percent_validation=10, normalise=TRUE,
+#' sample_mins = sampleMins, sample_maxes = sampleMaxes)
 #'
 #' @export
 partition_dataset <- function(dataset, parameters, percent_train = 75, percent_test = 15,
@@ -264,54 +288,70 @@ partition_dataset <- function(dataset, parameters, percent_train = 75, percent_t
                               sample_mins = NULL, sample_maxes = NULL,
                               timepoint = NULL) {
 
-  if (!is.null(seed)) set.seed(seed)
+  tryCatch(
+  {
+    if(check_data_partitions(percent_train, percent_test, percent_validation))
+    {
+      if (!is.null(seed)) set.seed(seed)
 
-  # If we normalise, we need to have the mins and maxes for parameters and
-  # measures for denormalisation of results. If we don't normalise then
-  # there will be no denormalisation, but the values being passed will not
-  # be initialised, so we need to cope with both here
-  pre_normed_data_mins <- NULL
-  pre_normed_data_maxes <- NULL
+      # If we normalise, we need to have the mins and maxes for parameters and
+      # measures for denormalisation of results. If we don't normalise then
+      # there will be no denormalisation, but the values being passed will not
+      # be initialised, so we need to cope with both here
+      pre_normed_data_mins <- NULL
+      pre_normed_data_maxes <- NULL
 
 
-  if (normalise == TRUE) {
-    if (is.null(sample_mins) | is.null(sample_maxes) | is.null(parameters))
-      print("You need to specify sampling mins and maxes for each parameter,
-            and parameter names, for correct normalisation. Terminated.")
-    else {
-      normed_data <- normalise_dataset(dataset, sample_mins, sample_maxes,
-                                       parameters)
-      dataset <- normed_data$scaled
-      pre_normed_data_mins <- normed_data$mins
-      pre_normed_data_maxes <- normed_data$maxs
+      if (normalise == TRUE) {
+        if (is.null(sample_mins) | is.null(sample_maxes) | is.null(parameters))
+          message("You need to specify sampling mins and maxes for each parameter,
+                and parameter names, for correct normalisation. Terminated.")
+        else {
+          normed_data <- normalise_dataset(dataset, sample_mins, sample_maxes,
+                                           parameters)
+          dataset <- normed_data$scaled
+          pre_normed_data_mins <- normed_data$mins
+          pre_normed_data_maxes <- normed_data$maxs
+        }
+      }
+
+      positions <- sample(nrow(dataset), size = floor( (nrow(dataset) / 100)
+                                                      * percent_train))
+      training <- dataset[positions, ]
+      remainder <- dataset[ -positions, ]
+
+      testing_positions <- sample(
+        nrow(remainder), size = floor(
+          (nrow(remainder) / 100) * ( (percent_test / (percent_test +
+                                                       percent_validation))
+                                     * 100)))
+      testing <- remainder[testing_positions, ]
+      validation <- remainder[-testing_positions, ]
+
+      partitioned_data <- list("training" = training, "testing" = testing,
+                              "validation" = validation,
+                              "pre_normed_mins" = pre_normed_data_mins,
+                              "pre_normed_maxes" = pre_normed_data_maxes)
+
+      if (is.null(timepoint))
+        save(partitioned_data, file = "partitioned_data.Rda")
+      else
+        save(partitioned_data, file = paste("partitioned_data_", timepoint, ".Rda",
+                                           sep = ""))
+
+      return(partitioned_data)
     }
-  }
-
-  positions <- sample(nrow(dataset), size = floor( (nrow(dataset) / 100)
-                                                  * percent_train))
-  training <- dataset[positions, ]
-  remainder <- dataset[ -positions, ]
-
-  testing_positions <- sample(
-    nrow(remainder), size = floor(
-      (nrow(remainder) / 100) * ( (percent_test / (percent_test +
-                                                   percent_validation))
-                                 * 100)))
-  testing <- remainder[testing_positions, ]
-  validation <- remainder[-testing_positions, ]
-
-  partitioned_data <- list("training" = training, "testing" = testing,
-                          "validation" = validation,
-                          "pre_normed_mins" = pre_normed_data_mins,
-                          "pre_normed_maxes" = pre_normed_data_maxes)
-
-  if (is.null(timepoint))
-    save(partitioned_data, file = "partitioned_data.Rda")
-  else
-    save(partitioned_data, file = paste("partitioned_data_", timepoint, ".Rda",
-                                       sep = ""))
-
-  return(partitioned_data)
+    else
+    {
+      message("Partition percentages do not add up to 100%. Terminated")
+      return(NULL)
+    }
+  },
+  error=function(cond) {
+  message("Training, Testing, and Validation percentages have been declared incorrectly")
+  message("Spartan Function Terminated")
+  return(NULL)
+})
 }
 
 #' Normalise a dataset such that all values are between 0 and 1
@@ -327,6 +367,7 @@ partition_dataset <- function(dataset, parameters, percent_train = 75, percent_t
 #'
 #' @export
 normalise_dataset <- function(dataset, sample_mins, sample_maxes, parameters) {
+
   mins <- apply(dataset, 2, min)
   maxs <- apply(dataset, 2, max)
 
@@ -408,4 +449,57 @@ join_strings_space <- function(string_list) {
 #' @keywords internal
 join_strings_nospace <- function(string_list) {
   return(paste(string_list, collapse = ""))
+}
+
+#' Shortcut function for writing data to CSV file
+#' @param outputData Data to write to CSV file
+#' @param outputFile Name of the output file
+#' @param row_names Boolean as to whether to print row names
+write_data_to_csv <- function(outputData, outputFile, row_names = FALSE)
+{
+  write.csv(outputData, outputFile, row.names = row_names, quote = FALSE)
+}
+
+#' To save retyping all options, function to read CSV data
+#' @param filepath Path to CSV file to read
+#' @return Data from CSV file
+read_from_csv <- function(filepath)
+{
+  return(read.csv(filepath, sep = ",", header = TRUE, check.names = FALSE))
+}
+
+#' Check whether a file exists
+#' @param filepath File path to check
+#' @return Boolean stating whether this file exists or not
+check_file_exists <- function(filepath) {
+  if(file.exists(filepath))
+    return(TRUE)
+  else
+  {
+    message(paste(filepath, " does not exist",sep=""))
+    return(FALSE)
+  }
+}
+
+#' Output a ggplot graph in the requested formats
+#' @param GRAPHFILE Path and name of the file to output
+#' @param OUTPUT_TYPE List of the output types to produce
+#' @param output_graph Graph to output
+output_ggplot_graph <-function(GRAPHFILE, OUTPUT_TYPE, output_graph) {
+  for (file_type in 1:length(OUTPUT_TYPE)) {
+    # Save the graphs in the requested format
+    if (OUTPUT_TYPE[file_type] == "PDF") {
+      ggsave(paste(GRAPHFILE, ".pdf", sep = ""),
+             plot = output_graph, width = 4, height = 4)
+    } else if (OUTPUT_TYPE[file_type] == "PNG") {
+      ggsave(paste(GRAPHFILE, ".png", sep = ""),
+             plot = output_graph, width = 4, height = 4)
+    } else if (OUTPUT_TYPE[file_type] == "TIFF") {
+      ggsave(paste(GRAPHFILE, ".tiff", sep = ""),
+             plot = output_graph, width = 4, height = 4)
+    } else if (OUTPUT_TYPE[file_type] == "BMP") {
+      ggsave(paste(GRAPHFILE, ".bmp", sep = ""),
+             plot = output_graph, width = 4, height = 4)
+    }
+  }
 }

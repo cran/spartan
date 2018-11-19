@@ -1,34 +1,16 @@
 library(spartan)
 context("Test Neural Network Utilities")
 
-# Due to the amount of time this takes, a lot of these tests have to be
-# skipped for CRAN to not exceed the time limit
-
-## Calls:
-#optimal_structure <- determine_optimal_neural_network_structure(
-#  dataset$training,  parameters,  measures[m],  algorithm_settings)
-# Create the network
-# NULL is the fold number,  only used in k fold validatiokn - second
-# dataset is sent in so mins and maxes can be accessed by the neural net
-# That is a legacy from our previous neural network code,
-# and could possibly be removed
-#model_fit <- create_neural_network(model_formula, dataset$training,
-#                                   NULL, dataset, optimal_structure,
-#                                   algorithm_settings$num_of_generations)
-
-# Call 1:
-
-
-
 test_that("determine_optimal_neural_network_structure", {
 
+  skip_on_travis()
+  skip_on_cran()
   # Outer test of function: to ensure we get some output from the inner functions tested below
 
-  skip("Skipping determine_optimal_neural_network_structure due to time limit")
   data("sim_data_for_emulation")
   ## Partition the dataset, in this case normalising the data
   partitionedData <- partition_dataset(sim_data_for_emulation, c("stableBindProbability","chemokineExpressionThreshold","initialChemokineExpressionValue",
-                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), percent_train=75, percent_test=15,
+                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), c("Velocity","Displacement"), percent_train=75, percent_test=15,
                                        percent_validation=10, normalise=TRUE, sample_mins = cbind(0,0.1,0.1,0.015,0.1,0.25), sample_maxes = cbind(100,0.9,0.5,0.08,1,5))
 
   # So change the default in the algorithm settings
@@ -46,13 +28,15 @@ test_that("determine_optimal_neural_network_structure", {
 
 test_that("kfoldCrossValidation", {
 
+  skip_on_travis()
+  skip_on_cran()
+
   # Test of k-fold cross validation calculations - inner functions are tested below
-  skip("Skipping kfoldCrossValidation due to time limit")
 
   data("sim_data_for_emulation")
   ## Partition the dataset, in this case normalising the data
   partitionedData <- partition_dataset(sim_data_for_emulation, c("stableBindProbability","chemokineExpressionThreshold","initialChemokineExpressionValue",
-                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), percent_train=75, percent_test=15,
+                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), c("Velocity","Displacement"), percent_train=75, percent_test=15,
                                        percent_validation=10, normalise=TRUE, sample_mins = cbind(0,0.1,0.1,0.015,0.1,0.25), sample_maxes = cbind(100,0.9,0.5,0.08,1,5))
 
   network_errors <- kfoldCrossValidation(partitionedData$training, c("stableBindProbability","chemokineExpressionThreshold","initialChemokineExpressionValue",
@@ -67,11 +51,13 @@ test_that("kfoldCrossValidation", {
 
 test_that("analysenetwork_structures", {
 
-  skip("Skipping analysenetwork_structures due to time limit")
+  skip_on_travis()
+  skip_on_cran()
+
   data("sim_data_for_emulation")
   ## Partition the dataset, in this case normalising the data
   partitionedData <- partition_dataset(sim_data_for_emulation, c("stableBindProbability","chemokineExpressionThreshold","initialChemokineExpressionValue",
-                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), percent_train=75, percent_test=15,
+                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), c("Velocity","Displacement"), percent_train=75, percent_test=15,
                                        percent_validation=10, normalise=TRUE, sample_mins = cbind(0,0.1,0.1,0.015,0.1,0.25), sample_maxes = cbind(100,0.9,0.5,0.08,1,5))
 
   average_errors <- analysenetwork_structures((nrow(partitionedData$training) %/% 10), partitionedData$training,
@@ -91,11 +77,13 @@ test_that("analysenetwork_structures", {
 
 test_that("createAndEvaluateFolds", {
 
-  skip("Skipping createAndEvaluateFolds due to time limit")
+  skip_on_travis()
+  skip_on_cran()
+
   data("sim_data_for_emulation")
   ## Partition the dataset, in this case normalising the data
   partitionedData <- partition_dataset(sim_data_for_emulation, c("stableBindProbability","chemokineExpressionThreshold","initialChemokineExpressionValue",
-                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), percent_train=75, percent_test=15,
+                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), c("Velocity","Displacement"), percent_train=75, percent_test=15,
                                        percent_validation=10, normalise=TRUE, sample_mins = cbind(0,0.1,0.1,0.015,0.1,0.25), sample_maxes = cbind(100,0.9,0.5,0.08,1,5))
 
   network_ms_errors <- createAndEvaluateFolds((nrow(partitionedData$training) %/% 10), 1, (nrow(partitionedData$training) %/% 10),
@@ -115,11 +103,13 @@ test_that("createAndEvaluateFolds", {
 
 test_that("updateErrorForStructure", {
 
-  skip("Skipping updateErrorForStructure due to time limit. Run on TRAVIS though")
+  skip_on_travis()
+  skip_on_cran()
+
   data("sim_data_for_emulation")
   ## Partition the dataset, in this case normalising the data
   partitionedData <- partition_dataset(sim_data_for_emulation, c("stableBindProbability","chemokineExpressionThreshold","initialChemokineExpressionValue",
-                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), percent_train=75, percent_test=15,
+                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), c("Velocity","Displacement"), percent_train=75, percent_test=15,
                                        percent_validation=10, normalise=TRUE, sample_mins = cbind(0,0.1,0.1,0.015,0.1,0.25), sample_maxes = cbind(100,0.9,0.5,0.08,1,5))
 
   network_ms_errors <- createAndEvaluateFolds((nrow(partitionedData$training) %/% 10), 1, (nrow(partitionedData$training) %/% 10),
@@ -143,6 +133,9 @@ test_that("updateErrorForStructure", {
 
 test_that("select_suitable_structure", {
 
+  skip_on_travis()
+  skip_on_cran()
+
   # Test returns the expected lowest
   errors <- rbind(cbind("4","0.413503637996208","0.413503637996208","0.413503637996208"),
                   cbind("3","0.504658205549008","0.504658205549008","0.504658205549008"))
@@ -157,10 +150,14 @@ test_that("select_suitable_structure", {
 
 test_that("calculate_fold_MSE", {
 
+  skip_on_travis()
+  skip_on_cran()
+
+
   data("sim_data_for_emulation")
   ## Partition the dataset, in this case normalising the data
   partitionedData <- partition_dataset(sim_data_for_emulation, c("stableBindProbability","chemokineExpressionThreshold","initialChemokineExpressionValue",
-                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), percent_train=75, percent_test=15,
+                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), c("Velocity","Displacement"), percent_train=75, percent_test=15,
                                        percent_validation=10, normalise=TRUE, sample_mins = cbind(0,0.1,0.1,0.015,0.1,0.25), sample_maxes = cbind(100,0.9,0.5,0.08,1,5))
 
   train_fold <- createTrainingFold(1, 10, 1, (nrow(partitionedData$training) %/% 10), partitionedData$training)
@@ -189,10 +186,13 @@ test_that("calculate_fold_MSE", {
 
 test_that("createTrainingFold", {
 
+  skip_on_travis()
+  skip_on_cran()
+
   data("sim_data_for_emulation")
   ## Partition the dataset, in this case normalising the data
   partitionedData <- partition_dataset(sim_data_for_emulation, c("stableBindProbability","chemokineExpressionThreshold","initialChemokineExpressionValue",
-                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), percent_train=75, percent_test=15,
+                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), c("Velocity","Displacement"), percent_train=75, percent_test=15,
                                        percent_validation=10, normalise=TRUE, sample_mins = cbind(0,0.1,0.1,0.015,0.1,0.25), sample_maxes = cbind(100,0.9,0.5,0.08,1,5))
 
   fold <- createTrainingFold(1, 10, 1, (nrow(partitionedData$training) %/% 10), partitionedData$training)
@@ -209,10 +209,13 @@ test_that("createTrainingFold", {
 
 test_that("createTestFold", {
 
+  skip_on_travis()
+  skip_on_cran()
+
   data("sim_data_for_emulation")
   ## Partition the dataset, in this case normalising the data
   partitionedData <- partition_dataset(sim_data_for_emulation, c("stableBindProbability","chemokineExpressionThreshold","initialChemokineExpressionValue",
-                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), percent_train=75, percent_test=15,
+                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), c("Velocity","Displacement"), percent_train=75, percent_test=15,
                                        percent_validation=10, normalise=TRUE, sample_mins = cbind(0,0.1,0.1,0.015,0.1,0.25), sample_maxes = cbind(100,0.9,0.5,0.08,1,5))
 
   fold<-createtest_fold(2, 10, 38, 60, partitionedData$training)
@@ -229,11 +232,13 @@ test_that("createTestFold", {
 # Test the overall method then:
 test_that("create_neural_network", {
 
-  skip("Skipping create_neural_network due to time limit")
+  skip_on_travis()
+  skip_on_cran()
+
   data("sim_data_for_emulation")
   ## Partition the dataset, in this case normalising the data
   partitionedData <- partition_dataset(sim_data_for_emulation, c("stableBindProbability","chemokineExpressionThreshold","initialChemokineExpressionValue",
-                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), percent_train=75, percent_test=15,
+                                                                 "maxChemokineExpressionValue","maxProbabilityOfAdhesion","adhesionFactorExpressionSlope"), c("Velocity","Displacement"), percent_train=75, percent_test=15,
                                        percent_validation=10, normalise=TRUE, sample_mins = cbind(0,0.1,0.1,0.015,0.1,0.25), sample_maxes = cbind(100,0.9,0.5,0.08,1,5),seed=100)
 
 

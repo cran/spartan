@@ -34,10 +34,15 @@
 #' parameter and the dummy. Sets a lower bound on sampling space
 #' @param PMAX Array containing the maximum value that should be used for each
 #' parameter and the dummy. Sets an upper bound on sampling space
+#' @param write_csv Whether the sample should be output to CSV file. Should be
+#' true unless using spartan-db
+#' @param return_sample Whether the complete sample should be returned as an
+#' R object. Used by spartan db and added to the database
 #'
 #' @export
 efast_generate_sample <- function(FILEPATH, NUMCURVES, NUMSAMPLES,
-                                  PARAMETERS, PMIN, PMAX) {
+                                  PARAMETERS, PMIN, PMAX, write_csv=TRUE,
+                                  return_sample=FALSE) {
 
   # Version 3.1 adds pre-execution check functions as part of refactoring:
   # Get the provided function arguments
@@ -50,9 +55,18 @@ efast_generate_sample <- function(FILEPATH, NUMCURVES, NUMSAMPLES,
                                                     NUMSAMPLES, PARAMETERS,
                                                     PMIN, PMAX)
 
-    # NOW OUTPUT THE RESULTS - SPLIT BY CURVE FILE
+    # NOW OUTPUT THE RESULTS - SPLIT BY CURVE FILE, IF REQUESTED
     # SO, WILL HAVE ONE FILE FOR EACH PARAMETER OF INTEREST, FOR EACH CURVE
-    output_param_sets_per_curve(FILEPATH, NUMCURVES, PARAMETERS, parameter_vals)
+    if(write_csv==TRUE)
+    {
+      output_param_sets_per_curve(FILEPATH, NUMCURVES, PARAMETERS, parameter_vals)
+    }
+
+    # For spartan DB, we need the object so we can add these to the database
+    if(return_sample==TRUE)
+      return(parameter_vals)
+
+
   }
 }
 
@@ -102,6 +116,10 @@ generate_efast_parameter_sets <- function(FILEPATH, NUMCURVES, NUMSAMPLES,
   # Computation of the frequency for the group
   # of interest omi and the # of sample points NUMSAMPLES (here N=NUMSAMPLES)
   omi <- floor(((wanted_n / NUMCURVES) - 1) / (2 * MI) / length(PARAMETERS))
+
+  # This was the fix I put in for Paul's 30 parameters, but has not worked as desired
+  # omi <- floor(((wanted_n / NUMCURVES) - 1) / (2 * MI) / (length(PARAMETERS)/3))
+
   NUMSAMPLES <- 2 * MI * omi + 1
   if (NUMSAMPLES * NUMCURVES < 65)
     message("Error: sample size must be >= 65 per factor")
@@ -116,6 +134,9 @@ generate_efast_parameter_sets <- function(FILEPATH, NUMCURVES, NUMSAMPLES,
     # to be used by the complementary group.
 
     omci <- efast_setfreq(length(PARAMETERS), omi / 2 / MI, PARAMNUM)
+
+    # Line used to try ti increase number of frequencies for large number of parameters, but has caused undesirable results
+    #omci <- efast_setfreq(length(PARAMETERS), length(PARAMETERS), PARAMNUM)
     OM <- array(0, dim = c(1, length(PARAMETERS), 1))
 
     # Loop over the NUMCURVES search curves.

@@ -230,6 +230,7 @@ efast_get_overall_medians_overTime  <-  function(
   }
 }
 
+
 #' Runs the eFAST Analysis for the pre-generated summary file
 #'
 #' Produces a file summarising the analysis; partitioning the variance between
@@ -273,17 +274,27 @@ efast_get_overall_medians_overTime  <-  function(
 #' e.g. "Hours"
 #' @param check_done If using multiple timepoints, whether data entry has been
 #' checked
-#'
+#' @param output_types Files types of graph to produce (pdf,png,bmp etc)
+#' @param csv_file_curve_summary Whether curve summaries are provided in
+#' multiple CSV files (as in traditional spartan), or as an R object (as in
+#' spartanDB)
+#' @param write_csv_file_out Whether the analysis should output a CSV file
+#' (TRUE) or return an R object (FALSE)
+#' @param CURVE_SUMMARY If providing an R object (csv_file_curve_summary=FALSE),
+#' this is the R object containing those summaries
+#' @return Either NULL if a CSV file is returned, or an R object containing the
+#' results of this analysis
 #' @export
 #'
 efast_run_Analysis  <-  function(
   FILEPATH, MEASURES, PARAMETERS, NUMCURVES, NUMSAMPLES, OUTPUTMEASURES_TO_TTEST,
   TTEST_CONF_INT, GRAPH_FLAG, EFASTRESULTFILENAME, TIMEPOINTS = NULL,
-  TIMEPOINTSCALE = NULL, GRAPHTIME = NULL, check_done=FALSE) {
+  TIMEPOINTSCALE = NULL, GRAPHTIME = NULL, check_done=FALSE, output_types=c("pdf"),
+  csv_file_curve_summary = TRUE, write_csv_file_out = TRUE, CURVE_SUMMARY=NULL) {
 
-  input_check <- list("arguments"=as.list(match.call()),"names"=names(match.call())[-1])
+  #input_check <- list("arguments"=as.list(match.call()),"names"=names(match.call())[-1])
   # Run if all checks pass:
-  if(check_input_args(input_check$names, input_check$arguments)) {
+  #if(check_input_args(input_check$names, input_check$arguments)) {
 
     if (is.null(TIMEPOINTS)) {
       # maximum number of fourier coefficients that may be retained in
@@ -292,12 +303,23 @@ efast_run_Analysis  <-  function(
       MI <- 4
       # wanted no. of sample points
       wanted_n <- NUMSAMPLES * length(PARAMETERS) * NUMCURVES
+      # OMI changed October 2018 to accommodate greater number of parameters
       omi <- floor( ( (wanted_n / NUMCURVES) - 1) / (2 * MI) / length(PARAMETERS))
+
+      # In sampling, this change caused undesirable effects (below), so changed back
+      # omi <- floor(((wanted_n / NUMCURVES) - 1) / (2 * MI) / (length(PARAMETERS)/3))
 
       message("Producing eFAST Analysis (efast_run_analysis)")
 
-      efast_sim_results <- read_all_curve_results(FILEPATH, GRAPHTIME, NUMCURVES,
+      if(csv_file_curve_summary)
+      {
+        efast_sim_results <- read_all_curve_results(FILEPATH, GRAPHTIME, NUMCURVES,
                                                   NUMSAMPLES,  MEASURES, PARAMETERS)
+      } else {
+
+        efast_sim_results <- build_curve_results_from_r_object(CURVE_SUMMARY, NUMCURVES, NUMSAMPLES,
+                                                  MEASURES, PARAMETERS)
+      }
 
       # Sensitivity Indexes
       sensitivities <- generate_sensitivity_indices(efast_sim_results, omi, MI,
@@ -314,25 +336,93 @@ efast_run_Analysis  <-  function(
         sensitivities, t_tests, OUTPUTMEASURES_TO_TTEST, MEASURES, PARAMETERS)
 
       # Output
-      write_data_to_csv(formatted_results,file.path(FILEPATH, EFASTRESULTFILENAME), row_names=TRUE)
+      if(write_csv_file_out)
+      {
+        write_data_to_csv(formatted_results,file.path(FILEPATH, EFASTRESULTFILENAME), row_names=TRUE)
 
-      message(paste("eFAST Results file generated. Output to",
+        message(paste("eFAST Results file generated. Output to",
                     file.path(FILEPATH, EFASTRESULTFILENAME)))
+      }
+      else
+      {
+        return(formatted_results)
+        message(paste("eFAST Results generated and returned as R object"))
+      }
 
         # GRAPH THE RESULTS IF REQUIRED
         if (GRAPH_FLAG)
           efast_graph_Results(
             FILEPATH, PARAMETERS, sensitivities$si, sensitivities$sti, sensitivities$errors_si,
-            sensitivities$errors_sti, MEASURES, GRAPHTIME, TIMEPOINTSCALE)
+            sensitivities$errors_sti, MEASURES, GRAPHTIME, TIMEPOINTSCALE, output_types)
 
 
     } else {
       efast_run_Analysis_overTime(
         FILEPATH, MEASURES, PARAMETERS, NUMCURVES, NUMSAMPLES, OUTPUTMEASURES_TO_TTEST,
-        TTEST_CONF_INT, GRAPH_FLAG, EFASTRESULTFILENAME, TIMEPOINTS, TIMEPOINTSCALE)
+        TTEST_CONF_INT, GRAPH_FLAG, EFASTRESULTFILENAME, TIMEPOINTS, TIMEPOINTSCALE, output_types)
 
     }
-  }
+  #}
+}
+
+#' Runs the eFAST Analysis for a set of results stored in a database
+#'
+#' Produces a file summarising the analysis; partitioning the variance between
+#' parameters and providing relevant statistics. These include, for each
+#' parameter of interest, first-order sensitivity index (Si), total-order
+#' sensitivity index (STi), complementary parameters sensitivity index (SCi),
+#' and relevant p-values and error bar data calculated using a two-sample
+#' t-test and standard error respectively. For a more detailed examination of
+#'  this analysis, see the references in the R Journal paper. For ease of
+#'  representation, the method also produces a graph showing this data for
+#'  each simulation output measure. In this case, this function works with
+#'  spartanDB to analyse data stored in a database
+#'
+#' @param efast_sim_results Set of simulation results mined from the database,
+#' put into the format required by spartan
+#' @param number_samples Number of samples taken per parameter
+#' @param parameters Array containing the names of the parameters of which
+#' parameter samples have been generated
+#' @param number_curves The number of 'resamples' to perform (see eFAST
+#' documentation) - recommend using at least 3
+#' @param measures Array containing the names of the output measures which
+#' are used to analyse the simulation
+#' @param OUTPUTMEASURES_TO_TTEST Which measures in the range should be tested
+#' to see if the result is statistically significant.  To do all, and if
+#' there were 3 measures, this would be set to 1:3
+#' @param TTEST_CONF_INT The level of significance to use for the T-Test
+#' (e.g. 0.95)
+#'
+#' @export
+efast_run_Analysis_from_DB<-function(efast_sim_results, number_samples, parameters,
+                                     number_curves, measures,
+                                     OUTPUTMEASURES_TO_TTEST=1:length(measures),
+                                     TTEST_CONF_INT=0.95)
+{
+  MI <- 4
+  # wanted no. of sample points
+  wanted_n <- number_samples * length(parameters) * number_curves
+  omi <- floor( ( (wanted_n / number_curves) - 1) / (2 * MI) / length(parameters))
+
+  message("Producing eFAST Analysis (efast_run_analysis)")
+
+  # Sensitivity Indexes
+  sensitivities <- generate_sensitivity_indices(efast_sim_results, omi, MI,
+                                                measures, parameters, number_curves)
+
+  # T-Test to get P-Values against dummy parameter
+  message("Generating measures of statistical significance")
+  t_tests  <-  efast_ttest(sensitivities$si, sensitivities$range_si,
+                           sensitivities$sti, sensitivities$range_sti,
+                           OUTPUTMEASURES_TO_TTEST, length(parameters),
+                           number_curves, TTEST_CONF_INT)
+
+  formatted_results <- format_efast_result_for_output(
+    sensitivities, t_tests, OUTPUTMEASURES_TO_TTEST, measures,parameters)
+
+  return(formatted_results)
+
+
 }
 
 #' Pre-process analysis settings if multiple timepoints are being considered
@@ -359,7 +449,13 @@ efast_run_Analysis_overTime  <- function(
 }
 
 #' Reads results from each curve into a multi-dimensional array
-#' @inheritParams efast_run_Analysis
+#' @param FILEPATH Filepath where simulation results can be found
+#' @param GRAPHTIME Timepoint graph is being produced
+#' @param NUMCURVES Number of resample curves used in this analysis
+#' @param NUMSAMPLES Number of samples taken from each curve
+#' @param MEASURES Simulation output measures of interest
+#' @param PARAMETERS Simulation parameters of interest
+#' @return R matrix containing the curve summaries in the format spartan requires
 read_all_curve_results <- function(FILEPATH, GRAPHTIME, NUMCURVES, NUMSAMPLES,
                                    MEASURES, PARAMETERS) {
   # read in curve 1
@@ -388,6 +484,38 @@ read_all_curve_results <- function(FILEPATH, GRAPHTIME, NUMCURVES, NUMSAMPLES,
                                 NUMCURVES)))
 
 }
+
+#' When developing spartanDB, it became clear curve results may not be in separate
+#' files but in one R object. This takes an R object containing curve summaries and
+#' builds these into the format spartan requires to perform the analysis
+#' @param CURVE_SUMMARY R object containing summaries for all curves
+#' @param NUMCURVES The number of 'resamples' to perform (see eFAST
+#' documentation) - recommend using at least 3
+#' @param NUMSAMPLES The number of parameter subsets that were generated in
+#' the eFAST design
+#' @param MEASURES Array containing the names of the output measures which
+#' are used to analyse the simulation
+#' @param PARAMETERS Array containing the names of the parameters of which
+#' parameter samples have been generated
+#' @return R matrix containing the curve summaries in the format spartan requires
+build_curve_results_from_r_object<-function(CURVE_SUMMARY, NUMCURVES, NUMSAMPLES,
+                                            MEASURES, PARAMETERS)
+{
+  results <- CURVE_SUMMARY[[1]]
+
+  if(NUMCURVES > 1) {
+    for (CURVE in 2:NUMCURVES) {
+      results <- cbind(results, CURVE_SUMMARY[[CURVE]])
+    }
+  }
+
+  # Convert to multi-dimensional array for ease of processing later
+  # Each dimension contains one curve
+  results <- as.matrix(results)
+  return(array(results, dim = c(NUMSAMPLES, (length(PARAMETERS) * length(MEASURES)),
+                                NUMCURVES)))
+}
+
 
 #' Generate eFAST Sensitivity Indices
 #' @param results_array Results for all eFAST resample curves

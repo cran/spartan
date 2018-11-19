@@ -6,7 +6,8 @@
 \usage{
 lhc_generatePRCoEffs(FILEPATH, PARAMETERS, MEASURES, LHCSUMMARYFILENAME,
   CORCOEFFSOUTPUTFILE, TIMEPOINTS = NULL, TIMEPOINTSCALE = NULL,
-  cor_calc_method = c("s"), check_done = FALSE)
+  cor_calc_method = c("s"), check_done = FALSE,
+  write_csv_files = TRUE, lhc_summary_object = NULL)
 }
 \arguments{
 \item{FILEPATH}{Directory where the simulation runs of single CSV file can
@@ -37,6 +38,14 @@ analysed, e.g. "Hours"}
 ("p"), Spearman's ("s"), and Kendall's ("k"). Default is p}
 
 \item{check_done}{If multiple timepoints, whether the input has been checked}
+
+\item{write_csv_files}{Whether results should be output to CSV file. Used with spartanDB}
+
+\item{lhc_summary_object}{If not specified in a CSV file, results can be specified in an
+R object. In this case LHCSUMMARYFILENAME will be NULL}
+}
+\value{
+If no CSV file output, PRCC values returned as an R object
 }
 \description{
 For each parameter, and each simulation output measure, calculates the

@@ -6,6 +6,7 @@
 #' @inheritParams oat_processParamSubsets
 #' @inheritParams oat_csv_result_file_analysis
 #' @param ATESTSIGLEVEL The A-Test determines if there is a large difference between two sets if the result is greater than 0.21 either side of the 0.5 line. Should this not be suitable, this can be changed here
+#' @param output_types Files types of graph to produce (pdf,png,bmp etc)
 #'
 #' @export
 #'
@@ -15,7 +16,8 @@ oat_graphATestsForSampleSize <- function(FILEPATH, PARAMETERS, MEASURES,
                                          BASELINE, PMIN = NULL, PMAX = NULL,
                                          PINC = NULL, PARAMVALS = NULL,
                                          TIMEPOINTS = NULL,
-                                         TIMEPOINTSCALE = NULL) {
+                                         TIMEPOINTSCALE = NULL,
+                                         output_types=c("pdf")) {
 
   if (is.null(TIMEPOINTS) || length(TIMEPOINTS) == 1) {
     # NOTE THAT OUTPUT_FOLDER AND BASELINE PARAMETERS ADDED IN SPARTAN 2.0
@@ -61,65 +63,38 @@ oat_graphATestsForSampleSize <- function(FILEPATH, PARAMETERS, MEASURES,
 
         }
 
-        # Where the resulting graph should go
-        if (is.null(TIMEPOINTS)) {
-          GRAPHFILE <- make_path(c(FILEPATH,
-                                   make_extension(PARAMETERS[PARAM], "pdf")))
-          GRAPHTITLE <- paste("A-Test Scores when adjusting parameter \n",
-                              PARAMETERS[PARAM], sep = "")
-        } else {
-          GRAPHFILE <- make_path(c(FILEPATH,
-                                   make_extension(
-                                     make_filename(
-                                       c(PARAMETERS[PARAM],
-                                         TIMEPOINTS)), "pdf")))
-
-          GRAPHTITLE <- paste("A-Test Scores when adjusting parameter \n",
-                              PARAMETERS[PARAM], " at Timepoint: ",
-                              TIMEPOINTS, " ", TIMEPOINTSCALE, sep = "")
+        graph_frame<-data.frame()
+        for(measure in 1:length(MEASURES))
+        {
+          measure_set<-data.frame(rep(MEASURES[measure],nrow(PARAM_ATESTS[PARAMETERS[PARAM]])),PARAM_ATESTS[PARAMETERS[PARAM]],PARAM_ATESTS[paste0("ATest",MEASURES[measure])])
+          colnames(measure_set)<-c("Measure","ParameterValue","ATestScore")
+          graph_frame<-rbind(graph_frame,measure_set)
         }
 
-        pdf(GRAPHFILE, width = 12, height = 7)
-        par(xpd = NA, mar = c(4, 4, 4, 17))
+        for(out in output_types)
+        {
+          # Now we can plot this
+          ggplot2::ggplot(data=graph_frame, ggplot2::aes(x=graph_frame$ParameterValue, y=graph_frame$ATestScore, group=graph_frame$Measure)) +
+            ggplot2::geom_line(ggplot2::aes(linetype=graph_frame$Measure)) + ggplot2::geom_point(ggplot2::aes(shape=graph_frame$Measure)) +
+            ggplot2::theme(legend.position="bottom") + ggplot2::xlab("Parameter Value")+ggplot2::ylab("A-Test Score") + ggplot2::ylim(0,1) +
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 65, hjust = 1, size=ggplot2::rel(0.95))) +
+            ggplot2::ggtitle(paste0("A-Test Scores when adjusting parameter\n",PARAMETERS[PARAM])) + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size=ggplot2::rel(0.90))) +
+            ggplot2::geom_hline(yintercept=0.5, linetype="dashed", color="black") +
+            ggplot2::geom_hline(yintercept=0.5 + ATESTSIGLEVEL, linetype="dashed", color="black") +
+            ggplot2::geom_hline(yintercept=0.5 - ATESTSIGLEVEL, linetype="dashed", color="black") +
+            ggplot2::scale_x_continuous(breaks = seq(min(graph_frame$ParameterValue), max(graph_frame$ParameterValue), by = PINC[PARAM])) +
+            ggplot2::annotate("text",x=(max(val_list) + min(val_list))/2, y=0.52, label="No Difference", color="blue", size=3) +
+            ggplot2::annotate("text",x=(max(val_list) + min(val_list))/2, y=(0.5 + ATESTSIGLEVEL+ 0.02), label="Large Difference", color="blue",size=3) +
+            ggplot2::annotate("text",x=(max(val_list) + min(val_list))/2, y=(0.5 - ATESTSIGLEVEL- 0.02), label="Large DIfference", color="blue", size=3)
 
-        # NOW PLOT THE MEASURES, START WITH THE FIRST
-        MEASURELABEL <- paste("ATest", MEASURES[1], sep = "")
-        plot(PARAM_ATESTS[[PARAMETERS[PARAM]]], PARAM_ATESTS[, MEASURELABEL],
-             type = "o", main = GRAPHTITLE,
-             lty = 1, ylim = c(0, 1), pch = 1, xlab = "Parameter Value",
-             ylab = "A Test Score", xaxt = "n")
 
-        if (length(MEASURES) > 1) {
-          # NOW ADD THE REST OF THE MEASURES
-          for (l in 2:length(MEASURES)) {
-            MEASURELABEL <- paste("ATest", MEASURES[l], sep = "")
-            lines(PARAM_ATESTS[[PARAMETERS[PARAM]]],
-                  PARAM_ATESTS[, MEASURELABEL],
-                  type = "o", lty = 5, pch = l)
-          }
+            if(is.null(TIMEPOINTS))
+            {
+              ggplot2::ggsave(file.path(FILEPATH,paste0(PARAMETERS[PARAM],".",out)))
+            } else {
+              ggplot2::ggsave(file.path(FILEPATH,paste0(PARAMETERS[PARAM],"_",TIMEPOINTS,".",out)))
+            }
         }
-
-        axis(1, val_list)
-        legend(par("usr")[2], par("usr")[4], title = "Measures", MEASURES,
-               pch = 1:length(MEASURES), cex = 0.7, ncol = 1)
-        par(xpd = FALSE)
-
-        abline(a = 0.5, b = 0, lty = 4)
-        text_pos <- (max(val_list) + min(val_list)) / 2
-        text(text_pos, 0.52, "no difference",
-             col = "blue")
-        a_abline <- 0.5 + ATESTSIGLEVEL
-        abline(a = a_abline, b = 0, lty = 4)
-        text(text_pos, (0.5 + ATESTSIGLEVEL
-                                                    + 0.02),
-             "large difference", col = "blue")
-        a_abline <- 0.5 - ATESTSIGLEVEL
-        abline(a = a_abline, b = 0, lty = 4)
-        text(text_pos, (0.5 - ATESTSIGLEVEL
-                                                    - 0.02),
-             "large difference", col = "blue")
-
-        dev.off()
       }
     } else {
       message("The directory specified in FILEPATH does not exist.
@@ -156,6 +131,8 @@ oat_graphATestsForSampleSize <- function(FILEPATH, PARAMETERS, MEASURES,
 #' @inheritParams oat_processParamSubsets
 #' @inheritParams oat_csv_result_file_analysis
 #' @param MEASURE_SCALE An array containing the measure used for each of the output measures (i.e. microns, microns/min).  Used to label graphs
+#' @param output_types File formats in which graphs should be produced
+#' @param outliers Whether outliers int he data should be removed
 #'
 #' @export
 #'
@@ -164,10 +141,14 @@ oat_plotResultDistribution <- function(FILEPATH, PARAMETERS, MEASURES,
                                        MEASURE_SCALE, CSV_FILE_NAME, BASELINE,
                                        PMIN = NULL, PMAX = NULL, PINC = NULL,
                                        PARAMVALS = NULL, TIMEPOINTS = NULL,
-                                       TIMEPOINTSCALE = NULL) {
+                                       TIMEPOINTSCALE = NULL, output_types=c("pdf"),
+                                       outliers=FALSE) {
 
   if (is.null(TIMEPOINTS) || length(TIMEPOINTS) == 1) {
-    if (file.exists(FILEPATH)) {
+
+    # RoboSpartan had issues with checking the filepath existed, so for the moment this check
+    # has been removed
+    #if (file.exists(FILEPATH)) {
       message("Plotting result distribution for each parameter (oat_plotResultDistribution)")
 
       # NEW TO SPARTAN VERSION 2
@@ -220,21 +201,10 @@ oat_plotResultDistribution <- function(FILEPATH, PARAMETERS, MEASURES,
           # BOXPLOT THE MEASURE
           if (is.null(TIMEPOINTS)) {
 
-            GRAPHFILE <- make_path(c(FILEPATH,
-                                     make_filename(c(PARAMETERS[PARAM],
-                                                     MEASURES[MEASURE],
-                                                     "BP.pdf"))))
-
             GRAPHTITLE <- paste("Distribution of ", MEASURES[MEASURE],
                                 " Responses \n when altering parameter ",
                               PARAMETERS[PARAM], sep = "")
           } else {
-            GRAPHFILE <- make_extension(make_path(c(FILEPATH,
-                                     make_filename(c(PARAMETERS[PARAM],
-                                                     MEASURES[MEASURE],
-                                                     "BP",
-                                                     TIMEPOINTS)))),
-                                                     "pdf")
 
             GRAPHTITLE <- paste("Distribution of ", MEASURES[MEASURE],
                               " Responses \n when altering parameter ",
@@ -243,27 +213,32 @@ oat_plotResultDistribution <- function(FILEPATH, PARAMETERS, MEASURES,
                               sep = "")
           }
 
-          pdf(GRAPHFILE)
+          ALLRESULTS[PARAMETERS[PARAM]] <-as.factor(as.matrix(ALLRESULTS[PARAMETERS[PARAM]]))
+          if(!outliers)
+          {
+            outlier_flag=NA
+          } else {
+            outlier_flag = 1
+          }
 
-          # GENERATE YLABEL BASED ON PARAMETER MEASURE
-          YLABEL <- paste("Median ", MEASURES[MEASURE], " (",
-                          MEASURE_SCALE[PARAM], ")", sep = "")
+          ggplot2::ggplot(ALLRESULTS, ggplot2::aes(x=stats::reorder(ALLRESULTS[,1],sort(as.numeric(ALLRESULTS[,1]))), y=ALLRESULTS[, MEASURE+1])) +
+            ggplot2::geom_boxplot(notch=TRUE, outlier.shape = outlier_flag) + ggplot2::labs(title=GRAPHTITLE,x="Parameter Value",
+                                  y = paste0(MEASURES[MEASURE], " (",MEASURE_SCALE[PARAM], ")")) +
+            ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+            ggplot2::stat_summary(fun.y=median, geom="point", shape=23, size=2)
 
-          boxplot(ALLRESULTS[, MEASURE + 1] ~ ALLRESULTS[, 1],
-                  ylab = YLABEL, xlab = "Parameter Value",
-                  main = GRAPHTITLE)
-
-          dev.off()
-
-          message(paste("Box Plot Generated and output as ", GRAPHFILE,
-                      sep = ""))
-
+          for(output in output_types)
+          {
+            ggplot2::ggsave(file.path(FILEPATH,paste0("BP_",PARAMETERS[PARAM],"_",MEASURES[MEASURE],TIMEPOINTS,".",output)))
+            message(paste0("Box Plots Generated and output as ",
+                          file.path(FILEPATH,paste0("BP_",PARAMETERS[PARAM],"_",MEASURES[MEASURE],TIMEPOINTS,".",output))))
+          }
         }
       }
-    } else {
-      message("The directory specified in FILEPATH does not exist.
-            No graph created")
-    }
+    #} else {
+    #  message("The directory specified in FILEPATH does not exist.
+    #        No graph created")
+    #}
   } else {
     # PROCESS EACH TIMEPOINT, AMENDING FILENAMES AND RECALLING THIS FUNCTION
     for (n in 1:length(TIMEPOINTS)) {

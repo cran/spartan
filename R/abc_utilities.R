@@ -34,6 +34,19 @@ ensemble_abc_wrapper <- function(x) {
 
 
     return(prediction)
+  } else if(exists("abc_set")) {
+
+    params <- as.data.frame(matrix(x, nrow = 1, ncol = length(x)))
+    names(params) <- abc_set$parameters
+
+    # Format the parameter input
+    prediction <- use_ensemble_to_generate_predictions(
+      abc_set$built_ensemble, params, abc_set$parameters, abc_set$measures,
+      normalise_values = abc_set$normalise_values,
+      normalise_result = abc_set$normalise_result)
+
+    return(prediction)
+
   } else {
     message("parameters, measures, and best_ensemble must exist in the workspace,
           declared in an abc_settings object. Run that method first")
@@ -62,18 +75,24 @@ ensemble_abc_wrapper <- function(x) {
 #' presented in their correct scale
 #' @param normalise_result Whether the results produced in running abc
 #' generated parameter sets using the ensemble should be rescaled.
+#' @param file_out Whether the settings file should be output to file (TRUE)
+#' or as an R object (FALSE)
+#' @return Object containing attributes needed for abc analysis
 #'
 #' @export
 create_abc_settings_object <- function(parameters, measures, built_ensemble,
                                        normalise_values = FALSE,
-                                       normalise_result = FALSE){
+                                       normalise_result = FALSE, file_out = TRUE){
 
   abc_set <- list("parameters" = parameters, "measures" = measures,
                   "built_ensemble" = built_ensemble,
                   "normalise_values" = normalise_values,
                   "normalise_result" = normalise_result)
 
-  save(abc_set, file = paste(getwd(), "/abc_settings.Rda", sep = ""))
+  if(file_out)
+    save(abc_set, file = paste(getwd(), "/abc_settings.Rda", sep = ""))
+  else
+    return(abc_set)
 }
 
 
@@ -89,31 +108,36 @@ create_abc_settings_object <- function(parameters, measures, built_ensemble,
 #' explored using ABC
 #' @param sampleMaxes Maximum value of the range over which each parameter was
 #' explored using ABC
+#' @param output_formats File formats in which result graphs should be produced
 #'
 #' @export
 #' @importFrom ggplot2 ggplot aes geom_histogram geom_density scale_x_continuous scale_y_continuous labs theme element_text ggsave geom_point ggtitle geom_abline
 #'
 graph_Posteriors_All_Parameters <- function(abc_resultset, parameters,
-                                            sampleMins, sampleMaxes) {
+                                            sampleMins, sampleMaxes, output_formats=c("pdf")) {
   for (p in 1:length(parameters)) {
 
     # Value for each parameter in each column, just need to plot the
     # density of that set
     GRAPHTITLE <- "Parameter Value Search Using \n Approximate Bayesian
       Computation"
-    GRAPH <- ggplot(data.frame(abc_resultset$param[, p]),
-                    aes(abc_resultset$param[, p])) +
-      geom_density() +
-      scale_x_continuous(limits = c(sampleMins[p], sampleMaxes[p])) +
-      labs(x = paste(parameters[p], " Value", sep = ""),
-           y = "Density", title = GRAPHTITLE,
-           subtitle = paste("Parameter: ", parameters[p], sep = "")) +
-      theme(axis.title = element_text(size = 11),
-            axis.text = element_text(size = 11),
-            plot.title = element_text(size = 11, hjust = 0.5),
-            plot.subtitle = element_text(size = 11, hjust = 0.5))
 
-    ggsave(paste(parameters[p], ".pdf", sep = ""),
-           plot = GRAPH, width = 4, height = 4)
+    for(out_type in output_formats)
+    {
+      GRAPH <- ggplot(data.frame(abc_resultset$param[, p]),
+                      aes(abc_resultset$param[, p])) +
+        geom_density() +
+        scale_x_continuous(limits = c(sampleMins[p], sampleMaxes[p])) +
+        labs(x = paste(parameters[p], " Value", sep = ""),
+             y = "Density", title = GRAPHTITLE,
+             subtitle = paste("Parameter: ", parameters[p], sep = "")) +
+        theme(axis.title = element_text(size = 11),
+              axis.text = element_text(size = 11),
+              plot.title = element_text(size = 11, hjust = 0.5),
+              plot.subtitle = element_text(size = 11, hjust = 0.5))
+
+      ggsave(paste0(parameters[p], ".",out_type),
+             plot = GRAPH, width = 4, height = 4)
+    }
   }
 }

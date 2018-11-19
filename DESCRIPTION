@@ -1,7 +1,7 @@
 Package: spartan
 Type: Package
 Title: Simulation Parameter Analysis R Toolkit ApplicatioN: 'spartan'
-Version: 3.0.1
+Version: 3.0.2
 Authors@R: c(person("Kieran","Alden", email = "kieran.alden@gmail.com", role =c("cre","aut")),
 	     person("Mark","Read",role ="aut"),
 	     person("Paul","Andrews",role ="aut"),
@@ -15,13 +15,13 @@ LazyData: true
 Imports: lhs, gplots, XML, plotrix, mlegp, ggplot2, neuralnet, psych,
         mco
 Depends: randomForest, e1071, R (>= 2.10.0)
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Suggests: knitr, rmarkdown, testthat
 VignetteBuilder: knitr
 URL: http://www.york.ac.uk/ycil/software/spartan
 BugReports: http://github.com/kalden/spartan/issues
 NeedsCompilation: no
-Packaged: 2018-05-16 15:18:00 UTC; kja505
+Packaged: 2018-11-19 17:57:51 UTC; kieran
 Author: Kieran Alden [cre, aut],
   Mark Read [aut],
   Paul Andrews [aut],
@@ -30,4 +30,4 @@ Author: Kieran Alden [cre, aut],
   Jon Timmis [aut]
 Maintainer: Kieran Alden <kieran.alden@gmail.com>
 Repository: CRAN
-Date/Publication: 2018-05-16 16:48:09 UTC
+Date/Publication: 2018-11-19 18:20:03 UTC

@@ -45,8 +45,9 @@ getMediansSubset <- function(FILEPATH, NUMRUNSPERSAMPLE, measures,
     }
   }
 
-  if(!is.null(all_results) & nrow(all_results) > 0)
-    colnames(all_results) <- measures
+  if(!is.null(all_results))
+    if(nrow(all_results) > 0)
+      colnames(all_results) <- measures
 
   # Now we return this set of medians
   return(all_results)
@@ -223,20 +224,25 @@ subset_results_by_param_value_set <- function(PARAMETERS, RESULT_SET,
 #' @param measure Simulation response measure to visualise
 #' @param graphname Name of the graph to produce (as a PDF)
 #' @param num_bins Number of bins to use in the histogram
+#' @param output_format File formats in which graphs should be produced
 #' @export
 #'
 visualise_data_distribution <- function(dataset, measure, graphname,
-                                        num_bins=30) {
+                                        num_bins=30, output_format=c("pdf")) {
   kurt <- psych::describe(dataset[measure])
-  #dataset <- data.frame(dataset[measure])
-  ggplot(dataset[measure],
-         aes(dataset[measure])) + geom_histogram(bins=num_bins) + ggtitle(
-             paste("Diagnostic Plot for ", measure, "\nKurtosis:",
-                    round(kurt$kurtosis, 3), "Skew", round(kurt$skew, 3),
-                    sep = " ")) +  scale_x_continuous(name = "Dataset") +
-    scale_y_continuous(name = "Frequency")
 
-  ggsave(paste(graphname, ".pdf", sep = ""), device = "pdf")
+  for(out in output_format)
+  {
+    ggplot2::ggplot(dataset[measure],
+         aes(dataset[,measure])) + geom_histogram(bins=num_bins) + ggtitle(
+             paste("Diagnostic Plot for", measure, "\nKurtosis:",
+                    round(kurt$kurtosis, 3), "Skew:", round(kurt$skew, 3),
+                    sep = " ")) +  scale_x_continuous(name = "Dataset") +
+    scale_y_continuous(name = "Frequency") +
+      theme(plot.title = element_text(hjust = 0.5))
+
+    ggsave(paste0(graphname, ".",out), device = out)
+  }
 }
 
 check_data_partitions <-function(train,test,validate)
@@ -245,6 +251,17 @@ check_data_partitions <-function(train,test,validate)
     return(TRUE)
   else
     return(FALSE)
+}
+
+check_ranges<-function(sample_mins,sample_maxes,parameters)
+{
+  if(length(sample_mins)==length(parameters) & length(sample_maxes)==length(parameters))
+  {
+    colnames(sample_mins)<-parameters
+    colnames(sample_maxes)<-parameters
+    return(list("sample_mins"=apply(sample_mins,2,as.numeric),"sample_maxes"=apply(sample_maxes,2,as.numeric)))
+  }
+
 }
 
 #' Partition latin-hypercube summary file to training, testing, and validation
@@ -261,6 +278,7 @@ check_data_partitions <-function(train,test,validate)
 #' and 1). For emulation creation to be successful, all data must be normalised
 #' prior to use in training and testing
 #' @param parameters Simulation parameters the emulation will be fed as input
+#' @param measures Simulation responses of interest
 #' @param sample_mins The minimum value used for each parameter in generating
 #' the latin-hypercube sample
 #' @param sample_maxes The maximum value used for each parameter in generating
@@ -275,14 +293,14 @@ check_data_partitions <-function(train,test,validate)
 #' "initialChemokineExpressionValue","maxChemokineExpressionValue",
 #' "maxProbabilityOfAdhesion","adhesionFactorExpressionSlope")
 #' measures<-c("Velocity","Displacement","PatchArea")
-#' sampleMaxes <- cbind(100,0.9,0.5,0.08,1,5)
-#' sampleMins <-cbind(0,0.1,0.1,0.015,0.1,0.25)
+#' sample_maxes <- cbind(100,0.9,0.5,0.08,1,5)
+#' sample_mins <-cbind(0,0.1,0.1,0.015,0.1,0.25)
 #' partitionedData <- partition_dataset(sim_data_for_emulation, parameters,
-#' percent_train=75, percent_test=15, percent_validation=10, normalise=TRUE,
-#' sample_mins = sampleMins, sample_maxes = sampleMaxes)
+#' measures, percent_train=75, percent_test=15, percent_validation=10, normalise=TRUE,
+#' sample_mins = sample_mins, sample_maxes = sample_maxes)
 #'
 #' @export
-partition_dataset <- function(dataset, parameters, percent_train = 75, percent_test = 15,
+partition_dataset <- function(dataset, parameters, measures, percent_train = 75, percent_test = 15,
                               percent_validation = 10, seed = NULL,
                               normalise = FALSE,
                               sample_mins = NULL, sample_maxes = NULL,
@@ -294,52 +312,83 @@ partition_dataset <- function(dataset, parameters, percent_train = 75, percent_t
     {
       if (!is.null(seed)) set.seed(seed)
 
-      # If we normalise, we need to have the mins and maxes for parameters and
-      # measures for denormalisation of results. If we don't normalise then
-      # there will be no denormalisation, but the values being passed will not
-      # be initialised, so we need to cope with both here
-      pre_normed_data_mins <- NULL
-      pre_normed_data_maxes <- NULL
+      if(!is.null(nrow(dataset)) && nrow(dataset)>0)
+      {
+        # Added 18th October 2018 in developing RoboSpartan - was noticed that user could
+        # submit dataset where whole columns were the same, which in normalisation causes
+        # issues. As such results have no use in the analysis, the decision was taken to
+        # remove these features
+        dataset_check<-dataset_precheck(dataset, parameters, measures)
 
-
-      if (normalise == TRUE) {
-        if (is.null(sample_mins) | is.null(sample_maxes) | is.null(parameters))
-          message("You need to specify sampling mins and maxes for each parameter,
-                and parameter names, for correct normalisation. Terminated.")
-        else {
-          normed_data <- normalise_dataset(dataset, sample_mins, sample_maxes,
-                                           parameters)
-          dataset <- normed_data$scaled
-          pre_normed_data_mins <- normed_data$mins
-          pre_normed_data_maxes <- normed_data$maxs
+        if(!is.null(dataset_check))
+        {
+          dataset<-dataset_check$dataset
+          parameters<-dataset_check$parameters
+          measures<-dataset_check$measures
         }
+
+        if(is.null(names(sample_mins)) | is.null(names(sample_maxes)))
+        {
+          range_check<-check_ranges(sample_mins,sample_maxes,parameters)
+          sample_mins<-range_check$sample_mins
+          sample_maxes<-range_check$sample_maxes
+        }
+
+
+        # If we normalise, we need to have the mins and maxes for parameters and
+        # measures for denormalisation of results. If we don't normalise then
+        # there will be no denormalisation, but the values being passed will not
+        # be initialised, so we need to cope with both here
+        pre_normed_data_mins <- NULL
+        pre_normed_data_maxes <- NULL
+
+
+        if (normalise == TRUE) {
+          if (is.null(sample_mins) | is.null(sample_maxes) | is.null(parameters))
+            message("You need to specify sampling mins and maxes for each parameter,
+                  and parameter names, for correct normalisation. Terminated.")
+          else {
+            normed_data <- normalise_dataset(dataset, sample_mins, sample_maxes,
+                                             parameters)
+            dataset <- normed_data$scaled
+            pre_normed_data_mins <- normed_data$mins
+            pre_normed_data_maxes <- normed_data$maxs
+          }
+        }
+
+        positions <- sample(nrow(dataset), size = floor( (nrow(dataset) / 100)
+                                                        * percent_train))
+        training <- dataset[positions, ]
+        remainder <- dataset[ -positions, ]
+
+        testing_positions <- sample(
+          nrow(remainder), size = floor(
+            (nrow(remainder) / 100) * ( (percent_test / (percent_test +
+                                                         percent_validation))
+                                       * 100)))
+        testing <- remainder[testing_positions, ]
+        validation <- remainder[-testing_positions, ]
+
+        partitioned_data <- list("training" = training, "testing" = testing,
+                                "validation" = validation,
+                                "pre_normed_mins" = pre_normed_data_mins,
+                                "pre_normed_maxes" = pre_normed_data_maxes,
+                                "parameters"=parameters,
+                                "measures"=measures)
+
+        if (is.null(timepoint))
+          save(partitioned_data, file = "partitioned_data.Rda")
+        else
+          save(partitioned_data, file = paste("partitioned_data_", timepoint, ".Rda",
+                                             sep = ""))
+
+        return(partitioned_data)
       }
-
-      positions <- sample(nrow(dataset), size = floor( (nrow(dataset) / 100)
-                                                      * percent_train))
-      training <- dataset[positions, ]
-      remainder <- dataset[ -positions, ]
-
-      testing_positions <- sample(
-        nrow(remainder), size = floor(
-          (nrow(remainder) / 100) * ( (percent_test / (percent_test +
-                                                       percent_validation))
-                                     * 100)))
-      testing <- remainder[testing_positions, ]
-      validation <- remainder[-testing_positions, ]
-
-      partitioned_data <- list("training" = training, "testing" = testing,
-                              "validation" = validation,
-                              "pre_normed_mins" = pre_normed_data_mins,
-                              "pre_normed_maxes" = pre_normed_data_maxes)
-
-      if (is.null(timepoint))
-        save(partitioned_data, file = "partitioned_data.Rda")
       else
-        save(partitioned_data, file = paste("partitioned_data_", timepoint, ".Rda",
-                                           sep = ""))
-
-      return(partitioned_data)
+      {
+        message("Error in dataset provided for partitioning. Terminated")
+        return(NULL)
+      }
     }
     else
     {
@@ -348,11 +397,47 @@ partition_dataset <- function(dataset, parameters, percent_train = 75, percent_t
     }
   },
   error=function(cond) {
-  message("Training, Testing, and Validation percentages have been declared incorrectly")
+    message("Terminal Error in partition_dataset function. R Error String:")
+    message(cond)
+
   message("Spartan Function Terminated")
   return(NULL)
 })
 }
+
+#' Before partitioning data, removes any columns where the value is all equal, or all NA
+#' @param dataset Dataset to be used in emulation development
+#' @param parameters Simulation parameters being assessed
+#' @param measures Simulation measures being assessed
+#' @return List containing the amended dataset, parameters, and measures, or if no modification, NULL
+dataset_precheck <- function(dataset, parameters, measures)
+{
+  # Remove columns where the value is all the same, or all values are NA - these are of no use in the analysis
+  col_measures_all_equal<-names(which((apply(dataset,2,min)-apply(dataset,2,max))==0 | is.na(apply(dataset,2,min)-apply(dataset,2,max))))
+
+  if(length(col_measures_all_equal)>0)
+  {
+    message(paste0("Features ",toString(col_measures_all_equal)," have values that are all equal for all rows. These have been removed from the result dataset"))
+    message("Updated parameters and measures arguments are stored in the partionedDataset object. However you should ensure these arguments are updated if you refer to these in other functions")
+    # Now to remove those columns that are all equal from the dataset
+    dataset<- dataset[, !(names(dataset) %in% col_measures_all_equal)]
+
+    for(entry in col_measures_all_equal)
+    {
+      if(entry %in% parameters)
+        parameters<-parameters[!(parameters %in% col_measures_all_equal)]
+      else if(entry %in% measures)
+        measures<-measures[!(measures %in% col_measures_all_equal)]
+    }
+
+    return(list("dataset"=dataset,"parameters"=parameters,"measures"=measures))
+  }
+  else
+  {
+    return(NULL)
+  }
+}
+
 
 #' Normalise a dataset such that all values are between 0 and 1
 #'
@@ -372,8 +457,8 @@ normalise_dataset <- function(dataset, sample_mins, sample_maxes, parameters) {
   maxs <- apply(dataset, 2, max)
 
   # we want to override the parameter bounds with those used in sampling
-  mins[parameters] <- sample_mins
-  maxs[parameters] <- sample_maxes
+  mins[parameters] <- sample_mins[parameters]
+  maxs[parameters] <- sample_maxes[parameters]
 
   # Normalise data
   scaled <- as.data.frame(scale(dataset, center = mins, scale = maxs - mins))
@@ -392,10 +477,18 @@ normalise_dataset <- function(dataset, sample_mins, sample_maxes, parameters) {
 #' @keywords internal
 denormalise_dataset <- function(normalised_data, scaled_mins, scaled_maxes) {
 
+
+  #for (c in 1:ncol(normalised_data)) {
+  #  normalised_data[, c] <- (normalised_data[, c] *
+  #                            (scaled_maxes[, c] -
+  #                               scaled_mins[, c])) + scaled_mins[, c]
+  #}
+
   for (c in 1:ncol(normalised_data)) {
+
     normalised_data[, c] <- (normalised_data[, c] *
-                              (scaled_maxes[, c] -
-                                 scaled_mins[, c])) + scaled_mins[, c]
+                               (scaled_maxes[c][[1]] -
+                                  scaled_mins[c][[1]])) + scaled_mins[c][[1]]
   }
   return(normalised_data)
 }

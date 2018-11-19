@@ -4,9 +4,11 @@
 \alias{emulate_lhc_sampled_parameters}
 \title{Emulate simulations for a set of latin-hypercube generated parameter values}
 \usage{
-emulate_lhc_sampled_parameters(filepath, surrogateModel, parameters, measures,
-  measure_scale, param_file = NULL, dataset = NULL, ensemble_set = TRUE,
-  normalise = FALSE, timepoint = NULL, timepointscale = NULL)
+emulate_lhc_sampled_parameters(filepath, surrogateModel, parameters,
+  measures, measure_scale, param_file = NULL, dataset = NULL,
+  ensemble_set = TRUE, normalise = FALSE, timepoint = NULL,
+  timepointscale = NULL, write_csv_files = TRUE,
+  graph_results = TRUE)
 }
 \arguments{
 \item{filepath}{Path to where the analysis output should be stored}
@@ -37,6 +39,10 @@ and 1)}
 the vignette for analysing more than one timepoint}
 
 \item{timepointscale}{Scale of the timepoints, if being used}
+
+\item{write_csv_files}{Whether output should be written to CSV file. Used with spartanDB}
+
+\item{graph_results}{Whether plots should be produced for this analysis}
 }
 \description{
 This method runs an ensemble for all parameter value sets specified in a CSV

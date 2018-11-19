@@ -49,12 +49,14 @@ generate_ensemble_training_set <- function(emulator, parameters, measures,
 #' @param normalise Whether the predictions generated when testing the
 #' ensemble should be normalised for presenting test results
 #' @param timepoint Simulation timepoint for which an ensemble is being created
+#' @param output_formats File formats in which result graphs should be produced
 #' @return Generated ensemble object
 create_ensemble <- function(ensemble_emulations, all_emulator_predictions,
                             emulator_test_data, measures, emulator_types,
                             pre_normed_mins, pre_normed_maxes,
                             algorithm_settings = NULL, normalise = FALSE,
-                            timepoint = NULL) {
+                            timepoint = NULL, output_formats=c("pdf")) {
+
 
   # If called in a process where the emulations are being made,
   # algorithm_settings will already exist. If we're making an ensemble from
@@ -74,6 +76,8 @@ create_ensemble <- function(ensemble_emulations, all_emulator_predictions,
     weights, all_emulator_predictions, measures,
       algorithm_settings$num_of_generations)
 
+
+
   # See how accurate this ensemble is
   if (algorithm_settings$plot_test_accuracy == TRUE) {
 
@@ -88,22 +92,47 @@ create_ensemble <- function(ensemble_emulations, all_emulator_predictions,
         rbind(pre_normed_mins[measures]),
         rbind(pre_normed_maxes[measures]))
 
+      # Performance statistics
+      performance_stats<-c("Ensemble")
+      performance_names<-c("Technique")
+
       for (m in 1:length(measures)) {
         produce_accuracy_plots_single_measure(
           "Ensemble_Testing", measures[m], unscaled_predictions[, measures[m]],
-          unscaled_simulations[, measures[m]], timepoint = timepoint)
+          unscaled_simulations[, measures[m]], output_formats, timepoint = timepoint)
+
+        performance_stats<-cbind(performance_stats,meanSquaredError(unscaled_predictions[, measures[m]],
+                                                                    unscaled_simulations[, measures[m]]),
+                                 rSquared(unscaled_predictions[, measures[m]],
+                                          unscaled_simulations[, measures[m]]))
+
+        performance_names<-c(performance_names,paste0(measures[m],"_MSE"),paste0(measures[m],"_R2"))
       }
     } else {
+
+      # Performance statistics
+      performance_stats<-c("Ensemble")
+      performance_names<-c("Technique")
+
       for (m in 1:length(measures)) {
         produce_accuracy_plots_single_measure(
           "Ensemble_Testing", measures[m], ensemble_predictions[, measures[m]],
-          emulator_test_data[, measures[m]], timepoint = timepoint)
+          emulator_test_data[, measures[m]], output_formats, timepoint = timepoint)
+
+        performance_stats<-cbind(performance_stats,meanSquaredError(ensemble_predictions[, measures[m]],
+                                                                    emulator_test_data[, measures[m]]))
+
+        performance_names<-c(performance_names,paste0(measures[m],"_MSE"),paste0(measures[m],"_R2"))
       }
     }
+    colnames(performance_stats)<-performance_names
   }
 
+
+
   generated_ensemble <- list("emulators" = ensemble_emulations,
-                             "weights" = weights)
+                             "weights" = weights,
+                             "performance_stats"=performance_stats)
 
   ## Return so this can be used by user in new predictions
   return(generated_ensemble)
@@ -123,6 +152,7 @@ calculate_weights_for_ensemble_model <- function(all_model_predictions,
                                                  emulator_test_data,
                                                  measures, emulator_types,
                                                  num_of_generations = 800000) {
+
   weights <- NULL
 
   ## NOW WE HAVE THE MODELS, WE NEED AN ENSEMBLE FOR EACH MEASURE
@@ -133,7 +163,8 @@ calculate_weights_for_ensemble_model <- function(all_model_predictions,
     columns <- seq(m, ncol(all_model_predictions), by = length(measures))
 
     # Extract this data for training the net
-    weightings_net_training_data <- all_model_predictions[, columns]
+    # KA: rbind added in October 2018: May need further checking
+    weightings_net_training_data <- rbind(all_model_predictions[, columns])
 
     model_formula <- generate_model_formula(
       colnames(weightings_net_training_data), measures[m])
@@ -183,6 +214,7 @@ weight_emulator_predictions_by_ensemble <- function(model_weights,
                                                     all_model_predictions,
                                                     measures,
                                                     num_generations = 800000) {
+
   all_ensemble_predictions <- NULL
 
   for (m in 1:length(measures)) {

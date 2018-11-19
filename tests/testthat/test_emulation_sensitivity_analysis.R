@@ -3,13 +3,16 @@ context("Test of Spartan Emulation Sensitivity Analysis")
 
 test_that("emulate_efast_sampled_parameters ", {
 
+  skip_on_cran()
+
   ## This is the first test that utilises the ensemble, downloadable from online
   ## Download it here, and delete it on the final test that uses this object.
   # Saves downloading several times
-  skip("Skipping emulate_efast_sampled_parameters for time purposes")
-  download.file("http://www.kieranalden.info/spartan/test_data/built_ensemble_72.Rda", "built_ensemble")
+  download.file("http://www.kieranalden.info/spartan/test_data/built_ensemble.zip", "built_ensemble.zip")
   # Load this in
-  load(file.path("built_ensemble"))
+  unzip("built_ensemble.zip")
+  load("built_ensemble")
+
 
   #load("built_ensemble_72.Rda")
   dir.create(file.path(getwd(),"SA"))
@@ -23,7 +26,7 @@ test_that("emulate_efast_sampled_parameters ", {
                                    c("stableBindProbability","chemokineExpressionThreshold",
                                      "initialChemokineExpressionValue",
                                      "maxChemokineExpressionValue","maxProbabilityOfAdhesion",
-                                     "adhesionFactorExpressionSlope"), c("Velocity","Displacement"),
+                                     "adhesionFactorExpressionSlope","dummy"), c("Velocity","Displacement"),
                                    3, ensemble_set = TRUE, normalise = TRUE)
 
   expect_true(file.exists(file.path(getwd(),"SA","Curve1_Results_Summary.csv")))
@@ -36,7 +39,8 @@ test_that("emulate_efast_sampled_parameters ", {
 
 test_that("emulate_lhc_sampled_parameters", {
 
-  skip("Skipping emulate_lhc_sampled_parameters for time purposes")
+  skip_on_cran()
+
   data("emulated_lhc_values")
 
   # Downloaded previously from website, should exist in workspace
@@ -46,12 +50,13 @@ test_that("emulate_lhc_sampled_parameters", {
 
   dir.create(file.path(getwd(),"SA"))
 
-  emulate_lhc_sampled_parameters(file.path(getwd(),"SA"), built_ensemble,
+  predictions<-emulate_lhc_sampled_parameters(file.path(getwd(),"SA"), built_ensemble,
                                  c("stableBindProbability","chemokineExpressionThreshold",
                                    "initialChemokineExpressionValue",
                                    "maxChemokineExpressionValue","maxProbabilityOfAdhesion",
                                    "adhesionFactorExpressionSlope"), c("Velocity","Displacement"),
-                                 c("microns","microns/min"), dataset = emulated_lhc_values, normalise = TRUE)
+                                 c("microns","microns/min"), dataset = emulated_lhc_values, normalise = TRUE,
+                                 write_csv_files = FALSE)
 
   expect_true(file.exists(file.path(getwd(),"SA","stableBindProbability_Velocity.png")))
   expect_true(file.exists(file.path(getwd(),"SA","chemokineExpressionThreshold_Velocity.png")))

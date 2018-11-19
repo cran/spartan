@@ -3,9 +3,12 @@ context("Test of Spartan Evolution Utilities")
 
 test_that("emulator_parameter_evolution", {
 
+  skip_on_cran()
+
   # Downloaded previously from website, should exist in workspace
-  skip("Skipping emulator_parameter_evolution for time purposes")
   load("built_ensemble")
+
+
 
   #skip("Skipping")
   #load(file.path("built_ensemble_72.Rda"))
@@ -34,10 +37,11 @@ test_that("emulator_parameter_evolution", {
 
 test_that("nsga2_set_user_params", {
 
+  skip_on_cran()
+
   #skip("Skipping")
   #load(file.path("built_ensemble_72.Rda"))
   # Downloaded above, now load
-  skip("Skipping nsga2_set_user_params for time purposes")
   load("built_ensemble")
 
   parameters <- c("stableBindProbability","chemokineExpressionThreshold",
@@ -58,6 +62,7 @@ test_that("nsga2_set_user_params", {
 
   # Can now remove the downloaded ensemble
   file.remove(file.path(getwd(),"built_ensemble"))
+  file.remove(file.path(getwd(),"built_ensemble.zip"))
 
 })
 

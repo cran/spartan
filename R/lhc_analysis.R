@@ -51,13 +51,15 @@
 #'  multiple simulation timepoints. Sets the scale of the timepoints being
 #'  analysed, e.g. "Hours"
 #' @param check_done If multiple timepoints, whether the input has been checked
+#' @param write_csv_file Whether the analysis should be written to CSV file. Used
+#' with spartanDB, where results are submitted to analysis database
 #'
 #' @export
 lhc_process_sample_run_subsets <- function(
   FILEPATH, SPARTAN_PARAMETER_FILE, PARAMETERS, NUMSAMPLES, NUMRUNSPERSAMPLE,
   MEASURES, RESULTFILENAME, ALTFILENAME, OUTPUTCOLSTART, OUTPUTCOLEND,
   LHC_ALL_SIM_RESULTS_FILE, TIMEPOINTS = NULL, TIMEPOINTSCALE = NULL,
-  check_done = FALSE) {
+  check_done = FALSE, write_csv_file = TRUE) {
 
   input_check <- list("arguments"=as.list(match.call()),"names"=names(match.call())[-1])
   # Run if all checks pass:
@@ -76,9 +78,10 @@ lhc_process_sample_run_subsets <- function(
         ALTFILENAME, NUMSAMPLES, lhc_table, OUTPUTCOLSTART, OUTPUTCOLEND)
 
       # Output if results not blank
-      if (!is.null(all_sim_median_results)) {
+      if (!is.null(all_sim_median_results) && write_csv_file) {
         write_data_to_csv(all_sim_median_results,file.path(FILEPATH,LHC_ALL_SIM_RESULTS_FILE))
       }
+      return(all_sim_median_results)
 
     } else {
       lhc_process_sample_run_subsets_overTime(
@@ -237,13 +240,16 @@ summarise_lhc_sweep_responses <- function(
 #'  analysed, e.g. "Hours"
 #' @param check_done If using multiple timepoints, whether data entry has been
 #' checked
+#' @param write_csv_file Whether the analysis should be written to CSV file. Used
+#' with spartanDB, where results are submitted to analysis database
 #'
 #' @export
 lhc_generateLHCSummary <- function(FILEPATH, PARAMETERS, MEASURES,
                                    LHC_ALL_SIM_RESULTS_FILE,
                                    LHCSUMMARYFILENAME,
                                    SPARTAN_PARAMETER_FILE = NULL,
-                                   TIMEPOINTS = NULL, TIMEPOINTSCALE = NULL, check_done=FALSE) {
+                                   TIMEPOINTS = NULL, TIMEPOINTSCALE = NULL,
+                                   check_done=FALSE, write_csv_file=TRUE) {
 
   input_check <- list("arguments"=as.list(match.call()),"names"=names(match.call())[-1])
   # Run if all checks pass:
@@ -259,9 +265,12 @@ lhc_generateLHCSummary <- function(FILEPATH, PARAMETERS, MEASURES,
       # Stores parameters used and their median output responses, for all sets
       summary_table <- summarise_replicate_runs(lhc_all_sim_results, PARAMETERS, MEASURES)
 
-      write_data_to_csv(summary_table, file.path(FILEPATH, LHCSUMMARYFILENAME))
-
-      message(paste("LHC Summary file output to ", file.path(FILEPATH, LHCSUMMARYFILENAME), sep = ""))
+      if(write_csv_file)
+      {
+        write_data_to_csv(summary_table, file.path(FILEPATH, LHCSUMMARYFILENAME))
+        message(paste("LHC Summary file output to ", file.path(FILEPATH, LHCSUMMARYFILENAME), sep = ""))
+      }
+      return(summary_table)
 
     } else {
     # Process each timepoint
@@ -361,7 +370,10 @@ calculate_medians_for_all_measures <- function(sim_params, param_result,
   else
     summary_sim_row <- NULL
 
+  #print(paste0("Measures: ",measures))
+
   for (l in 1:length(measures)) {
+    #print(param_result[[measures[l]]])
     summary_sim_row <- cbind(summary_sim_row,
                              median(param_result[[measures[l]]]))
   }
@@ -382,11 +394,16 @@ calculate_medians_for_all_measures <- function(sim_params, param_result,
 #' @param cor_calc_method Way to calculate the correlation coefficient: Pearson's
 #' ("p"), Spearman's ("s"), and Kendall's ("k"). Default is p
 #' @param check_done If multiple timepoints, whether the input has been checked
+#' @param write_csv_files Whether results should be output to CSV file. Used with spartanDB
+#' @param lhc_summary_object If not specified in a CSV file, results can be specified in an
+#' R object. In this case LHCSUMMARYFILENAME will be NULL
+#' @return If no CSV file output, PRCC values returned as an R object
 #' @export
 #'
 lhc_generatePRCoEffs <- function(
   FILEPATH, PARAMETERS, MEASURES, LHCSUMMARYFILENAME, CORCOEFFSOUTPUTFILE,
-  TIMEPOINTS = NULL, TIMEPOINTSCALE = NULL, cor_calc_method=c("s"), check_done = FALSE) {
+  TIMEPOINTS = NULL, TIMEPOINTSCALE = NULL, cor_calc_method=c("s"), check_done = FALSE,
+  write_csv_files = TRUE, lhc_summary_object=NULL) {
 
   input_check <- list("arguments"=as.list(match.call()),"names"=names(match.call())[-1])
 
@@ -395,17 +412,31 @@ lhc_generatePRCoEffs <- function(
 
     if (is.null(TIMEPOINTS)) {
 
-      lhc_result_file <- read_from_csv(file.path(FILEPATH,LHCSUMMARYFILENAME))
+      if(!is.null(LHCSUMMARYFILENAME))
+      {
+        lhc_result_file <- read_from_csv(file.path(FILEPATH,LHCSUMMARYFILENAME))
+      }
+      else if(!is.null(lhc_summary_object))
+      {
+        lhc_result_file<-lhc_summary_object
+      }
 
       message("Generating Partial Rank Correlation Coefficients (lhc_generatePRCoEffs)")
 
       COEFFRESULTS <- calculate_prccs_all_parameters(PARAMETERS, lhc_result_file,
                                                      MEASURES, cor_calc_method)
 
-      write_data_to_csv(COEFFRESULTS,file.path(FILEPATH,CORCOEFFSOUTPUTFILE),row_names=TRUE)
-
-      message(paste("File of PRCCs output to ", file.path(FILEPATH,CORCOEFFSOUTPUTFILE),
-                    sep=""))
+      if(write_csv_files)
+      {
+        write_data_to_csv(COEFFRESULTS,file.path(FILEPATH,CORCOEFFSOUTPUTFILE),row_names=TRUE)
+        message(paste("File of PRCCs output to ", file.path(FILEPATH,CORCOEFFSOUTPUTFILE),
+                      sep=""))
+      }
+      else
+      {
+        message("Calculated PRCCs returned as R Object")
+        return(COEFFRESULTS)
+      }
 
     } else {
       lhc_generatePRCoEffs_overTime(
@@ -413,6 +444,33 @@ lhc_generatePRCoEffs <- function(
         TIMEPOINTS, TIMEPOINTSCALE)
     }
   }
+}
+
+#' Generate Partial Rank Correlation Coefficients for parameter/response pairs for results in database
+#'
+#' For each parameter, and each simulation output measure, calculates the
+#' Partial Rank Correlation Coefficient between the parameter value and the
+#' simulation results, giving a statistical measurement of any effect that
+#' is present. In this case, results are mined from a database, as created by
+#' the spartanDB package, and the statistics returned for adding back to the DB.
+#'
+#' @param db_results Set of experiment results from the DB
+#' @param parameters Simulation parameters
+#' @param measures Simulation measures
+#' @param cor_calc_method Way to calculate the correlation coefficient: Pearson's
+#' ("p"), Spearman's ("s"), and Kendall's ("k"). Default is p
+#' @export
+#'
+lhc_generatePRCoEffs_db_link <- function(
+  db_results, parameters, measures, cor_calc_method=c("s")) {
+
+  message("Generating Partial Rank Correlation Coefficients (lhc_generatePRCoEffs)")
+
+  COEFFRESULTS <- calculate_prccs_all_parameters(parameters, db_results,
+                                                 measures, cor_calc_method)
+
+  return(COEFFRESULTS)
+
 }
 
 #' Pre-process analysis settings if multiple timepoints are being considered
@@ -463,7 +521,7 @@ calculate_prccs_all_parameters <- function(PARAMETERS, LHCRESULTFILE, MEASURES,
     COEFFDATA <- lhc_constructcoeff_dataset(LHCRESULTFILE, PARAMETERS[k],
                                             PARAMETERS)
     # Retrieve parameter result
-    COEFFPARAMCOL <- LHCRESULTFILE[, PARAMETERS[k]]
+    COEFFPARAMCOL <- as.numeric(LHCRESULTFILE[, PARAMETERS[k]])
 
     # Calculate coefficients
     COEFFRESULTS <- rbind(COEFFRESULTS, calculate_prcc_for_all_measures(
@@ -509,12 +567,20 @@ calculate_prcc_for_all_measures <- function(MEASURES, COEFFPARAMCOL, COEFFDATA,
 {
   PARAM_RESULTS <- NULL
   for (l in 1:length(MEASURES)) {
-    COEFFMEASURERESULT <- LHCRESULTFILE[, MEASURES[l]]
+    #print(MEASURES[l])
+    #print(LHCRESULTFILE[,MEASURES[l]])
+    COEFFMEASURERESULT <- as.numeric(LHCRESULTFILE[, MEASURES[l]])
     PARAMCOEFF <- pcor.test(COEFFPARAMCOL, COEFFMEASURERESULT,
                           COEFFDATA, calc_method=cor_calc_method, use=prcc_method)
+    #print(PARAMCOEFF)
     if(!is.null(PARAMCOEFF))
+    {
+      #print(PARAMCOEFF$estimate)
+      #print(PARAMCOEFF$p.value)
       PARAM_RESULTS <- cbind(PARAM_RESULTS, PARAMCOEFF$estimate,
                             PARAMCOEFF$p.value)
+      #print(PARAM_RESULTS)
+    }
     else {
       message("Correlation Calculation method needs to be either s,p,or k, and prcc calculation method either rec or mat")
       return(NULL)
